@@ -127,6 +127,260 @@ When Phase 2 is complete, this table should show the final state:
 | Group C | 1 | 0 | 1 | `ad_Sphere_OLAF` — skipped (VTK, not `.outb`) |
 | **Total** | **17** | **16 / 16** | **1** | **Phase 2 complete. 16 baselined, 1 skipped. `verify_aerodyn_baselines.sh all` exits 0.** |
 
+## Platform drift investigation
+
+Our baselines differ from NREL's shipped r-test references. We've been labeling the differences "cross-platform floating-point drift," but the magnitude varies enormously across cases — from **0% drift** (MHK_RM1_Fixed and MHK_RM1_Floating match NREL bit-exactly) to **1749 N·m absolute / 75% of values outside 1e-5 tolerance** (BAR_OLAF, VerticalAxis_OLAF). That range is too wide to attribute to a single cause without investigation. This section tracks four concrete investigations to either confirm or deny the "platform drift" explanation.
+
+### Observed drift summary (from Phase 2 generation)
+
+For context, these are the drift-vs-NREL numbers that prompted the investigation:
+
+| Case | % within 1e-5 rel OR 1e-6 abs | Max abs | Drifting channels | Aero model | Concern level |
+|------|-------------------------------|---------|-------------------|-----------|---------------|
+| ad_MHK_RM1_Fixed | 100.00% | 0.0 | 0 / 54 | BEMT | None (perfect match) |
+| ad_MHK_RM1_Floating | 100.00% | 0.0 | 0 / 54 | BEMT | None (perfect match) |
+| ad_MultipleHAWT | 100.00% | 3.3e-10 | 1 / 426 | BEMT | None |
+| ad_BAR_SineMotion | 99.94% | 2.1e-1 | 12 / 127 | BEMT | Low |
+| ad_BAR_SineMotion_UA4_DBEMT3 | 99.93% | 4.2e-1 | 9 / 127 | BEMT+UA4+DBEMT3 | Low |
+| ad_BAR_CombinedCases | 99.99% | 7.2e-2 | 16 / 215 | BEMT | Low |
+| ad_BAR_RNAMotion | 97.95% | 3.3 | 65 / 123 | BEMT | Medium |
+| ad_Kite_OLAF | 99.27% | 2.8e-2 | 197 / 433 | OLAF | Medium |
+| ad_HelicalWakeInf_OLAF | 99.84% | 2.4e-2 | 48 / 180 | OLAF | Medium |
+| ad_BAR_OLAF | 98.68% | **1749** | **215 / 543** | **OLAF** | **High** |
+| ad_QuadRotor_OLAF | 99.48% | 573 | 25 / 213 | OLAF | High |
+| ad_timeseries_shutdown | 94.37% | 2.6e-2 | 5 / 22 | BEMT | Medium |
+| ad_VerticalAxis_OLAF | **25.75%** | 3.1e-2 | **111 / 129** | **OLAF** | **High** |
+| ad_B1n2_OLAF | 100.00% | 2.9e-7 | 4 / 40 | OLAF | None |
+| ad_EllipticalWingInf_OLAF | 100.00% | 7.6e-9 | 26 / 314 | OLAF | None |
+| ad_MHK_RM1_Fixed_IfW | 99.96% | 1.9 | 11 / 56 | BEMT+IfW | Low |
+
+**Key patterns:**
+- BEMT cases generally show low drift; OLAF cases show higher drift
+- Simple OLAF cases (B1n2, Elliptical) have negligible drift; complex OLAF (BAR, QuadRotor, VerticalAxis) have large drift
+- MHK cases match perfectly — something about that code path avoids all platform-dependent operations
+- The 1749 N·m max abs in BAR_OLAF could be FP accumulation through the iterative FVW solver OR it could indicate a fundamentally different wake evolution
+
+### Investigation 1: NREL CI build configuration
+
+**Hypothesis:** NREL builds their r-test references with different cmake flags, compiler, or BLAS than we use. If their CI uses Intel MKL instead of OpenBLAS, or a different gfortran version, or specific optimization flags, that would be the primary explanation.
+
+**Method:** read NREL's CI configuration files. Look for:
+- GitHub Actions workflows at `.github/workflows/` in the openfast repo
+- CTest configuration at `reg_tests/CMakeLists.txt` — look for tolerance values, compiler flags
+- Any `Dockerfile` or CI scripts that document the build environment
+- The r-test repo's own CI or README for how references are generated
+
+**What to look for specifically:**
+- BLAS/LAPACK library used (MKL? reference BLAS? OpenBLAS? Apple Accelerate?)
+- Compiler and version (gfortran N.N.N? ifort? ifx?)
+- Architecture (x86_64? ARM64? Both?)
+- cmake flags beyond what we set (`-DCMAKE_BUILD_TYPE`, `-DDOUBLE_PRECISION`, FMA flags, optimization level overrides)
+- How r-test references are regenerated (automated? manual? which machine?)
+
+**Files to check** (all inside `openfast/` repo):
+- `.github/workflows/*.yml` — GitHub Actions CI definitions
+- `reg_tests/CMakeLists.txt` — CTest setup, tolerance defaults
+- `reg_tests/CTestList.cmake` — per-case test registration, tolerance overrides
+- `reg_tests/r-test/README.md` — may document reference generation process
+- `Dockerfile` or `docker/` at repo root — CI container definition if present
+- `share/` or `cmake/` — compiler flag definitions
+
+**Expected outcome:** a concrete list of configuration differences between NREL's build and ours. If they use MKL on x86_64 and we use OpenBLAS on ARM64, that's a ~complete explanation for the drift. If they use the same OpenBLAS on x86_64, the explanation is narrower (architecture only).
+
+**Status:** [ ] Not started
+
+**Dev note when complete:** Record the NREL config, the differences found, and the conclusion.
+
+---
+
+### Investigation 2: Time-series drift profile for ad_BAR_OLAF
+
+**Hypothesis:** if the 1749 N·m drift in ad_BAR_OLAF is FP accumulation through an iterative solver, the error should grow monotonically over the 60 timesteps. If it's a discrete branch divergence (e.g., a convergence check flipping at one timestep), the error should jump suddenly.
+
+**Method:** parse both our `.outb` and NREL's reference `.outb` for ad_BAR_OLAF using `fast_io.load_output()` (from `reg_tests/lib/`). For the top 5 drifting channels (by max abs), plot abs_diff vs timestep. Also plot the actual values side-by-side.
+
+**Specific commands** (run inside `vit-dev-openfast`):
+```bash
+docker exec vit-dev-openfast bash -c "cd /workspace/openfast/reg_tests/lib && python3 << 'PYEOF'
+import sys; sys.path.insert(0, '.')
+from fast_io import load_output
+import numpy as np
+
+# Our baseline
+ours, info_ours, _ = load_output('/workspace/openfast/baselines/aerodyn/ad_BAR_OLAF/ad_driver.baseline.outb')
+# NREL reference
+ref, info_ref, _ = load_output('/workspace/openfast/reg_tests/r-test/modules/aerodyn/ad_BAR_OLAF/ad_driver.outb')
+
+names = info_ref.get('attribute_names', [])
+abs_diff = np.abs(ours - ref)
+max_abs_per_ch = abs_diff.max(axis=0)
+
+# Top 5 drifting channels
+top5 = np.argsort(max_abs_per_ch)[::-1][:5]
+for c_idx in top5:
+    ch_name = names[c_idx] if c_idx < len(names) else f'ch{c_idx}'
+    ts_diff = abs_diff[:, c_idx]
+    ts_ours = ours[:, c_idx]
+    ts_ref = ref[:, c_idx]
+    # Print timestep-by-timestep profile
+    print(f'\\n=== {ch_name} (max_abs={max_abs_per_ch[c_idx]:.3e}) ===')
+    print('t_idx  abs_diff        our_value       ref_value')
+    for t in range(len(ts_diff)):
+        if ts_diff[t] > 0:
+            print(f'{t:5d}  {ts_diff[t]:14.6e}  {ts_ours[t]:14.6e}  {ts_ref[t]:14.6e}')
+PYEOF
+"
+```
+
+**What to look for:**
+- **Gradual growth:** abs_diff increases smoothly from ~0 at t=0 to max at final timestep → FP accumulation through iterative solver. Expected for OLAF's vortex filament updates where each timestep builds on the previous state.
+- **Sudden jump:** abs_diff is near-zero for many timesteps then spikes at one specific timestep → branch divergence (a convergence check or conditional that takes a different path due to a threshold being crossed differently). More concerning — might indicate a real functional difference.
+- **Oscillatory:** abs_diff fluctuates without trend → independent per-timestep FP noise. Would suggest the drift is in a per-timestep computation (like an airfoil lookup) rather than in cumulative state.
+- **Constant offset:** abs_diff is nonzero but ~constant from the first timestep → different initial condition or parameter. Most concerning — might indicate a build configuration difference.
+
+**Also do the same for `ad_VerticalAxis_OLAF`** — the case with 25.75% within tolerance. Same script, different file paths.
+
+**Status:** [ ] Not started
+
+**Dev note when complete:** Include the timestep profiles for the top channels of both cases, the classification (gradual/sudden/oscillatory/constant), and the interpretation.
+
+---
+
+### Investigation 3: Reference BLAS comparison
+
+**Hypothesis:** OpenBLAS is the primary driver of cross-platform drift. OpenBLAS uses optimized BLAS kernels that may produce different floating-point results from the reference (Netlib) BLAS implementation that NREL may use.
+
+**Method:** rebuild AeroDyn_Driver with OpenFAST's built-in option to download and build reference (Netlib) LAPACK/BLAS instead of linking the system OpenBLAS:
+
+```bash
+# In vit-dev-openfast:
+cd /workspace/openfast/build
+rm -rf *
+cmake .. \
+    -DBUILD_FASTFARM=off \
+    -DBUILD_OPENFAST_CPP_API=off \
+    -DBUILD_TESTING=off \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DUSE_LOCAL_STATIC_LAPACK=on      # <-- this flag downloads reference LAPACK/BLAS
+make aerodyn_driver -j$(nproc)
+```
+
+**NOTE:** the `-DUSE_LOCAL_STATIC_LAPACK=on` option triggers a download of the reference LAPACK source from a NREL-hosted URL during cmake configure. This requires network access from inside the container. We confirmed during Docker container setup (dev note `202604140204`) that `docker build` has network access through the host, but whether a running container (`docker exec`) has network access is a SEPARATE question — the original `vit-dev` ROSCO container had no network access from inside a running container (CLAUDE.md documents "No network access from inside the container due to corporate TLS inspection"). **If the download fails, we may need to manually download the LAPACK tarball on the Mac and copy it into the container.**
+
+After rebuilding, run a subset of cases (at minimum: `ad_BAR_SineMotion`, `ad_BAR_OLAF`, `ad_VerticalAxis_OLAF`, `ad_MHK_RM1_Fixed`) and compare against NREL's reference using the same `fast_io` comparison we've been doing. If drift shrinks dramatically with reference BLAS, OpenBLAS is the explanation. If drift stays the same, the cause is elsewhere (compiler, architecture, FMA).
+
+**What to compare:**
+- Same 4 cases, using `check_aerodyn_nrel_drift.sh` (but pointed at the reference-BLAS build)
+- Specifically: does ad_MHK_RM1_Fixed remain bit-identical (it should, since it already matched with OpenBLAS)? Does ad_BAR_OLAF's 1749 N·m shrink substantially?
+
+**Alternative if network fails:** skip the reference-BLAS download and instead compare with `OPENBLAS_NUM_THREADS=1` (force single-threaded OpenBLAS to eliminate threading nondeterminism as a variable). If single-threaded doesn't change results, threading isn't the issue.
+
+**Status:** [ ] Not started
+
+**Dev note when complete:** Record the reference-BLAS drift numbers alongside the OpenBLAS drift numbers. Table comparing max_abs and %_within_tolerance for each case under both BLAS configurations.
+
+---
+
+### Investigation 4: FMA contraction flag
+
+**Hypothesis:** gfortran and/or g++'s FMA (fused multiply-add) contraction scheduling differs between our build and NREL's. This was the dominant source of cross-build drift in ROSCO (see dev note `202603191041-fma-contraction-fix.md` in the VIT repo) — adding `-ffp-contract=off` to both compilers eliminated all ROSCO drift. OpenFAST's cmake does NOT set `-ffp-contract` explicitly, so the compiler default applies (`-ffp-contract=fast` for gfortran at optimization levels above -O0).
+
+**Method:** rebuild with `-ffp-contract=off` on both Fortran and C++ compilers:
+
+```bash
+cd /workspace/openfast/build
+rm -rf *
+cmake .. \
+    -DBUILD_FASTFARM=off \
+    -DBUILD_OPENFAST_CPP_API=off \
+    -DBUILD_TESTING=off \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_Fortran_FLAGS="-ffp-contract=off" \
+    -DCMAKE_CXX_FLAGS="-ffp-contract=off"
+make aerodyn_driver -j$(nproc)
+```
+
+Then run the same 4 representative cases and compare against NREL's reference. If NREL also builds with the compiler default (`-ffp-contract=fast`), this won't help — both builds would have FMA enabled. But if NREL builds with `-ffp-contract=off` (which some CI pipelines do for reproducibility), disabling FMA on our side should reduce drift to near-zero for the non-BLAS-dependent code paths.
+
+**What to compare:**
+- Same 4 cases as Investigation 3, drift vs NREL
+- Also compare vs our own OpenBLAS+FMA baselines — this tells us how much drift is from FMA specifically vs BLAS
+
+**Important:** after this investigation, rebuild with the original flags (no `-ffp-contract=off`) to restore the production configuration. We only want `-ffp-contract=off` as a diagnostic, not as the permanent build — same principle as ROSCO where it was used during verification but not in production.
+
+**Status:** [ ] Not started
+
+**Dev note when complete:** Record the no-FMA drift numbers. If FMA is the dominant source, this investigation directly informs whether we should set `-ffp-contract=off` for our baselines (trading performance for reproducibility) or accept FMA drift as tolerable noise.
+
+---
+
+### Investigation order and dependencies
+
+```
+Investigation 1 (read NREL CI config) ──────────> can run immediately, cheapest
+Investigation 2 (time-series analysis)  ──────────> can run immediately, uses existing data
+Investigation 3 (reference BLAS rebuild) ─────────> requires rebuild (~5 min) + re-run (~2 min)
+Investigation 4 (FMA flag rebuild)       ─────────> requires rebuild (~5 min) + re-run (~2 min)
+```
+
+Investigations 1 and 2 are independent and can run in parallel. They are also the cheapest — no rebuilds, no downloads, just reading files and parsing existing `.outb` data. Start with these.
+
+Investigations 3 and 4 are rebuild experiments. They CAN run in parallel (each rebuilds from scratch) but share the build directory, so in practice they must be sequential. Do 3 first (more likely to be informative — BLAS is the bigger variable than FMA for OLAF's matrix operations).
+
+**After all four complete:** write a summary dev note that synthesizes the findings into a revised characterization of the drift. Either:
+- "Confirmed: platform drift from [specific causes]. Our baselines are correct references for our platform." → proceed with confidence
+- "Found: [specific configuration issue]. Our baselines may be based on a misconfigured build." → fix the configuration, regenerate all 16 baselines, re-verify
+
+### Build environment reference (for fresh sessions)
+
+These are the current build parameters. Any investigation that changes them should document the change and restore afterwards.
+
+**Current (production) build configuration:**
+```bash
+# Inside vit-dev-openfast container
+cd /workspace/openfast/build
+cmake .. \
+    -DBUILD_FASTFARM=off \
+    -DBUILD_OPENFAST_CPP_API=off \
+    -DBUILD_TESTING=off \
+    -DCMAKE_BUILD_TYPE=Release
+make aerodyn_driver -j$(nproc)
+```
+
+**Container:** `vit-dev-openfast:latest` built from `vit/docker/Dockerfile.openfast` (commit `3564874` on VIT repo)
+**Platform:** ARM64 Linux (Ubuntu 24.04 via Colima on Apple Silicon)
+**Compiler:** gfortran 13.3.0 (`Ubuntu 13.3.0-6ubuntu2~24.04.1`)
+**cmake:** 3.28.3
+**BLAS/LAPACK:** OpenBLAS 0.3.26 (`libopenblas-dev:arm64 0.3.26+ds-1ubuntu0.1`) — provides both BLAS and LAPACK symbols
+**OpenFAST commit:** `2895884d2` (v5.0.1 release merge)
+**r-test submodule:** `dd5feaaa` (v5.0.0 tag)
+**FMA flags:** not explicitly set → gfortran default is `-ffp-contract=fast` at -O2+
+
+**Key scripts:**
+- `scripts/generate_aerodyn_baseline.sh <case>` — generate a baseline for one case
+- `scripts/verify_aerodyn_baselines.sh <case|all>` — verify against committed baselines (bit-identical gate)
+- `scripts/check_aerodyn_nrel_drift.sh <case|all>` — informational drift vs NREL reference
+
+**Key data files:**
+- `baselines/aerodyn/<case>/ad_driver.baseline.outb` — our committed baselines (16 cases)
+- `baselines/aerodyn/<case>/drift_vs_nrel.txt` — drift report at generation time
+- `reg_tests/r-test/modules/aerodyn/<case>/ad_driver.outb` — NREL's reference (in submodule)
+- `reg_tests/lib/fast_io.py` — `.outb` parser (`load_output()` function)
+- `reg_tests/lib/pass_fail.py` — tolerance comparison logic
+
+**Repos and remotes:**
+- OpenFAST fork: `~/Artifacts/vit_translation_openfast/openfast/` — `origin` = `git@github.com:kevinmenear/openfast.git`, `upstream` = `https://github.com/OpenFAST/openfast.git`
+- VIT: `~/Artifacts/vit_translation_openfast/vit/` — `origin` = `git@github.com:NatLabRockies/vit.git`
+- KGen: `~/Artifacts/vit_translation_openfast/KGen/` — `origin` = `git@github.com:kevinmenear/KGen.git`
+
+**Related dev notes** (in VIT repo `vit/dev/`):
+- `202604140253-outb-format-and-verification-strategy.md` — `.outb` format analysis, tier-2 strategy decision, empirical validation with 5 failing elements identified
+- `202604140330-aerodyn-baseline-infrastructure.md` — Phase 1 infrastructure (1 case)
+- `202604210845-aerodyn-baseline-phase2-complete.md` — Phase 2 extension (all 16 cases)
+- `202604140241-openfast-build-aerodyn-baseline.md` — original OpenFAST build + AeroDyn Driver smoke test
+- `202604140204-vit-dev-openfast-docker-plan.md` — Docker container setup
+- `202604140013-openfast-aerodyn-phase-start.md` — AeroDyn phase kickoff
+
 ## Regenerating baselines
 
 Baselines are platform-specific by definition. They **must be regenerated** when any of the following changes:
