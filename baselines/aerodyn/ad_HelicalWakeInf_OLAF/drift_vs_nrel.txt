@@ -1,0 +1,65 @@
+Drift report: ad_HelicalWakeInf_OLAF vs NREL r-test reference
+Generated: 2026-04-21T02:27:31Z
+Platform: NAME="Ubuntu"
+
+Our output: /workspace/openfast/build/modules/aerodyn/baseline_gen_ad_HelicalWakeInf_OLAF/ad_driver.outb
+NREL ref:   /workspace/openfast/build/modules/aerodyn/baseline_gen_ad_HelicalWakeInf_OLAF/ad_driver_nrel_ref.outb
+Array shape: (100, 180) (timesteps, channels) = 18000 values
+
+Bit-identical:                  13200 / 18000 (73.33%)
+Within 1e-5 rel:                17957 / 18000 (99.76%)
+Within 1e-5 rel OR 1e-6 abs:    17971 / 18000 (99.84%)
+Max abs difference:            2.411180e-02
+Max rel difference:            5.000000e-01
+
+Per-channel drift (non-zero channels only):
+  RtAeroMxh              (N-m     )  abs=2.411e-02  rel=4.522e-08  at t_idx=69
+  RtAeroPwr              (W       )  abs=1.447e-02  rel=3.248e-08  at t_idx=2
+  B1N1Fl                 (N/m     )  abs=3.056e-04  rel=2.986e-08  at t_idx=5
+  B1N1Fx                 (N/m     )  abs=3.031e-04  rel=5.000e-01  at t_idx=0
+  B1N7Alpha              (deg     )  abs=1.190e-04  rel=4.422e-05  at t_idx=45
+  B1N9Fl                 (N/m     )  abs=1.132e-04  rel=3.323e-08  at t_idx=2
+  B1N9Fx                 (N/m     )  abs=1.127e-04  rel=2.980e-08  at t_idx=1
+  B1N9Fn                 (N/m     )  abs=1.094e-04  rel=2.980e-08  at t_idx=1
+  B1N3Cl                 (-       )  abs=4.560e-05  rel=4.343e-05  at t_idx=43
+  B1N1Fy                 (N/m     )  abs=4.348e-05  rel=2.980e-08  at t_idx=1
+  B1N1Fn                 (N/m     )  abs=4.348e-05  rel=2.980e-08  at t_idx=1
+  B1N7Fl                 (N/m     )  abs=3.829e-05  rel=2.980e-08  at t_idx=1
+  B1N7Fx                 (N/m     )  abs=3.820e-05  rel=7.412e-08  at t_idx=94
+  B1N7Fn                 (N/m     )  abs=3.794e-05  rel=2.980e-08  at t_idx=1
+  B1N6Fl                 (N/m     )  abs=3.728e-05  rel=2.980e-08  at t_idx=1
+  B1N6Fx                 (N/m     )  abs=3.721e-05  rel=1.448e-07  at t_idx=7
+  B1N2Fl                 (N/m     )  abs=2.835e-05  rel=1.070e-07  at t_idx=57
+  B1N2Fx                 (N/m     )  abs=2.834e-05  rel=2.980e-08  at t_idx=1
+  B1N3Fn                 (N/m     )  abs=1.941e-05  rel=2.980e-08  at t_idx=1
+  B1N3Fy                 (N/m     )  abs=5.062e-06  rel=5.481e-08  at t_idx=1
+  B1N1Gam                (m^2/s   )  abs=3.340e-06  rel=3.014e-08  at t_idx=1
+  B2N1Gam                (m^2/s   )  abs=3.340e-06  rel=3.014e-08  at t_idx=1
+  B3N1Gam                (m^2/s   )  abs=3.340e-06  rel=3.014e-08  at t_idx=1
+  B1N5Fy                 (N/m     )  abs=2.986e-06  rel=2.980e-08  at t_idx=2
+  B1N6Fy                 (N/m     )  abs=2.829e-06  rel=3.520e-08  at t_idx=1
+  B1N1Alpha              (deg     )  abs=2.506e-06  rel=3.033e-08  at t_idx=12
+  B1N2Alpha              (deg     )  abs=1.672e-06  rel=2.980e-08  at t_idx=1
+  B2N9Gam                (m^2/s   )  abs=1.498e-06  rel=2.980e-08  at t_idx=1
+  B1N9Gam                (m^2/s   )  abs=1.498e-06  rel=2.980e-08  at t_idx=1
+  B3N9Gam                (m^2/s   )  abs=1.498e-06  rel=2.980e-08  at t_idx=1
+  B3N4Gam                (m^2/s   )  abs=1.105e-06  rel=7.754e-08  at t_idx=3
+  B1N4Gam                (m^2/s   )  abs=1.105e-06  rel=7.754e-08  at t_idx=3
+  B2N4Gam                (m^2/s   )  abs=1.105e-06  rel=7.754e-08  at t_idx=3
+  B2N3Gam                (m^2/s   )  abs=1.005e-06  rel=2.980e-08  at t_idx=1
+  B3N3Gam                (m^2/s   )  abs=1.005e-06  rel=2.980e-08  at t_idx=1
+  B1N3Gam                (m^2/s   )  abs=1.005e-06  rel=2.980e-08  at t_idx=1
+  B3N5Gam                (m^2/s   )  abs=8.259e-07  rel=5.428e-08  at t_idx=2
+  B1N5Gam                (m^2/s   )  abs=8.259e-07  rel=5.428e-08  at t_idx=2
+  B2N5Gam                (m^2/s   )  abs=8.259e-07  rel=5.428e-08  at t_idx=2
+  B3N7Gam                (m^2/s   )  abs=6.317e-07  rel=2.980e-08  at t_idx=1
+  B2N7Gam                (m^2/s   )  abs=6.317e-07  rel=2.980e-08  at t_idx=1
+  B1N7Gam                (m^2/s   )  abs=6.317e-07  rel=2.980e-08  at t_idx=1
+  B1N5Alpha              (deg     )  abs=4.169e-07  rel=1.041e-07  at t_idx=83
+  B1N8Alpha              (deg     )  abs=2.058e-07  rel=4.851e-08  at t_idx=2
+  B1N1Cl                 (-       )  abs=8.941e-08  rel=5.000e-01  at t_idx=0
+  B1N4Cl                 (-       )  abs=8.057e-08  rel=7.175e-08  at t_idx=3
+  B1N6Cl                 (-       )  abs=3.173e-08  rel=2.980e-08  at t_idx=1
+  B1N7Cl                 (-       )  abs=2.553e-08  rel=9.645e-08  at t_idx=5
+
+Total channels with drift:     48 / 180

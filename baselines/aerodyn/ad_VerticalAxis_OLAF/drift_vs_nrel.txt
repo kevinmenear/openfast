@@ -1,0 +1,128 @@
+Drift report: ad_VerticalAxis_OLAF vs NREL r-test reference
+Generated: 2026-04-21T02:27:33Z
+Platform: NAME="Ubuntu"
+
+Our output: /workspace/openfast/build/modules/aerodyn/baseline_gen_ad_VerticalAxis_OLAF/ad_driver.outb
+NREL ref:   /workspace/openfast/build/modules/aerodyn/baseline_gen_ad_VerticalAxis_OLAF/ad_driver_nrel_ref.outb
+Array shape: (37, 129) (timesteps, channels) = 4773 values
+
+Bit-identical:                    666 / 4773 (13.95%)
+Within 1e-5 rel:                 1099 / 4773 (23.03%)
+Within 1e-5 rel OR 1e-6 abs:     1229 / 4773 (25.75%)
+Max abs difference:            3.136844e-02
+Max rel difference:            7.696790e+00
+
+Per-channel drift (non-zero channels only):
+  AB1N016Alpha           (deg     )  abs=3.137e-02  rel=1.706e-03  at t_idx=33
+  AB1N018Alpha           (deg     )  abs=2.339e-02  rel=1.794e-03  at t_idx=34
+  AB1N001Alpha           (deg     )  abs=2.299e-02  rel=2.990e-03  at t_idx=35
+  AB1N017Alpha           (deg     )  abs=2.223e-02  rel=1.709e-03  at t_idx=34
+  AB1N015Alpha           (deg     )  abs=2.173e-02  rel=1.160e-03  at t_idx=33
+  AB1N014Alpha           (deg     )  abs=1.823e-02  rel=1.241e-03  at t_idx=34
+  AB2N017Alpha           (deg     )  abs=1.355e-02  rel=1.185e-03  at t_idx=16
+  AB2N010Alpha           (deg     )  abs=1.199e-02  rel=1.317e-03  at t_idx=34
+  AB2N009Alpha           (deg     )  abs=1.198e-02  rel=1.315e-03  at t_idx=34
+  AB2N011Alpha           (deg     )  abs=1.195e-02  rel=1.323e-03  at t_idx=34
+  AB2N008Alpha           (deg     )  abs=1.193e-02  rel=1.315e-03  at t_idx=34
+  AB1N013Alpha           (deg     )  abs=1.178e-02  rel=8.263e-04  at t_idx=34
+  AB2N018Alpha           (deg     )  abs=1.139e-02  rel=9.477e-04  at t_idx=16
+  AB1N012Alpha           (deg     )  abs=1.098e-02  rel=5.920e-04  at t_idx=33
+  AB2N012Alpha           (deg     )  abs=1.096e-02  rel=1.232e-03  at t_idx=34
+  AB2N007Alpha           (deg     )  abs=1.093e-02  rel=1.220e-03  at t_idx=34
+  AB1N002Alpha           (deg     )  abs=1.060e-02  rel=1.486e-03  at t_idx=35
+  AB1N011Alpha           (deg     )  abs=1.025e-02  rel=5.017e-04  at t_idx=32
+  AB2N006Alpha           (deg     )  abs=9.940e-03  rel=1.134e-03  at t_idx=34
+  AB2N016Alpha           (deg     )  abs=9.751e-03  rel=7.972e-04  at t_idx=16
+  AB1N008Alpha           (deg     )  abs=9.732e-03  rel=4.763e-04  at t_idx=32
+  AB1N009Alpha           (deg     )  abs=9.670e-03  rel=4.731e-04  at t_idx=32
+  AB1N010Alpha           (deg     )  abs=9.631e-03  rel=5.205e-04  at t_idx=33
+  AB2N013Alpha           (deg     )  abs=9.028e-03  rel=1.037e-03  at t_idx=34
+  AB1N007Alpha           (deg     )  abs=8.852e-03  rel=4.336e-04  at t_idx=32
+  AB2N005Alpha           (deg     )  abs=8.787e-03  rel=9.726e-04  at t_idx=36
+  AB1N006Alpha           (deg     )  abs=8.713e-03  rel=4.275e-04  at t_idx=32
+  AB2N004Alpha           (deg     )  abs=8.666e-03  rel=9.514e-04  at t_idx=36
+  AB2N003Alpha           (deg     )  abs=8.516e-03  rel=9.090e-04  at t_idx=36
+  AB1N005Alpha           (deg     )  abs=8.473e-03  rel=3.929e-04  at t_idx=31
+  AB1N004Alpha           (deg     )  abs=8.470e-03  rel=3.954e-04  at t_idx=31
+  AB2N014Alpha           (deg     )  abs=7.965e-03  rel=9.430e-04  at t_idx=34
+  AB1N003Alpha           (deg     )  abs=7.102e-03  rel=3.339e-04  at t_idx=31
+  AB2N015Alpha           (deg     )  abs=6.828e-03  rel=8.567e-04  at t_idx=34
+  AB2N002Alpha           (deg     )  abs=6.675e-03  rel=6.739e-04  at t_idx=36
+  AB2N001Alpha           (deg     )  abs=4.863e-03  rel=4.591e-04  at t_idx=36
+  RtAeroPwr              (W       )  abs=2.666e-03  rel=1.616e-03  at t_idx=34
+  AB1N018Cl              (-       )  abs=2.556e-03  rel=5.087e-03  at t_idx=34
+  AB1N017Cl              (-       )  abs=2.420e-03  rel=4.934e-03  at t_idx=34
+  AB2N009Cl              (-       )  abs=1.756e-03  rel=5.154e-03  at t_idx=34
+  AB2N010Cl              (-       )  abs=1.730e-03  rel=5.047e-03  at t_idx=34
+  AB2N008Cl              (-       )  abs=1.704e-03  rel=4.910e-03  at t_idx=34
+  AB2N011Cl              (-       )  abs=1.650e-03  rel=4.676e-03  at t_idx=34
+  AB1N001Cl              (-       )  abs=1.195e-03  rel=1.748e-03  at t_idx=35
+  AB2N005Cl              (-       )  abs=1.168e-03  rel=3.832e-03  at t_idx=36
+  AB2N004Cl              (-       )  abs=1.166e-03  rel=3.962e-03  at t_idx=36
+  AB2N006Cl              (-       )  abs=1.118e-03  rel=3.678e-03  at t_idx=36
+  AB2N003Cl              (-       )  abs=1.103e-03  rel=4.251e-03  at t_idx=36
+  AB2N017Cl              (-       )  abs=1.074e-03  rel=1.702e-03  at t_idx=16
+  AB2N007Cl              (-       )  abs=1.068e-03  rel=3.562e-03  at t_idx=36
+  AB1N001Vindx           (m/s     )  abs=1.004e-03  rel=4.712e-02  at t_idx=35
+  AB2N018Cl              (-       )  abs=9.814e-04  rel=1.645e-03  at t_idx=16
+  AB2N012Cl              (-       )  abs=9.273e-04  rel=2.533e-03  at t_idx=34
+  AB1N016Cl              (-       )  abs=9.010e-04  rel=2.716e-03  at t_idx=33
+  AB2N002Cl              (-       )  abs=8.943e-04  rel=4.741e-03  at t_idx=36
+  AB1N016Vindx           (m/s     )  abs=8.928e-04  rel=1.449e-02  at t_idx=33
+  AB2N013Cl              (-       )  abs=8.228e-04  rel=2.151e-03  at t_idx=34
+  AB2N016Cl              (-       )  abs=8.110e-04  rel=1.452e-03  at t_idx=16
+  AB1N014Vindx           (m/s     )  abs=7.886e-04  rel=8.855e-03  at t_idx=34
+  AB1N015Vindx           (m/s     )  abs=6.991e-04  rel=6.936e-03  at t_idx=34
+  AB2N014Cl              (-       )  abs=6.850e-04  rel=1.695e-03  at t_idx=34
+  AB2N015Cl              (-       )  abs=6.729e-04  rel=2.351e-03  at t_idx=36
+  AB1N015Cl              (-       )  abs=6.306e-04  rel=1.833e-03  at t_idx=33
+  AB1N002Cl              (-       )  abs=6.013e-04  rel=9.189e-04  at t_idx=35
+  AB1N018Vindx           (m/s     )  abs=5.748e-04  rel=6.950e-03  at t_idx=33
+  AB2N001Cl              (-       )  abs=5.716e-04  rel=2.137e-03  at t_idx=34
+  AB1N014Cl              (-       )  abs=5.712e-04  rel=1.505e-03  at t_idx=34
+  AB1N013Vindx           (m/s     )  abs=5.628e-04  rel=7.564e-03  at t_idx=34
+  AB1N002Vindx           (m/s     )  abs=5.186e-04  rel=1.129e-02  at t_idx=35
+  AB2N017Vindx           (m/s     )  abs=4.610e-04  rel=9.262e-03  at t_idx=16
+  AB1N012Vindx           (m/s     )  abs=4.517e-04  rel=5.446e-03  at t_idx=33
+  AB1N011Vindx           (m/s     )  abs=4.471e-04  rel=5.399e-03  at t_idx=33
+  AB1N010Vindx           (m/s     )  abs=4.390e-04  rel=5.302e-03  at t_idx=33
+  AB1N010Cl              (-       )  abs=4.310e-04  rel=1.084e-03  at t_idx=32
+  AB1N011Cl              (-       )  abs=4.276e-04  rel=1.077e-03  at t_idx=32
+  AB1N009Vindx           (m/s     )  abs=4.248e-04  rel=5.128e-03  at t_idx=33
+  AB1N012Cl              (-       )  abs=4.233e-04  rel=1.069e-03  at t_idx=32
+  AB2N018Vindx           (m/s     )  abs=4.109e-04  rel=2.533e-02  at t_idx=16
+  AB1N008Cl              (-       )  abs=4.105e-04  rel=1.033e-03  at t_idx=32
+  AB1N009Cl              (-       )  abs=4.090e-04  rel=1.029e-03  at t_idx=32
+  AB1N007Cl              (-       )  abs=4.087e-04  rel=9.152e-04  at t_idx=31
+  AB1N008Vindx           (m/s     )  abs=4.005e-04  rel=4.834e-03  at t_idx=33
+  AB1N013Cl              (-       )  abs=3.925e-04  rel=9.968e-04  at t_idx=32
+  AB1N006Cl              (-       )  abs=3.816e-04  rel=8.577e-04  at t_idx=31
+  AB1N004Cl              (-       )  abs=3.786e-04  rel=8.688e-04  at t_idx=31
+  AB1N005Cl              (-       )  abs=3.779e-04  rel=8.554e-04  at t_idx=31
+  AB1N007Vindx           (m/s     )  abs=3.598e-04  rel=4.339e-03  at t_idx=33
+  AB1N017Vindx           (m/s     )  abs=3.500e-04  rel=1.487e-02  at t_idx=34
+  AB1N003Cl              (-       )  abs=3.358e-04  rel=6.892e-04  at t_idx=30
+  AB1N006Vindx           (m/s     )  abs=3.170e-04  rel=7.352e-02  at t_idx=32
+  AB2N016Vindx           (m/s     )  abs=2.936e-04  rel=1.005e-02  at t_idx=16
+  AB1N005Vindx           (m/s     )  abs=2.890e-04  rel=1.127e-01  at t_idx=32
+  AB1N004Vindx           (m/s     )  abs=2.640e-04  rel=3.237e-03  at t_idx=31
+  AB1N003Vindx           (m/s     )  abs=2.428e-04  rel=3.016e-03  at t_idx=31
+  AB2N009Vindx           (m/s     )  abs=1.711e-04  rel=1.100e-02  at t_idx=34
+  AB2N010Vindx           (m/s     )  abs=1.687e-04  rel=1.071e-02  at t_idx=34
+  AB2N008Vindx           (m/s     )  abs=1.630e-04  rel=1.008e-02  at t_idx=34
+  AB2N005Vindx           (m/s     )  abs=1.583e-04  rel=1.630e-01  at t_idx=16
+  AB2N011Vindx           (m/s     )  abs=1.563e-04  rel=9.306e-03  at t_idx=34
+  AB2N004Vindx           (m/s     )  abs=1.539e-04  rel=1.123e-02  at t_idx=16
+  AB2N007Vindx           (m/s     )  abs=1.532e-04  rel=8.618e-03  at t_idx=34
+  AB2N012Vindx           (m/s     )  abs=1.460e-04  rel=7.798e-03  at t_idx=34
+  AB2N006Vindx           (m/s     )  abs=1.368e-04  rel=6.661e-03  at t_idx=34
+  AB2N013Vindx           (m/s     )  abs=1.263e-04  rel=5.875e-03  at t_idx=34
+  AB2N014Vindx           (m/s     )  abs=1.195e-04  rel=7.361e-03  at t_idx=16
+  AB2N003Vindx           (m/s     )  abs=1.178e-04  rel=8.422e-03  at t_idx=36
+  AB2N002Vindx           (m/s     )  abs=9.163e-05  rel=1.250e-02  at t_idx=36
+  AB2N015Vindx           (m/s     )  abs=9.033e-05  rel=6.973e-04  at t_idx=24
+  AB2N001Vindx           (m/s     )  abs=6.011e-05  rel=4.760e-02  at t_idx=36
+  RtVAvgyh               (m/s     )  abs=2.955e-08  rel=3.910e-08  at t_idx=7
+  RtVAvgzh               (m/s     )  abs=2.621e-08  rel=3.491e-08  at t_idx=2
+
+Total channels with drift:     111 / 129

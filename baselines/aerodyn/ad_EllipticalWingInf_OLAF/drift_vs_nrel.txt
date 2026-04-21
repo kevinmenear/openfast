@@ -1,0 +1,43 @@
+Drift report: ad_EllipticalWingInf_OLAF vs NREL r-test reference
+Generated: 2026-04-21T02:27:30Z
+Platform: NAME="Ubuntu"
+
+Our output: /workspace/openfast/build/modules/aerodyn/baseline_gen_ad_EllipticalWingInf_OLAF/ad_driver.outb
+NREL ref:   /workspace/openfast/build/modules/aerodyn/baseline_gen_ad_EllipticalWingInf_OLAF/ad_driver_nrel_ref.outb
+Array shape: (10, 314) (timesteps, channels) = 3140 values
+
+Bit-identical:                   2880 / 3140 (91.72%)
+Within 1e-5 rel:                 3123 / 3140 (99.46%)
+Within 1e-5 rel OR 1e-6 abs:     3140 / 3140 (100.00%)
+Max abs difference:            7.586557e-09
+Max rel difference:            5.000000e-01
+
+Per-channel drift (non-zero channels only):
+  RtAeroFxh              (N       )  abs=7.587e-09  rel=5.017e-08  at t_idx=0
+  AB1N003Vindx           (m/s     )  abs=7.377e-10  rel=2.981e-08  at t_idx=1
+  AB1N038Vindx           (m/s     )  abs=7.377e-10  rel=2.982e-08  at t_idx=3
+  AB1N039Vindx           (m/s     )  abs=7.366e-10  rel=2.992e-08  at t_idx=1
+  AB1N001Vindx           (m/s     )  abs=7.273e-10  rel=3.006e-08  at t_idx=3
+  AB1N040Vindx           (m/s     )  abs=7.273e-10  rel=3.005e-08  at t_idx=1
+  AB1N004Vindx           (m/s     )  abs=7.200e-10  rel=2.981e-08  at t_idx=2
+  AB1N037Vindx           (m/s     )  abs=7.200e-10  rel=2.981e-08  at t_idx=1
+  AB1N036Vindx           (m/s     )  abs=7.153e-10  rel=2.981e-08  at t_idx=1
+  AB1N005Vindx           (m/s     )  abs=7.153e-10  rel=2.981e-08  at t_idx=1
+  AB1N034Vindx           (m/s     )  abs=7.123e-10  rel=2.980e-08  at t_idx=1
+  AB1N007Vindx           (m/s     )  abs=7.123e-10  rel=2.980e-08  at t_idx=1
+  AB1N032Vindx           (m/s     )  abs=7.116e-10  rel=2.980e-08  at t_idx=1
+  AB1N009Vindx           (m/s     )  abs=7.116e-10  rel=2.980e-08  at t_idx=1
+  AB1N030Vindx           (m/s     )  abs=7.113e-10  rel=2.980e-08  at t_idx=1
+  AB1N011Vindx           (m/s     )  abs=7.113e-10  rel=2.980e-08  at t_idx=1
+  AB1N029Vindx           (m/s     )  abs=7.113e-10  rel=5.000e-01  at t_idx=0
+  AB1N012Vindx           (m/s     )  abs=7.113e-10  rel=5.000e-01  at t_idx=0
+  AB1N015Vindx           (m/s     )  abs=7.112e-10  rel=2.980e-08  at t_idx=1
+  AB1N026Vindx           (m/s     )  abs=7.112e-10  rel=2.980e-08  at t_idx=1
+  AB1N016Vindx           (m/s     )  abs=7.112e-10  rel=5.000e-01  at t_idx=0
+  AB1N025Vindx           (m/s     )  abs=7.112e-10  rel=5.000e-01  at t_idx=0
+  AB1N018Vindx           (m/s     )  abs=7.111e-10  rel=2.981e-08  at t_idx=2
+  AB1N023Vindx           (m/s     )  abs=7.111e-10  rel=2.981e-08  at t_idx=2
+  AB1N017Vindx           (m/s     )  abs=7.111e-10  rel=5.000e-01  at t_idx=0
+  AB1N024Vindx           (m/s     )  abs=7.111e-10  rel=5.000e-01  at t_idx=0
+
+Total channels with drift:     26 / 314

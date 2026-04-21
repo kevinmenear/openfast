@@ -52,8 +52,10 @@ if [[ ! -x "$DRIVER" ]]; then
     echo "       Run: cd build && make aerodyn_driver -j\$(nproc)" >&2
     exit 2
 fi
-if [[ ! -f "${RTEST_CASE_DIR}/ad_driver.outb" ]]; then
-    echo "ERROR: reference ad_driver.outb not found in $RTEST_CASE_DIR" >&2
+# Check for ANY .outb reference (may be ad_driver.outb, .T2.outb, or .4.outb)
+NREL_REF_FILES=$(find "${RTEST_CASE_DIR}" -maxdepth 1 -name 'ad_driver*.outb' 2>/dev/null)
+if [[ -z "$NREL_REF_FILES" ]]; then
+    echo "ERROR: no ad_driver*.outb reference found in $RTEST_CASE_DIR" >&2
     exit 2
 fi
 
@@ -67,17 +69,24 @@ mkdir -p "$BUILD_SCRATCH_DIR"
 # Step 2: copy test case inputs (all files except .outb so we don't touch the reference yet)
 echo "[2/7] Copying inputs from r-test"
 cp -a "${RTEST_CASE_DIR}/." "$BUILD_SCRATCH_DIR/"
-# Rename the reference so it doesn't get overwritten when the driver writes its output
-if [[ -f "${BUILD_SCRATCH_DIR}/ad_driver.outb" ]]; then
-    mv "${BUILD_SCRATCH_DIR}/ad_driver.outb" "${BUILD_SCRATCH_DIR}/ad_driver_nrel_ref.outb"
-fi
+# Rename all .outb reference files so they don't get overwritten when the driver writes output
+for outb in "${BUILD_SCRATCH_DIR}"/ad_driver*.outb; do
+    [[ -f "$outb" ]] && mv "$outb" "${outb%.outb}_nrel_ref.outb"
+done
 
-# Step 3: copy BAR_Baseline to parent dir (the primary AeroDyn input references ../BAR_Baseline/)
-echo "[3/7] Copying BAR_Baseline shared data"
-rm -rf "$BUILD_BAR_BASELINE_DIR"
-cp -a "$BAR_BASELINE_DIR" "$BUILD_BAR_BASELINE_DIR"
-# Our scratch dir sits inside build/modules/aerodyn/, same parent as BAR_Baseline
-# So ../BAR_Baseline/ resolves correctly.
+# Step 3: copy shared data directories to build tree so relative paths resolve.
+# BAR_Baseline (referenced as ../BAR_Baseline/ by BAR-family cases):
+echo "[3/7] Copying shared data directories"
+if [[ -d "$BAR_BASELINE_DIR" ]] && [[ ! -d "$BUILD_BAR_BASELINE_DIR" ]]; then
+    cp -a "$BAR_BASELINE_DIR" "$BUILD_BAR_BASELINE_DIR"
+fi
+# 5MW_Baseline (referenced as ../../../glue-codes/openfast/5MW_Baseline/ by some cases):
+FMW_BASELINE_SRC="${OPENFAST_ROOT}/reg_tests/r-test/glue-codes/openfast/5MW_Baseline"
+FMW_BASELINE_DST="${OPENFAST_ROOT}/build/glue-codes/openfast/5MW_Baseline"
+if [[ -d "$FMW_BASELINE_SRC" ]] && [[ ! -d "$FMW_BASELINE_DST" ]]; then
+    mkdir -p "$(dirname "$FMW_BASELINE_DST")"
+    cp -a "$FMW_BASELINE_SRC" "$FMW_BASELINE_DST"
+fi
 
 # Step 4: run the driver
 echo "[4/7] Running aerodyn_driver ${CASE_NAME}/ad_driver.dvr"
@@ -90,11 +99,26 @@ if ! "$DRIVER" ad_driver.dvr > driver.log 2>&1; then
 fi
 popd > /dev/null
 
+# Detect which output file the driver produced (may vary by AnalysisType / NumTurbines).
+# Combined cases (AT=3) write ad_driver.N.outb; multi-turbine writes ad_driver.T2.outb.
+# NREL's reg_test convention: compare .T2 if exists, else .4 if exists, else .outb.
 OUR_OUT="${BUILD_SCRATCH_DIR}/ad_driver.outb"
+if [[ -f "${BUILD_SCRATCH_DIR}/ad_driver.T2.outb" ]]; then
+    OUR_OUT="${BUILD_SCRATCH_DIR}/ad_driver.T2.outb"
+elif [[ -f "${BUILD_SCRATCH_DIR}/ad_driver.4.outb" ]]; then
+    OUR_OUT="${BUILD_SCRATCH_DIR}/ad_driver.4.outb"
+fi
+# Find the NREL reference — it was renamed to *_nrel_ref.outb in the scratch dir.
+# Detect which variant exists: .T2, .4, or plain.
 REF_OUT="${BUILD_SCRATCH_DIR}/ad_driver_nrel_ref.outb"
+if [[ -f "${BUILD_SCRATCH_DIR}/ad_driver.T2_nrel_ref.outb" ]]; then
+    REF_OUT="${BUILD_SCRATCH_DIR}/ad_driver.T2_nrel_ref.outb"
+elif [[ -f "${BUILD_SCRATCH_DIR}/ad_driver.4_nrel_ref.outb" ]]; then
+    REF_OUT="${BUILD_SCRATCH_DIR}/ad_driver.4_nrel_ref.outb"
+fi
 
 if [[ ! -f "$OUR_OUT" ]]; then
-    echo "ERROR: driver did not produce $OUR_OUT" >&2
+    echo "ERROR: driver did not produce an output file (checked .outb, .T2.outb, .4.outb)" >&2
     exit 4
 fi
 

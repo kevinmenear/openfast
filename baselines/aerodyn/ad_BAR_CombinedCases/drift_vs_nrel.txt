@@ -1,0 +1,33 @@
+Drift report: ad_BAR_CombinedCases vs NREL r-test reference
+Generated: 2026-04-21T12:34:50Z
+Platform: NAME="Ubuntu"
+
+Our output: /workspace/openfast/build/modules/aerodyn/baseline_gen_ad_BAR_CombinedCases/ad_driver.4.outb
+NREL ref:   /workspace/openfast/build/modules/aerodyn/baseline_gen_ad_BAR_CombinedCases/ad_driver.4_nrel_ref.outb
+Array shape: (102, 215) (timesteps, channels) = 21930 values
+
+Bit-identical:                  20298 / 21930 (92.56%)
+Within 1e-5 rel:                21926 / 21930 (99.98%)
+Within 1e-5 rel OR 1e-6 abs:    21928 / 21930 (99.99%)
+Max abs difference:            7.215906e-02
+Max rel difference:            8.713942e-03
+
+Per-channel drift (non-zero channels only):
+  RtAeroMzh              (N-m     )  abs=7.216e-02  rel=2.092e-08  at t_idx=5
+  RtAeroMyh              (N-m     )  abs=7.140e-02  rel=1.363e-08  at t_idx=7
+  AB1N023Fx              (N/m     )  abs=3.238e-02  rel=6.226e-06  at t_idx=12
+  AB1N028Fx              (N/m     )  abs=1.761e-02  rel=3.327e-06  at t_idx=48
+  AB1N006Fx              (N/m     )  abs=6.030e-03  rel=6.717e-06  at t_idx=77
+  RtAeroFyh              (N       )  abs=5.201e-04  rel=2.987e-08  at t_idx=12
+  AB1N011Fx              (N/m     )  abs=3.590e-04  rel=1.131e-07  at t_idx=0
+  RtAeroFzh              (N       )  abs=1.687e-04  rel=2.022e-08  at t_idx=0
+  PtfmSurge              (m       )  abs=6.099e-05  rel=3.781e-05  at t_idx=40
+  AB1N029Vx              (m/s     )  abs=5.997e-05  rel=8.691e-06  at t_idx=22
+  AB1N028Vx              (m/s     )  abs=5.802e-05  rel=6.071e-06  at t_idx=17
+  RtVAvgyh               (m/s     )  abs=2.966e-05  rel=1.716e-04  at t_idx=74
+  AB1N005Vrel            (m/s     )  abs=2.859e-05  rel=1.647e-06  at t_idx=18
+  AB1N018Vindx           (m/s     )  abs=3.792e-06  rel=1.819e-06  at t_idx=13
+  AB1N001Vrel            (m/s     )  abs=2.332e-07  rel=9.300e-08  at t_idx=0
+  RtVAvgzh               (m/s     )  abs=1.251e-08  rel=1.397e-08  at t_idx=0
+
+Total channels with drift:     16 / 215

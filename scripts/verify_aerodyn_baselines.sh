@@ -53,10 +53,17 @@ else
     CASES=("$TARGET")
 fi
 
-# Ensure BAR_Baseline is in place for all BAR-family cases
+# Ensure shared data directories are in place for cases that reference them
 if [[ ! -d "$BAR_BASELINE_DST" ]]; then
-    echo "Copying BAR_Baseline to build dir (shared by all BAR-family cases)"
+    echo "Copying BAR_Baseline to build dir (shared by BAR-family cases)"
     cp -a "$BAR_BASELINE_SRC" "$BAR_BASELINE_DST"
+fi
+FMW_BASELINE_SRC="${RTEST_CASES_ROOT}/../../../glue-codes/openfast/5MW_Baseline"
+FMW_BASELINE_DST="${OPENFAST_ROOT}/build/glue-codes/openfast/5MW_Baseline"
+if [[ -d "$FMW_BASELINE_SRC" ]] && [[ ! -d "$FMW_BASELINE_DST" ]]; then
+    echo "Copying 5MW_Baseline to build dir (shared by 5MW-family cases)"
+    mkdir -p "$(dirname "$FMW_BASELINE_DST")"
+    cp -a "$FMW_BASELINE_SRC" "$FMW_BASELINE_DST"
 fi
 
 PASSED=0
@@ -99,7 +106,13 @@ for CASE_NAME in "${CASES[@]}"; do
     fi
     popd > /dev/null
 
+    # Detect output-file variant (combined cases: .4.outb; multi-turbine: .T2.outb)
     OUR_OUT="${SCRATCH}/ad_driver.outb"
+    if [[ -f "${SCRATCH}/ad_driver.T2.outb" ]]; then
+        OUR_OUT="${SCRATCH}/ad_driver.T2.outb"
+    elif [[ -f "${SCRATCH}/ad_driver.4.outb" ]]; then
+        OUR_OUT="${SCRATCH}/ad_driver.4.outb"
+    fi
     if [[ ! -f "$OUR_OUT" ]]; then
         echo "✗ ${CASE_NAME}: driver did not produce an output file"
         FAILED=$((FAILED + 1))
@@ -107,14 +120,16 @@ for CASE_NAME in "${CASES[@]}"; do
         continue
     fi
 
-    # Primary gate: cmp -s
+    # Primary gate: cmp -s (fast, catches any binary difference)
     if cmp -s "$OUR_OUT" "$BASELINE_FILE"; then
         echo "✓ ${CASE_NAME}: bit-identical vs our baseline ($(stat -c%s "$OUR_OUT") bytes)"
         PASSED=$((PASSED + 1))
     else
-        # Diagnostic
-        echo "✗ ${CASE_NAME}: does NOT match baseline byte-for-byte"
-        python3 <<PYEOF
+        # cmp -s failed — could be a header-only diff (e.g., .outb embeds scratch dir path
+        # in the header, which differs between generator and verifier runs). Parse both files
+        # with fast_io and compare the actual simulation data. If data is identical, count as
+        # PASS with a note about the header-only binary diff.
+        DATA_MATCH=$(python3 <<PYEOF
 import sys
 sys.path.insert(0, "${REG_LIB_DIR}")
 from fast_io import load_output
@@ -124,29 +139,34 @@ ours, info_ours, _ = load_output("${OUR_OUT}")
 ref, info_ref, _ = load_output("${BASELINE_FILE}")
 
 if ours.shape != ref.shape:
-    print(f"    SHAPE MISMATCH: ours={ours.shape}, baseline={ref.shape}")
+    print("SHAPE_MISMATCH")
+elif np.array_equal(ours, ref):
+    print("DATA_IDENTICAL")
 else:
     abs_diff = np.abs(ours - ref)
     with np.errstate(divide='ignore', invalid='ignore'):
         rel_diff = np.where(np.abs(ref) > 1e-12, abs_diff / np.abs(ref), 0.0)
     n_exact = int((abs_diff == 0).sum())
-    print(f"    Data shape: {ours.shape}  ({ours.size} values)")
-    print(f"    Bit-identical: {n_exact} / {ours.size} ({100*n_exact/ours.size:.2f}%)")
-    print(f"    Max abs diff:  {abs_diff.max():.6e}")
-    print(f"    Max rel diff:  {rel_diff.max():.6e}")
-    # Top 3 drifting channels
+    print(f"DATA_DIFFERS {n_exact}/{ours.size} {abs_diff.max():.6e} {rel_diff.max():.6e}")
     names = info_ref.get('attribute_names', [])
     max_abs_per_ch = abs_diff.max(axis=0)
     top = np.argsort(max_abs_per_ch)[::-1][:3]
-    print(f"    Top drifting channels:")
     for c_idx in top:
-        if max_abs_per_ch[c_idx] == 0:
-            break
+        if max_abs_per_ch[c_idx] == 0: break
         ch_name = names[c_idx] if c_idx < len(names) else f"ch{c_idx}"
-        print(f"      {ch_name}: max_abs={max_abs_per_ch[c_idx]:.3e}")
+        print(f"  {ch_name}: max_abs={max_abs_per_ch[c_idx]:.3e}")
 PYEOF
-        FAILED=$((FAILED + 1))
-        FAILED_CASES+=("$CASE_NAME")
+        )
+
+        if [[ "$DATA_MATCH" == "DATA_IDENTICAL" ]]; then
+            echo "✓ ${CASE_NAME}: data identical vs our baseline (header-only binary diff, $(stat -c%s "$OUR_OUT") vs $(stat -c%s "$BASELINE_FILE") bytes)"
+            PASSED=$((PASSED + 1))
+        else
+            echo "✗ ${CASE_NAME}: does NOT match baseline"
+            echo "    $DATA_MATCH"
+            FAILED=$((FAILED + 1))
+            FAILED_CASES+=("$CASE_NAME")
+        fi
     fi
 done
 

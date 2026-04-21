@@ -1,0 +1,22 @@
+Drift report: ad_timeseries_shutdown vs NREL r-test reference
+Generated: 2026-04-21T12:32:01Z
+Platform: NAME="Ubuntu"
+
+Our output: /workspace/openfast/build/modules/aerodyn/baseline_gen_ad_timeseries_shutdown/ad_driver.outb
+NREL ref:   /workspace/openfast/build/modules/aerodyn/baseline_gen_ad_timeseries_shutdown/ad_driver_nrel_ref.outb
+Array shape: (9000, 22) (timesteps, channels) = 198000 values
+
+Bit-identical:                 170282 / 198000 (86.00%)
+Within 1e-5 rel:               186834 / 198000 (94.36%)
+Within 1e-5 rel OR 1e-6 abs:   186862 / 198000 (94.37%)
+Max abs difference:            2.562963e-02
+Max rel difference:            1.316195e+00
+
+Per-channel drift (non-zero channels only):
+  RtTSR                  (-       )  abs=2.563e-02  rel=6.884e-04  at t_idx=2954
+  RtAeroCp               (-       )  abs=2.388e-02  rel=7.294e-04  at t_idx=2984
+  RtAeroCt               (-       )  abs=3.653e-03  rel=9.115e-04  at t_idx=2968
+  Yaw                    (deg     )  abs=1.340e-03  rel=2.557e-05  at t_idx=2782
+  RtAeroCq               (-       )  abs=3.997e-04  rel=1.644e-03  at t_idx=2962
+
+Total channels with drift:     5 / 22

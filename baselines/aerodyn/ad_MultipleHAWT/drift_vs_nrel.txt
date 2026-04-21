@@ -1,0 +1,18 @@
+Drift report: ad_MultipleHAWT vs NREL r-test reference
+Generated: 2026-04-21T12:34:51Z
+Platform: NAME="Ubuntu"
+
+Our output: /workspace/openfast/build/modules/aerodyn/baseline_gen_ad_MultipleHAWT/ad_driver.T2.outb
+NREL ref:   /workspace/openfast/build/modules/aerodyn/baseline_gen_ad_MultipleHAWT/ad_driver.T2_nrel_ref.outb
+Array shape: (3, 426) (timesteps, channels) = 1278 values
+
+Bit-identical:                   1275 / 1278 (99.77%)
+Within 1e-5 rel:                 1278 / 1278 (100.00%)
+Within 1e-5 rel OR 1e-6 abs:     1278 / 1278 (100.00%)
+Max abs difference:            3.292773e-10
+Max rel difference:            1.268853e-07
+
+Per-channel drift (non-zero channels only):
+  AB1N029TnInd           (-       )  abs=3.293e-10  rel=1.267e-07  at t_idx=0
+
+Total channels with drift:     1 / 426
