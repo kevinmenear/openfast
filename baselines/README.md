@@ -382,6 +382,247 @@ make aerodyn_driver -j$(nproc)
 - `202604140204-vit-dev-openfast-docker-plan.md` — Docker container setup
 - `202604140013-openfast-aerodyn-phase-start.md` — AeroDyn phase kickoff
 
+## Phase 3: NREL-matching environment
+
+Investigations 1 and 2 identified three root causes of drift vs NREL: BLAS library (ATLAS vs OpenBLAS), architecture (x86_64 vs ARM64), and compiler (gfortran-14 vs 13). Phase 3 eliminates all three by setting up a new container that matches NREL's CI environment as closely as possible.
+
+**Goal:** produce AeroDyn output that is bit-identical (or very close) to NREL's shipped r-test references, eliminating the need for separate platform-specific baselines and making our verification directly comparable to NREL's.
+
+**Benefit for the AeroDyn translation effort:** if our upstream Fortran baselines match NREL's references, we have stronger confidence that our starting point is correct. When we later compare translated C++ output against those baselines (with `-ffp-contract=off`), any difference is a translation issue, not a platform artifact.
+
+### What changes from the current setup
+
+| Parameter | Current (`vit-dev-openfast`) | NREL-matching target | How to change |
+|-----------|------------------------------|---------------------|---------------|
+| **BLAS** | OpenBLAS 0.3.26 (`libopenblas-dev`) | **ATLAS** (`libatlas-base-dev`) | Swap apt package in Dockerfile |
+| **Architecture** | ARM64 (native Apple Silicon) | **x86_64** (Rosetta emulation) | New Colima profile: `colima start --profile x86 --arch x86_64` |
+| **Compiler** | gfortran-13.3.0 | **gfortran-14** | `apt install gfortran-14 g++-14 gcc-14` in Dockerfile |
+| **Build type** | `Release` (`-O3`) | **`RelWithDebInfo`** (`-O2 -g`) | cmake flag |
+| **OpenMP** | Not set (default OFF) | **ON** | cmake `-DOPENMP:BOOL=ON` |
+| **FMA flags** | None (compiler default) | None (same) | No change needed |
+
+### Execution steps
+
+#### Step 1: Create x86_64 Colima profile
+
+Colima supports multiple profiles. Create a second one for x86_64 without touching the existing ARM64 profile:
+
+```bash
+# On Mac (not inside any container):
+colima start --profile x86 --arch x86_64 --cpu 4 --memory 8
+```
+
+This starts a new Colima VM running x86_64 Linux via Rosetta 2. Docker commands will target this VM while the profile is active. The existing `default` profile (ARM64) remains intact and can be switched back to with `colima start --profile default`.
+
+**Risk:** Rosetta's FP translation for x86_64 SIMD instructions (SSE, AVX) should be faithful, but hasn't been verified for the specific BLAS/LAPACK operations OpenFAST uses. If bit-identity fails even with everything else matching, Rosetta FP translation is the residual factor and we document it.
+
+**Status:** [ ]
+
+#### Step 2: Write `Dockerfile.openfast-nrel-match`
+
+New Dockerfile in `vit/docker/` that targets x86_64 with NREL's dependencies:
+
+```dockerfile
+FROM ubuntu:24.04
+
+# NREL-matching system packages
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        gfortran-14 g++-14 gcc-14 \
+        libatlas-base-dev \
+        libyaml-cpp-dev \
+        cmake \
+        make \
+        wget \
+        build-essential \
+        libssl-dev zlib1g-dev libffi-dev libbz2-dev \
+        libreadline-dev libsqlite3-dev libncurses-dev \
+        python3 python3-pip python3-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set gfortran-14 as default
+RUN update-alternatives --install /usr/bin/gfortran gfortran /usr/bin/gfortran-14 100 \
+    && update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-14 100 \
+    && update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-14 100
+
+# Python 2.7 (for KGen)
+RUN wget -q https://www.python.org/ftp/python/2.7.18/Python-2.7.18.tar.xz -O /tmp/Python-2.7.18.tar.xz \
+    && cd /tmp && tar -xf Python-2.7.18.tar.xz \
+    && cd Python-2.7.18 && ./configure --prefix=/opt/python27 \
+    && make -j$(nproc) && make install \
+    && ln -sf /opt/python27/bin/python2.7 /usr/local/bin/python2.7 \
+    && cd / && rm -rf /tmp/Python-2.7.18*
+
+# VIT Python dependencies + fparser
+RUN pip3 install --break-system-packages \
+        numpy pyyaml rich fparser vtk nptdms \
+        'Bokeh>=2.4,!=3.0.0,!=3.0.1,!=3.0.2,!=3.0.3'
+
+WORKDIR /workspace
+CMD ["sleep", "infinity"]
+```
+
+Key differences from `Dockerfile.openfast`:
+- Starts from `ubuntu:24.04` (not `vit-dev-image` which is ARM64)
+- Uses `gfortran-14` (not whatever the base image had)
+- Uses `libatlas-base-dev` (not `libopenblas-dev`)
+- Installs Python 2.7 from source (same as before, but under x86_64 emulation — will be slower)
+- Installs all Python deps from scratch (not inheriting from `vit-dev-image`)
+
+**NOTE:** this is a FROM-scratch build, not layered on `vit-dev-image`, because `vit-dev-image` is ARM64. The entire container is rebuilt for x86_64. Expect ~20-30 minutes for the Docker build under Rosetta emulation (Python 2.7 source build + pip installs + ATLAS build are all slower under emulation).
+
+**Status:** [ ]
+
+#### Step 3: Build and start the container
+
+```bash
+# Ensure x86 Colima profile is active:
+colima list   # verify x86 profile is running
+
+# Build (from vit/docker/):
+cd ~/Artifacts/vit_translation_openfast/vit/docker
+docker build --platform linux/amd64 -f Dockerfile.openfast-nrel-match -t vit-dev-openfast-nrel .
+
+# Run with the same workspace mount:
+docker run -d --name vit-dev-openfast-nrel \
+    -v ~/Artifacts/vit_translation_openfast:/workspace \
+    vit-dev-openfast-nrel
+
+# Install VIT as editable:
+docker exec vit-dev-openfast-nrel pip3 install -e /workspace/vit --break-system-packages
+```
+
+**Status:** [ ]
+
+#### Step 4: Verify the environment matches NREL
+
+```bash
+docker exec vit-dev-openfast-nrel bash -c "
+  uname -m                    # should be x86_64
+  gfortran --version | head -1   # should be GNU Fortran 14.x
+  dpkg -l libatlas-base-dev | tail -1  # should show ATLAS installed
+"
+```
+
+**Status:** [ ]
+
+#### Step 5: Build OpenFAST with NREL-matching cmake flags
+
+```bash
+docker exec vit-dev-openfast-nrel bash -c "
+  cd /workspace/openfast/build && rm -rf * &&
+  cmake .. \
+    -DBUILD_FASTFARM=off \
+    -DBUILD_OPENFAST_CPP_API=off \
+    -DBUILD_TESTING=off \
+    -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+    -DBLA_VENDOR:STRING=ATLAS \
+    -DOPENMP:BOOL=ON \
+    -DDOUBLE_PRECISION=ON &&
+  make aerodyn_driver -j\$(nproc)
+"
+```
+
+**Expected:** cmake finds ATLAS BLAS/LAPACK (not OpenBLAS). Build succeeds. AeroDyn_Driver produced.
+
+**Status:** [ ]
+
+#### Step 6: Spot-check against NREL references (4 representative cases)
+
+Run 4 cases that span the drift spectrum and compare directly against NREL's r-test references:
+
+```bash
+# Cases to test:
+#   ad_MHK_RM1_Fixed      — was 100% bit-identical on ARM64+OpenBLAS (should remain so)
+#   ad_BAR_SineMotion     — was 99.94% within tolerance, constant-offset signature
+#   ad_BAR_OLAF           — was 98.68%, max abs 1749, intermittent sensitivity
+#   ad_VerticalAxis_OLAF  — was 25.75%, oscillatory growth
+```
+
+For each case, run `check_aerodyn_nrel_drift.sh` and record the results. The key metric: **did the drift shrink?** Specifically:
+- `ad_MHK_RM1_Fixed`: should remain bit-identical (0 drift)
+- `ad_BAR_SineMotion`: the constant 0.2147 offset should disappear or shrink dramatically
+- `ad_BAR_OLAF`: the 1749 N·m intermittent peak should shrink or vanish
+- `ad_VerticalAxis_OLAF`: the 75% out-of-tolerance rate should improve substantially
+
+If all four match NREL within `1e-5` (or ideally bit-identical), we've successfully matched the toolchain.
+
+**Status:** [ ]
+
+#### Step 7: Full 16-case baseline regeneration (if spot-check passes)
+
+If the 4-case spot-check shows dramatic improvement (most/all cases now matching NREL's references), regenerate all 16 baselines from the NREL-matching container:
+
+```bash
+for case in $(ls baselines/aerodyn/); do
+    docker exec vit-dev-openfast-nrel bash -c \
+        "cd /workspace/openfast && ./scripts/generate_aerodyn_baseline.sh $case"
+done
+```
+
+Then run `verify_aerodyn_baselines.sh all` to confirm all pass.
+
+**Status:** [ ]
+
+#### Step 8: Decide on the container strategy going forward
+
+Two options after we know whether NREL-matching works:
+
+**Option A (recommended if bit-identical): use `vit-dev-openfast-nrel` as the primary container.** Replace the ARM64 container with the x86_64 NREL-matching one. Accept the ~2x performance penalty from Rosetta emulation in exchange for NREL-reference-compatible baselines. The 0.27s BAR_SineMotion case becomes ~0.5s — still fast enough for a development workflow.
+
+**Option B (if residual drift remains): keep both containers.** Use `vit-dev-openfast` (ARM64) for fast daily development, and `vit-dev-openfast-nrel` (x86_64) for periodic NREL-compatibility checks. Baselines committed from the ARM64 container (deterministic, faster), with the x86_64 container as a sanity-check tool.
+
+**Option C (fallback if Rosetta FP is the issue): document Rosetta as a known limitation.** If even with ATLAS + gfortran-14 + x86_64 emulation we still see drift, the remaining factor is Rosetta's FP instruction translation. This is documented, accepted, and we revert to Option B.
+
+**Status:** [ ] (decision made after Step 6 results)
+
+### Build environment reference (NREL-matching target)
+
+For fresh sessions, these are the target parameters for the NREL-matching container:
+
+**Target (NREL-matching) build configuration:**
+```bash
+# Inside vit-dev-openfast-nrel container
+cd /workspace/openfast/build
+cmake .. \
+    -DBUILD_FASTFARM=off \
+    -DBUILD_OPENFAST_CPP_API=off \
+    -DBUILD_TESTING=off \
+    -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+    -DBLA_VENDOR:STRING=ATLAS \
+    -DOPENMP:BOOL=ON \
+    -DDOUBLE_PRECISION=ON
+make aerodyn_driver -j$(nproc)
+```
+
+**Container:** `vit-dev-openfast-nrel:latest` built from `vit/docker/Dockerfile.openfast-nrel-match`
+**Platform:** x86_64 Linux (Ubuntu 24.04 via Colima `--arch x86_64` Rosetta 2 on Apple Silicon)
+**Compiler:** gfortran-14 (matching NREL CI)
+**cmake:** 3.28.x (Ubuntu 24.04 default, same as before)
+**BLAS/LAPACK:** ATLAS (`libatlas-base-dev`) — matching NREL CI
+**OpenMP:** ON — matching NREL CI
+**OpenFAST commit:** `2895884d2` (v5.0.1 release merge, same as before)
+**FMA flags:** not explicitly set (same as NREL)
+
+**NREL's actual CI configuration** (from `.github/workflows/automated-dev-tests.yml`):
+- OS: `ubuntu-24.04` (x86_64, GitHub Actions runner)
+- Compiler: `gfortran-14`, `g++-14`, `gcc-14`
+- BLAS: ATLAS (`-DBLA_VENDOR:STRING=ATLAS`)
+- Build type: `RelWithDebInfo`
+- OpenMP: ON
+- Double precision: ON
+
+**Colima profiles (on the Mac):**
+```bash
+colima list                                    # show all profiles
+colima start --profile default                 # ARM64 (original, for vit-dev and vit-dev-openfast)
+colima start --profile x86 --arch x86_64       # x86_64 (for vit-dev-openfast-nrel)
+```
+
+**Key scripts** (same as before, run in whichever container is appropriate):
+- `scripts/generate_aerodyn_baseline.sh <case>` — generate a baseline for one case
+- `scripts/verify_aerodyn_baselines.sh <case|all>` — verify against committed baselines
+- `scripts/check_aerodyn_nrel_drift.sh <case|all>` — informational drift vs NREL reference
+
 ## Regenerating baselines
 
 Baselines are platform-specific by definition. They **must be regenerated** when any of the following changes:
