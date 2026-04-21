@@ -187,9 +187,9 @@ For context, these are the drift-vs-NREL numbers that prompted the investigation
 
 **Expected outcome:** a concrete list of configuration differences between NREL's build and ours. If they use MKL on x86_64 and we use OpenBLAS on ARM64, that's a ~complete explanation for the drift. If they use the same OpenBLAS on x86_64, the explanation is narrower (architecture only).
 
-**Status:** [ ] Not started
+**Status:** [x] **Complete.** NREL uses ATLAS BLAS on x86_64 with gfortran-14 and `RelWithDebInfo`. Three major differences from our build: BLAS library (ATLAS vs OpenBLAS — NREL specifically chose ATLAS because of a documented "bug in OpenBLAS" with OpenMP), architecture (x86_64 vs ARM64), compiler (gfortran-14 vs 13.3.0). Additional: NREL's reg_test tolerance is `1e-2` relative (not `1e-5`), 1000× looser than what we tested with. NREL does not expect cross-platform bit-identity.
 
-**Dev note when complete:** Record the NREL config, the differences found, and the conclusion.
+**Dev note:** `202604210915-platform-drift-root-cause.md` (VIT repo)
 
 ---
 
@@ -240,9 +240,14 @@ PYEOF
 
 **Also do the same for `ad_VerticalAxis_OLAF`** — the case with 25.75% within tolerance. Same script, different file paths.
 
-**Status:** [ ] Not started
+**Status:** [x] **Complete.** Three distinct signatures found:
+1. **Constant offset** (ad_BAR_SineMotion `RtAeroMyh`): abs_diff is exactly `0.2146758` at every single timestep — fingerprint of a single BLAS/lookup operation producing a different result, propagated uniformly. Physically negligible (2e-8 relative at peak).
+2. **Intermittent sensitivity** (ad_BAR_OLAF): most timesteps bit-identical (48/60 for `RtAeroMxh`), with spikes at specific sensitive wake configurations. The 1749 N·m peak at t_idx=26 is a transient that subsides — NOT accumulation, NOT divergence.
+3. **Oscillatory growth** (ad_VerticalAxis_OLAF): drift grows ~1.5 orders of magnitude over 37 timesteps (3 revolutions) through cyclic wake feedback. Max 0.031 deg on a ±30° dynamic range — 0.1% relative, physically negligible.
 
-**Dev note when complete:** Include the timestep profiles for the top channels of both cases, the classification (gradual/sudden/oscillatory/constant), and the interpretation.
+None of these patterns suggest bugs. All are consistent with ATLAS-vs-OpenBLAS + x86_64-vs-ARM64 differences.
+
+**Dev note:** `202604210915-platform-drift-root-cause.md` (VIT repo)
 
 ---
 
@@ -275,9 +280,7 @@ After rebuilding, run a subset of cases (at minimum: `ad_BAR_SineMotion`, `ad_BA
 
 **Alternative if network fails:** skip the reference-BLAS download and instead compare with `OPENBLAS_NUM_THREADS=1` (force single-threaded OpenBLAS to eliminate threading nondeterminism as a variable). If single-threaded doesn't change results, threading isn't the issue.
 
-**Status:** [ ] Not started
-
-**Dev note when complete:** Record the reference-BLAS drift numbers alongside the OpenBLAS drift numbers. Table comparing max_abs and %_within_tolerance for each case under both BLAS configurations.
+**Status:** [ ] **Deferred.** Root cause identified by investigations 1 and 2 — ATLAS vs OpenBLAS is the dominant factor. This experiment would quantify how much drift is BLAS-specific vs architecture-specific, which is informative but academic. If we want to reduce cross-platform drift in the future, the actionable step is to match NREL's BLAS choice (`libatlas-base-dev` instead of `libopenblas-dev` in the Dockerfile), not to isolate the BLAS contribution.
 
 ---
 
@@ -308,9 +311,7 @@ Then run the same 4 representative cases and compare against NREL's reference. I
 
 **Important:** after this investigation, rebuild with the original flags (no `-ffp-contract=off`) to restore the production configuration. We only want `-ffp-contract=off` as a diagnostic, not as the permanent build — same principle as ROSCO where it was used during verification but not in production.
 
-**Status:** [ ] Not started
-
-**Dev note when complete:** Record the no-FMA drift numbers. If FMA is the dominant source, this investigation directly informs whether we should set `-ffp-contract=off` for our baselines (trading performance for reproducibility) or accept FMA drift as tolerable noise.
+**Status:** [ ] **Deferred.** Neither our build nor NREL's sets FMA flags (both use compiler default). Investigation 1 showed FMA scheduling is not a differentiator between our builds — the BLAS library and architecture differences are much larger. FMA investigation would only be informative if we wanted to explore whether `-ffp-contract=off` would reduce OLAF sensitivity windows, which is a research question rather than a verification question.
 
 ---
 
