@@ -58,7 +58,7 @@ if [[ ! -d "$BAR_BASELINE_DST" ]]; then
     echo "Copying BAR_Baseline to build dir (shared by BAR-family cases)"
     cp -a "$BAR_BASELINE_SRC" "$BAR_BASELINE_DST"
 fi
-FMW_BASELINE_SRC="${RTEST_CASES_ROOT}/../../../glue-codes/openfast/5MW_Baseline"
+FMW_BASELINE_SRC="${OPENFAST_ROOT}/reg_tests/r-test/glue-codes/openfast/5MW_Baseline"
 FMW_BASELINE_DST="${OPENFAST_ROOT}/build/glue-codes/openfast/5MW_Baseline"
 if [[ -d "$FMW_BASELINE_SRC" ]] && [[ ! -d "$FMW_BASELINE_DST" ]]; then
     echo "Copying 5MW_Baseline to build dir (shared by 5MW-family cases)"
