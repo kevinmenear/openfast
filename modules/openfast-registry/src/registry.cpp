@@ -29,6 +29,10 @@ void Registry::gen_module_files(std::string const &out_dir)
     // Generate C code
     if (this->gen_c_code)
         this->gen_c_module(*mod, out_dir);
+
+    // Generate C++ code
+    if (this->gen_cpp_code)
+        this->gen_cpp_module(*mod, out_dir);
 }
 
 std::string tolower(std::string s)

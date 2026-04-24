@@ -63,6 +63,10 @@ int main(int argc, char *argv[])
         {
             reg.gen_c_code = true;
         }
+        else if ((arg.compare("-cppcode")) == 0 || (arg.compare("/cppcode")) == 0)
+        {
+            reg.gen_cpp_code = true;
+        }
         else if ((arg.compare("-noextrap")) == 0 || (arg.compare("/noextrap")) == 0)
         {
             reg.no_extrap_interp = true;

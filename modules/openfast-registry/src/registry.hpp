@@ -529,6 +529,7 @@ struct Registry
     std::map<std::string, std::shared_ptr<DataType>, ci_less> data_types;
     std::map<std::string, std::shared_ptr<DataType>, ci_less> data_types_isocbinding;
     bool gen_c_code = false;
+    bool gen_cpp_code = false;
     bool no_extrap_interp = false;
     bool gen_inc_subs = false;
     bool use_isocbinding = false;
@@ -661,6 +662,7 @@ struct Registry
     void gen_module_files(std::string const &out_dir);
     void gen_fortran_module(const Module &mod, const std::string &out_dir);
     void gen_c_module(const Module &mod, const std::string &out_dir);
+    void gen_cpp_module(const Module &mod, const std::string &out_dir);
     void gen_fortran_subs(std::ostream &w, const Module &mod);
 };
 

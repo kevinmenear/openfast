@@ -18,12 +18,13 @@ add_executable(openfast_registry
   src/main.cpp
   src/registry_gen_fortran.cpp
   src/registry_gen_c.cpp
+  src/registry_gen_cpp.cpp
   src/registry_parse.cpp
   src/registry.cpp
   src/registry.hpp
   src/templates.hpp
 )
-target_compile_features(openfast_registry PRIVATE cxx_std_14)
+target_compile_features(openfast_registry PRIVATE cxx_std_17)
 
 set_target_properties(openfast_registry PROPERTIES
   RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/modules/openfast-registry
