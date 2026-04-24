@@ -19,8 +19,10 @@ static const std::map<std::string, int> char_len_defaults = {
     {"NWTC_SizeOfNumWord", 20},
 };
 
-// Return C type string for a basic data type
-static std::string cpp_type_str(const DataType &dt)
+// Return C type string for a basic data type.
+// When double_precision is true, default-precision reals (bit_size=0, i.e., ReKi)
+// map to double instead of float. This matches DOUBLE_PRECISION=ON in OpenFAST.
+static std::string cpp_type_str(const DataType &dt, bool double_precision = false)
 {
     switch (dt.tag)
     {
@@ -32,13 +34,13 @@ static std::string cpp_type_str(const DataType &dt)
         switch (dt.basic.bit_size)
         {
         case 0:
-            return "float"; // ReKi default
+            return double_precision ? "double" : "float";
         case 32:
             return "float";
         case 64:
             return "double";
         }
-        return "float";
+        return double_precision ? "double" : "float";
     case DataType::Tag::Character:
         return "char";
     case DataType::Tag::Derived:
@@ -187,7 +189,7 @@ void Registry::gen_cpp_module(const Module &mod, const std::string &out_dir)
         w << indent << "// Parameters";
         for (const auto &param : mod.params)
         {
-            auto type_str = cpp_type_str(*param.type);
+            auto type_str = cpp_type_str(*param.type, this->cpp_double_precision);
             if (!param.value.empty())
             {
                 // Convert Fortran-style values
@@ -315,7 +317,7 @@ void Registry::gen_cpp_module(const Module &mod, const std::string &out_dir)
             }
 
             // ---- Basic type fields (Integer, Real, Logical) ----
-            auto type_str = cpp_type_str(*field.data_type);
+            auto type_str = cpp_type_str(*field.data_type, this->cpp_double_precision);
 
             if (field.is_allocatable)
             {

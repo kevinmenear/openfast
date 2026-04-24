@@ -1,16 +1,16 @@
 Drift report: ad_QuadRotor_OLAF vs NREL r-test reference
-Generated: 2026-04-21T12:34:56Z
+Generated: 2026-04-24T18:34:43Z
 Platform: NAME="Ubuntu"
 
 Our output: /workspace/openfast/build/modules/aerodyn/baseline_gen_ad_QuadRotor_OLAF/ad_driver.T2.outb
 NREL ref:   /workspace/openfast/build/modules/aerodyn/baseline_gen_ad_QuadRotor_OLAF/ad_driver.T2_nrel_ref.outb
 Array shape: (10, 213) (timesteps, channels) = 2130 values
 
-Bit-identical:                   2006 / 2130 (94.18%)
-Within 1e-5 rel:                 2113 / 2130 (99.20%)
+Bit-identical:                   2116 / 2130 (99.34%)
+Within 1e-5 rel:                 2119 / 2130 (99.48%)
 Within 1e-5 rel OR 1e-6 abs:     2119 / 2130 (99.48%)
 Max abs difference:            5.731493e+02
-Max rel difference:            5.000000e-01
+Max rel difference:            2.438402e-03
 
 Per-channel drift (non-zero channels only):
   RtAeroMxh              (N-m     )  abs=5.731e+02  rel=4.186e-05  at t_idx=7
@@ -19,7 +19,6 @@ Per-channel drift (non-zero channels only):
   RtAeroFxh              (N       )  abs=1.903e+01  rel=1.793e-05  at t_idx=7
   RtAeroFzh              (N       )  abs=7.840e+00  rel=2.438e-03  at t_idx=7
   RtAeroFyh              (N       )  abs=7.070e+00  rel=9.454e-04  at t_idx=7
-  AB1N012Gam             (m^2/s   )  abs=2.389e-04  rel=1.616e-06  at t_idx=0
   RtVAvgxh               (m/s     )  abs=1.233e-04  rel=1.247e-05  at t_idx=7
   RtTSR                  (-       )  abs=8.065e-05  rel=1.238e-05  at t_idx=7
   RtVAvgyh               (m/s     )  abs=4.719e-05  rel=1.046e-04  at t_idx=7
@@ -27,16 +26,6 @@ Per-channel drift (non-zero channels only):
   RtSkew                 (deg     )  abs=1.358e-05  rel=2.388e-06  at t_idx=7
   RtAeroCp               (-       )  abs=3.324e-06  rel=7.542e-06  at t_idx=7
   RtAeroCt               (-       )  abs=2.990e-06  rel=5.562e-06  at t_idx=7
-  AB1N024Alpha           (deg     )  abs=1.224e-06  rel=1.068e-07  at t_idx=2
   RtAeroCq               (-       )  abs=1.196e-06  rel=1.767e-05  at t_idx=7
-  AB1N017Alpha           (deg     )  abs=1.148e-06  rel=9.566e-08  at t_idx=0
-  AB1N022Cd              (-       )  abs=4.748e-08  rel=3.594e-06  at t_idx=4
-  AB1N009Cd              (-       )  abs=6.765e-09  rel=7.930e-08  at t_idx=0
-  AB1N011Cd              (-       )  abs=2.593e-09  rel=9.990e-08  at t_idx=3
-  AB1N024Cd              (-       )  abs=1.780e-09  rel=9.671e-08  at t_idx=0
-  AB1N013Cd              (-       )  abs=1.403e-09  rel=7.997e-08  at t_idx=0
-  AB1N004AxInd           (-       )  abs=1.090e-09  rel=1.935e-07  at t_idx=6
-  AB1N002TnInd           (-       )  abs=2.663e-10  rel=6.093e-08  at t_idx=6
-  AB1N030AxInd           (-       )  abs=2.212e-10  rel=5.281e-08  at t_idx=3
 
-Total channels with drift:     25 / 213
+Total channels with drift:     14 / 213

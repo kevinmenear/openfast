@@ -530,6 +530,7 @@ struct Registry
     std::map<std::string, std::shared_ptr<DataType>, ci_less> data_types_isocbinding;
     bool gen_c_code = false;
     bool gen_cpp_code = false;
+    bool cpp_double_precision = false;  // Map default-precision (ReKi) to double in C++ output
     bool no_extrap_interp = false;
     bool gen_inc_subs = false;
     bool use_isocbinding = false;

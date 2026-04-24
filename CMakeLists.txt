@@ -39,6 +39,7 @@ option(VARIABLE_TRACKING "Enables variable tracking for better runtime debugging
 option(GENERATE_TYPES "Use the openfast-regsitry to autogenerate types modules" off)
 option(BUILD_SHARED_LIBS "Enable building shared libraries" off)
 option(DOUBLE_PRECISION "Treat REAL as double precision" on)
+option(FP_CONTRACT_OFF "Disable FMA contraction for VIT translation verification" on)
 option(USE_DLL_INTERFACE "Enable runtime loading of dynamic libraries" on)
 option(FPE_TRAP_ENABLED "Enable FPE trap in compiler options" off)
 option(WIN_DLL_LOAD "Enable loading of Windows only DLL's (OrcaFlex, SoilDyn)" on)  # This is mostly for testing purposes

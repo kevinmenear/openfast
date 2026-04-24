@@ -67,6 +67,11 @@ int main(int argc, char *argv[])
         {
             reg.gen_cpp_code = true;
         }
+        else if ((arg.compare("-cppcode-double")) == 0 || (arg.compare("/cppcode-double")) == 0)
+        {
+            reg.gen_cpp_code = true;
+            reg.cpp_double_precision = true;
+        }
         else if ((arg.compare("-noextrap")) == 0 || (arg.compare("/noextrap")) == 0)
         {
             reg.no_extrap_interp = true;

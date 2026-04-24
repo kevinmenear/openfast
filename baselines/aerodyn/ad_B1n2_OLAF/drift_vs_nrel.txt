@@ -1,21 +1,17 @@
 Drift report: ad_B1n2_OLAF vs NREL r-test reference
-Generated: 2026-04-21T02:27:27Z
+Generated: 2026-04-24T18:34:20Z
 Platform: NAME="Ubuntu"
 
 Our output: /workspace/openfast/build/modules/aerodyn/baseline_gen_ad_B1n2_OLAF/ad_driver.outb
 NREL ref:   /workspace/openfast/build/modules/aerodyn/baseline_gen_ad_B1n2_OLAF/ad_driver_nrel_ref.outb
 Array shape: (60, 40) (timesteps, channels) = 2400 values
 
-Bit-identical:                   2160 / 2400 (90.00%)
-Within 1e-5 rel:                 2394 / 2400 (99.75%)
+Bit-identical:                   2400 / 2400 (100.00%)
+Within 1e-5 rel:                 2400 / 2400 (100.00%)
 Within 1e-5 rel OR 1e-6 abs:     2400 / 2400 (100.00%)
-Max abs difference:            2.890052e-07
-Max rel difference:            1.853824e-03
+Max abs difference:            0.000000e+00
+Max rel difference:            0.000000e+00
 
 Per-channel drift (non-zero channels only):
-  AB1N002Alpha           (deg     )  abs=2.890e-07  rel=9.781e-08  at t_idx=1
-  AB1N001VUndy           (m/s     )  abs=4.949e-09  rel=1.258e-07  at t_idx=2
-  AB1N001VUndz           (m/s     )  abs=2.595e-09  rel=1.402e-08  at t_idx=2
-  AB1N002VUndy           (m/s     )  abs=2.416e-09  rel=3.601e-08  at t_idx=3
 
-Total channels with drift:     4 / 40
+Total channels with drift:     0 / 40

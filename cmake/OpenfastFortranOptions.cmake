@@ -128,6 +128,15 @@ macro(set_fast_gfortran)
     set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fdefault-real-8 -fdefault-double-8")
   endif()
 
+  # Disable FMA contraction for VIT translation verification phase.
+  # Ensures gfortran and g++ produce bit-identical results for equivalent
+  # floating-point expressions. Without this, each compiler independently
+  # chooses which multiply-adds to fuse, causing sub-ULP differences.
+  if (FP_CONTRACT_OFF)
+    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -ffp-contract=off")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ffp-contract=off")
+  endif()
+
   # debug flags
   if(CMAKE_BUILD_TYPE MATCHES Debug)
     set( CMAKE_Fortran_FLAGS_DEBUG "${CMAKE_Fortran_FLAGS_DEBUG} -fcheck=all,no-array-temps -pedantic -fbacktrace -finit-real=inf -finit-integer=9999." )

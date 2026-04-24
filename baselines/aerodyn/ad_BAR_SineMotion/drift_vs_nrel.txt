@@ -1,29 +1,17 @@
 Drift report: ad_BAR_SineMotion vs NREL r-test reference
-Generated: 2026-04-14T07:28:54Z
+Generated: 2026-04-24T18:34:24Z
 Platform: NAME="Ubuntu"
 
 Our output: /workspace/openfast/build/modules/aerodyn/baseline_gen_ad_BAR_SineMotion/ad_driver.outb
 NREL ref:   /workspace/openfast/build/modules/aerodyn/baseline_gen_ad_BAR_SineMotion/ad_driver_nrel_ref.outb
 Array shape: (70, 127) (timesteps, channels) = 8890 values
 
-Bit-identical:                   8050 / 8890 (90.55%)
-Within 1e-5 rel:                 8879 / 8890 (99.88%)
-Within 1e-5 rel OR 1e-6 abs:     8885 / 8890 (99.94%)
-Max abs difference:            2.146758e-01
-Max rel difference:            1.025391e-02
+Bit-identical:                   8890 / 8890 (100.00%)
+Within 1e-5 rel:                 8890 / 8890 (100.00%)
+Within 1e-5 rel OR 1e-6 abs:     8890 / 8890 (100.00%)
+Max abs difference:            0.000000e+00
+Max rel difference:            0.000000e+00
 
 Per-channel drift (non-zero channels only):
-  RtAeroMyh              (N-m     )  abs=2.147e-01  rel=5.092e-08  at t_idx=10
-  AB1N021Fx              (N/m     )  abs=9.345e-02  rel=4.085e-05  at t_idx=28
-  RtAeroFzh              (N       )  abs=1.517e-03  rel=3.413e-08  at t_idx=11
-  AB1N002Fy              (N/m     )  abs=1.048e-03  rel=3.046e-05  at t_idx=39
-  AB1N029Fx              (N/m     )  abs=1.238e-04  rel=1.018e-07  at t_idx=3
-  AB1N007Fx              (N/m     )  abs=5.791e-05  rel=3.126e-08  at t_idx=16
-  AB1N008Alpha           (deg     )  abs=9.057e-07  rel=5.292e-08  at t_idx=8
-  AB1N001Fy              (N/m     )  abs=7.274e-07  rel=1.493e-07  at t_idx=0
-  AB1N015Alpha           (deg     )  abs=6.061e-07  rel=6.832e-08  at t_idx=52
-  RtAeroCt               (-       )  abs=6.300e-08  rel=4.649e-08  at t_idx=0
-  PtfmPitch              (deg     )  abs=5.038e-08  rel=4.623e-08  at t_idx=10
-  RtVAvgzh               (m/s     )  abs=4.440e-08  rel=3.991e-08  at t_idx=11
 
-Total channels with drift:     12 / 127
+Total channels with drift:     0 / 127

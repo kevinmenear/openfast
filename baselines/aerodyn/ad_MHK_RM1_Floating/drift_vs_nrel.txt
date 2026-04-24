@@ -1,17 +1,35 @@
 Drift report: ad_MHK_RM1_Floating vs NREL r-test reference
-Generated: 2026-04-21T02:27:26Z
+Generated: 2026-04-24T18:34:37Z
 Platform: NAME="Ubuntu"
 
 Our output: /workspace/openfast/build/modules/aerodyn/baseline_gen_ad_MHK_RM1_Floating/ad_driver.outb
 NREL ref:   /workspace/openfast/build/modules/aerodyn/baseline_gen_ad_MHK_RM1_Floating/ad_driver_nrel_ref.outb
 Array shape: (600, 54) (timesteps, channels) = 32400 values
 
-Bit-identical:                  32400 / 32400 (100.00%)
-Within 1e-5 rel:                32400 / 32400 (100.00%)
-Within 1e-5 rel OR 1e-6 abs:    32400 / 32400 (100.00%)
-Max abs difference:            0.000000e+00
-Max rel difference:            0.000000e+00
+Bit-identical:                  22798 / 32400 (70.36%)
+Within 1e-5 rel:                31736 / 32400 (97.95%)
+Within 1e-5 rel OR 1e-6 abs:    32349 / 32400 (99.84%)
+Max abs difference:            1.128420e+01
+Max rel difference:            5.157407e+00
 
 Per-channel drift (non-zero channels only):
+  RtFldMyg               (N-m     )  abs=1.128e+01  rel=2.025e-04  at t_idx=597
+  RtFldMxh               (N-m     )  abs=4.959e+00  rel=1.096e-05  at t_idx=288
+  HbMby                  (N-m     )  abs=4.902e-01  rel=3.061e-05  at t_idx=521
+  RtFldFyh               (N       )  abs=4.148e-04  rel=4.697e-09  at t_idx=5
+  TwN2Mby                (N-m/m   )  abs=4.032e-04  rel=2.146e-05  at t_idx=336
+  B1N3SigCr              (-       )  abs=1.604e-04  rel=4.338e-06  at t_idx=404
+  HbMbz                  (N-m     )  abs=1.530e-04  rel=2.692e-08  at t_idx=3
+  HbFby                  (N       )  abs=1.263e-04  rel=1.453e-08  at t_idx=1
+  HbFbz                  (N       )  abs=1.242e-04  rel=2.006e-09  at t_idx=27
+  RtFldMzh               (N-m     )  abs=9.909e-05  rel=5.796e-09  at t_idx=6
+  Wave1Elev              (m       )  abs=3.063e-05  rel=3.332e-05  at t_idx=565
+  B1N7Fbt                (N/m     )  abs=2.785e-05  rel=3.431e-08  at t_idx=5
+  HWindSpeedX            (m/s     )  abs=3.387e-06  rel=1.784e-06  at t_idx=110
+  HWindSpeedZ            (m/s     )  abs=3.330e-06  rel=4.756e-05  at t_idx=52
+  PtfmHeave              (m       )  abs=2.396e-06  rel=1.955e-05  at t_idx=118
+  B1N6Mbs                (N-m/m   )  abs=6.838e-07  rel=2.064e-08  at t_idx=31
+  PtfmPitch              (deg     )  abs=7.530e-08  rel=6.786e-08  at t_idx=19
+  HbMbx                  (N-m     )  abs=5.731e-09  rel=5.157e+00  at t_idx=13
 
-Total channels with drift:     0 / 54
+Total channels with drift:     18 / 54

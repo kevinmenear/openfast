@@ -1,17 +1,34 @@
 Drift report: ad_MHK_RM1_Fixed vs NREL r-test reference
-Generated: 2026-04-21T02:27:22Z
+Generated: 2026-04-24T18:34:32Z
 Platform: NAME="Ubuntu"
 
 Our output: /workspace/openfast/build/modules/aerodyn/baseline_gen_ad_MHK_RM1_Fixed/ad_driver.outb
 NREL ref:   /workspace/openfast/build/modules/aerodyn/baseline_gen_ad_MHK_RM1_Fixed/ad_driver_nrel_ref.outb
 Array shape: (600, 54) (timesteps, channels) = 32400 values
 
-Bit-identical:                  32400 / 32400 (100.00%)
-Within 1e-5 rel:                32400 / 32400 (100.00%)
-Within 1e-5 rel OR 1e-6 abs:    32400 / 32400 (100.00%)
-Max abs difference:            0.000000e+00
-Max rel difference:            0.000000e+00
+Bit-identical:                  22200 / 32400 (68.52%)
+Within 1e-5 rel:                31722 / 32400 (97.91%)
+Within 1e-5 rel OR 1e-6 abs:    32329 / 32400 (99.78%)
+Max abs difference:            1.358468e+01
+Max rel difference:            5.154545e+00
 
 Per-channel drift (non-zero channels only):
+  RtFldMyg               (N-m     )  abs=1.358e+01  rel=6.131e-05  at t_idx=446
+  RtFldMxh               (N-m     )  abs=5.487e+00  rel=2.510e-05  at t_idx=233
+  RtFldFyh               (N       )  abs=3.447e+00  rel=1.252e-04  at t_idx=524
+  HbFbz                  (N       )  abs=1.900e+00  rel=4.010e-05  at t_idx=345
+  B1FldFz                (N       )  abs=9.331e-01  rel=1.097e-05  at t_idx=113
+  RtFldMzh               (N-m     )  abs=5.281e-01  rel=4.135e-05  at t_idx=452
+  B1N6Mbs                (N-m/m   )  abs=1.320e-03  rel=1.452e-04  at t_idx=236
+  HbFby                  (N       )  abs=7.253e-04  rel=1.073e-08  at t_idx=10
+  B1N3SigCr              (-       )  abs=1.941e-04  rel=6.858e-06  at t_idx=259
+  HbMbz                  (N-m     )  abs=6.630e-05  rel=1.166e-08  at t_idx=3
+  HbMby                  (N-m     )  abs=6.630e-05  rel=4.123e-09  at t_idx=0
+  B1N2SgCav              (-       )  abs=4.107e-05  rel=1.014e-05  at t_idx=103
+  Wave1Elev              (m       )  abs=3.063e-05  rel=3.332e-05  at t_idx=565
+  B1N7Fbt                (N/m     )  abs=9.286e-06  rel=1.164e-07  at t_idx=0
+  HbMbx                  (N-m     )  abs=9.971e-09  rel=2.410e+00  at t_idx=39
+  HWindSpeedZ            (m/s     )  abs=2.622e-09  rel=2.018e-08  at t_idx=5
+  HWindSpeedY            (m/s     )  abs=1.600e-09  rel=1.206e-08  at t_idx=388
 
-Total channels with drift:     0 / 54
+Total channels with drift:     17 / 54
