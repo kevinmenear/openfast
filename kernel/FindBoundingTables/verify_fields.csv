@@ -1,0 +1,64 @@
+case,field,type,status,computed,reference,diff
+FindBoundingTables.0.0.1,uppertable,scalar,IDENTICAL,2,2,
+FindBoundingTables.0.0.1,lowertable,scalar,IDENTICAL,1,1,
+FindBoundingTables.0.0.1,xvals,array,IDENTICAL,,,size=           2
+FindBoundingTables.0.0.2,uppertable,scalar,IDENTICAL,2,2,
+FindBoundingTables.0.0.2,lowertable,scalar,IDENTICAL,1,1,
+FindBoundingTables.0.0.2,xvals,array,IDENTICAL,,,size=           2
+FindBoundingTables.0.0.3,uppertable,scalar,IDENTICAL,2,2,
+FindBoundingTables.0.0.3,lowertable,scalar,IDENTICAL,1,1,
+FindBoundingTables.0.0.3,xvals,array,IDENTICAL,,,size=           2
+FindBoundingTables.0.0.4,uppertable,scalar,IDENTICAL,2,2,
+FindBoundingTables.0.0.4,lowertable,scalar,IDENTICAL,1,1,
+FindBoundingTables.0.0.4,xvals,array,IDENTICAL,,,size=           2
+FindBoundingTables.0.0.5,uppertable,scalar,IDENTICAL,2,2,
+FindBoundingTables.0.0.5,lowertable,scalar,IDENTICAL,1,1,
+FindBoundingTables.0.0.5,xvals,array,IDENTICAL,,,size=           2
+FindBoundingTables.0.0.6,uppertable,scalar,IDENTICAL,2,2,
+FindBoundingTables.0.0.6,lowertable,scalar,IDENTICAL,1,1,
+FindBoundingTables.0.0.6,xvals,array,IDENTICAL,,,size=           2
+FindBoundingTables.0.0.7,uppertable,scalar,IDENTICAL,2,2,
+FindBoundingTables.0.0.7,lowertable,scalar,IDENTICAL,1,1,
+FindBoundingTables.0.0.7,xvals,array,IDENTICAL,,,size=           2
+FindBoundingTables.0.0.8,uppertable,scalar,IDENTICAL,2,2,
+FindBoundingTables.0.0.8,lowertable,scalar,IDENTICAL,1,1,
+FindBoundingTables.0.0.8,xvals,array,IDENTICAL,,,size=           2
+FindBoundingTables.0.0.9,uppertable,scalar,IDENTICAL,2,2,
+FindBoundingTables.0.0.9,lowertable,scalar,IDENTICAL,1,1,
+FindBoundingTables.0.0.9,xvals,array,IDENTICAL,,,size=           2
+FindBoundingTables.0.0.10,uppertable,scalar,IDENTICAL,2,2,
+FindBoundingTables.0.0.10,lowertable,scalar,IDENTICAL,1,1,
+FindBoundingTables.0.0.10,xvals,array,IDENTICAL,,,size=           2
+FindBoundingTables.0.0.11,uppertable,scalar,IDENTICAL,2,2,
+FindBoundingTables.0.0.11,lowertable,scalar,IDENTICAL,1,1,
+FindBoundingTables.0.0.11,xvals,array,IDENTICAL,,,size=           2
+FindBoundingTables.0.0.12,uppertable,scalar,IDENTICAL,2,2,
+FindBoundingTables.0.0.12,lowertable,scalar,IDENTICAL,1,1,
+FindBoundingTables.0.0.12,xvals,array,IDENTICAL,,,size=           2
+FindBoundingTables.0.0.13,uppertable,scalar,IDENTICAL,2,2,
+FindBoundingTables.0.0.13,lowertable,scalar,IDENTICAL,1,1,
+FindBoundingTables.0.0.13,xvals,array,IDENTICAL,,,size=           2
+FindBoundingTables.0.0.14,uppertable,scalar,IDENTICAL,2,2,
+FindBoundingTables.0.0.14,lowertable,scalar,IDENTICAL,1,1,
+FindBoundingTables.0.0.14,xvals,array,IDENTICAL,,,size=           2
+FindBoundingTables.0.0.15,uppertable,scalar,IDENTICAL,2,2,
+FindBoundingTables.0.0.15,lowertable,scalar,IDENTICAL,1,1,
+FindBoundingTables.0.0.15,xvals,array,IDENTICAL,,,size=           2
+FindBoundingTables.0.0.16,uppertable,scalar,IDENTICAL,2,2,
+FindBoundingTables.0.0.16,lowertable,scalar,IDENTICAL,1,1,
+FindBoundingTables.0.0.16,xvals,array,IDENTICAL,,,size=           2
+FindBoundingTables.0.0.17,uppertable,scalar,IDENTICAL,3,3,
+FindBoundingTables.0.0.17,lowertable,scalar,IDENTICAL,2,2,
+FindBoundingTables.0.0.17,xvals,array,IDENTICAL,,,size=           2
+FindBoundingTables.0.0.18,uppertable,scalar,IDENTICAL,3,3,
+FindBoundingTables.0.0.18,lowertable,scalar,IDENTICAL,2,2,
+FindBoundingTables.0.0.18,xvals,array,IDENTICAL,,,size=           2
+FindBoundingTables.0.0.19,uppertable,scalar,IDENTICAL,3,3,
+FindBoundingTables.0.0.19,lowertable,scalar,IDENTICAL,2,2,
+FindBoundingTables.0.0.19,xvals,array,IDENTICAL,,,size=           2
+FindBoundingTables.0.0.20,uppertable,scalar,IDENTICAL,3,3,
+FindBoundingTables.0.0.20,lowertable,scalar,IDENTICAL,2,2,
+FindBoundingTables.0.0.20,xvals,array,IDENTICAL,,,size=           2
+FindBoundingTables.0.0.21,uppertable,scalar,IDENTICAL,3,3,
+FindBoundingTables.0.0.21,lowertable,scalar,IDENTICAL,2,2,
+FindBoundingTables.0.0.21,xvals,array,IDENTICAL,,,size=           2

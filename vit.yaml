@@ -1,0 +1,48 @@
+project:
+  name: AeroDyn
+  source_dir: modules
+  build_dir: build
+kgen:
+  path: /workspace/KGen/bin/kgen
+  build_cmd: cd /workspace/openfast/build && cmake --build . --target aerodyn_driver
+    -j$(nproc)
+  run_cmd: cd /workspace/openfast/reg_tests/r-test/modules/aerodyn/ad_BAR_SineMotion
+    && /workspace/openfast/build/modules/aerodyn/aerodyn_driver ad_driver.dvr
+  clean_cmd: cd /workspace/openfast/build/modules/aerodyn && make clean
+  install_cmd: ''
+  invocation: 0:0:1-5
+build_system:
+  type: cmake
+  cmake_file: modules/aerodyn/CMakeLists.txt
+  target_name: aerodyn_driver
+fortran:
+  kind_aliases:
+    ReKi: REAL(8)
+    DbKi: REAL(8)
+    SiKi: REAL(4)
+    R4Ki: REAL(4)
+    R8Ki: REAL(8)
+    IntKi: INTEGER(4)
+    B4Ki: INTEGER(4)
+  compiler: gfortran
+  flags: -cpp -fdefault-real-8 -fdefault-double-8 -ffp-contract=off
+  preprocessor_defines:
+  - OPENFAST_DOUBLE_PRECISION
+  - HAS_FORTRAN2008_FEATURES
+verification:
+  tolerance: 1.0e-14
+translations:
+  Calculate_Cn:
+    status: integrated
+    cpp_file: translations/AirfoilInfo/calculate_cn.cpp
+  FindBoundingTables:
+    status: integrated
+    cpp_file: translations/AirfoilInfo/findboundingtables.cpp
+  Compute_iLoweriUpper:
+    status: integrated
+    cpp_file: translations/AirfoilInfo/compute_iloweriupper.cpp
+types:
+  AFI_ParameterType:
+    strategy: view
+  AFI_Table_Type:
+    strategy: view

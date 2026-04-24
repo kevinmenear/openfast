@@ -28,6 +28,7 @@ if (GENERATE_TYPES)
 endif()
 
 # BasicAero Library
+enable_language(CXX)
 add_library(basicaerolib STATIC
   # UnsteadyAero lib
   src/UnsteadyAero.f90
@@ -36,8 +37,13 @@ add_library(basicaerolib STATIC
   # AirFoil Info lib
   src/AirfoilInfo.f90
   src/AirfoilInfo_Types.f90
+  src/calculate_cn.cpp
+  src/vit_afi_table_type_view.f90
+  src/vit_afi_parametertype_view.f90
+  src/findboundingtables.cpp
+  src/compute_iloweriupper.cpp
 )
-target_link_libraries(basicaerolib ifwlib nwtclibs)
+target_link_libraries(basicaerolib ifwlib nwtclibs stdc++)
 
 # AeroAcoustics library
 add_library(aeroacousticslib STATIC

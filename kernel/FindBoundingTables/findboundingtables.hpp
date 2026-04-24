@@ -1,0 +1,31 @@
+// VIT Translation Scaffold
+// Function: FindBoundingTables
+// Source: AirfoilInfo.f90
+// Module: AirfoilInfo
+// Fortran: SUBROUTINE FindBoundingTables(p, secondaryDepVal, lowerTable, upperTable, xVals)
+// Source MD5: c748e744cc97
+// VIT: 0.1.0
+// Status: unverified
+// Generated: 2026-04-24T21:26:48Z
+
+#include "vit_types.h"
+
+void FindBoundingTables(afi_parametertype_view_t* p, double secondaryDepVal, int* lowerTable, int* upperTable, double* xVals) {
+    // Binary search on p->secondVals to find bounding table indices
+    // Output indices are 1-based (Fortran callers expect 1-based)
+    *lowerTable = 1;
+    *upperTable = p->NumTabs;
+
+    while (*upperTable - *lowerTable > 1) {
+        int iMid = (*upperTable + *lowerTable) / 2;
+
+        if (secondaryDepVal >= p->secondVals[iMid - 1]) {  // 0-based array access
+            *lowerTable = iMid;
+        } else {
+            *upperTable = iMid;
+        }
+    }
+
+    xVals[0] = p->secondVals[*lowerTable - 1];  // 0-based array access
+    xVals[1] = p->secondVals[*upperTable - 1];  // 0-based array access
+}
