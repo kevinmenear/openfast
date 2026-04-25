@@ -8,6 +8,8 @@
 #ifndef VIT_TRANSLATED_H
 #define VIT_TRANSLATED_H
 
+#include "vit_types.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -20,6 +22,7 @@ void calculate_c_alpha_c(double* alpha, int n_alpha, double* Cn, int n_Cn, doubl
 void computeuaseparationfunction_zero_c(afi_table_type_view_t* p, int ColUAf, double* cn_cl, int n_cn_cl);
 void computeua360_updatecnseparated_c(afi_table_type_view_t* p, int ColUAf, double* cn_cl, int n_cn_cl, int iLower);
 void computeua360_updateseparationf_c(afi_table_type_view_t* p, int ColUAf, double* cn_cl, int n_cn_cl, int iLower, int iUpper);
+void computeuaseparationfunction_oncl_c(afi_table_type_view_t* p, int ColCl, int ColUAf, int col_fs, int col_fa);
 
 #ifdef __cplusplus
 }

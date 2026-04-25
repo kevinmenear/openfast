@@ -35,59 +35,35 @@ translations:
   Calculate_Cn:
     status: integrated
     cpp_file: translations/AirfoilInfo/calculate_cn.cpp
-    cases_passed: 20
-    cases_total: 20
-    cases_skipped: 0
-    kernel_dir: kernel/Calculate_Cn
   FindBoundingTables:
     status: integrated
     cpp_file: translations/AirfoilInfo/findboundingtables.cpp
-    cases_passed: 21
-    cases_total: 21
-    cases_skipped: 0
-    kernel_dir: kernel/FindBoundingTables
   Compute_iLoweriUpper:
     status: integrated
     cpp_file: translations/AirfoilInfo/compute_iloweriupper.cpp
-    cases_passed: 20
-    cases_total: 20
-    cases_skipped: 0
-    kernel_dir: kernel/Compute_iLoweriUpper
   ComputeUA360_CnOffset:
     status: integrated
     cpp_file: translations/AirfoilInfo/computeua360_cnoffset.cpp
-    cases_passed: 21
-    cases_total: 21
-    cases_skipped: 0
-    kernel_dir: kernel/ComputeUA360_CnOffset
   Calculate_C_alpha:
     status: integrated
     cpp_file: translations/AirfoilInfo/calculate_c_alpha.cpp
-    cases_passed: 20
-    cases_total: 20
-    cases_skipped: 0
-    kernel_dir: kernel/Calculate_C_alpha
   ComputeUASeparationFunction_zero:
     status: integrated
     cpp_file: translations/AirfoilInfo/computeuaseparationfunction_zero.cpp
-    cases_passed: 20
-    cases_total: 20
-    cases_skipped: 0
-    kernel_dir: kernel/ComputeUASeparationFunction_zero
+    verification: simulation
   ComputeUA360_updateCnSeparated:
     status: integrated
     cpp_file: translations/AirfoilInfo/computeua360_updatecnseparated.cpp
-    cases_passed: 20
-    cases_total: 20
-    cases_skipped: 0
-    kernel_dir: kernel/ComputeUA360_updateCnSeparated
   ComputeUA360_updateSeparationF:
     status: integrated
     cpp_file: translations/AirfoilInfo/computeua360_updateseparationf.cpp
+  ComputeUASeparationFunction_onCl:
+    status: integrated
+    cpp_file: translations/AirfoilInfo/computeuaseparationfunction_oncl.cpp
     cases_passed: 20
     cases_total: 20
     cases_skipped: 0
-    kernel_dir: kernel/ComputeUA360_updateSeparationF
+    kernel_dir: kernel/ComputeUASeparationFunction_onCl
 types:
   AFI_ParameterType:
     strategy: view

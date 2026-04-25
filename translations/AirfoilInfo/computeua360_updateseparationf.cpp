@@ -9,7 +9,6 @@
 // Generated: 2026-04-25T18:40:30Z
 
 #include "vit_types.h"
-#include "vit_translated.h"
 #include <cmath>
 #include <limits>
 #include <vector>

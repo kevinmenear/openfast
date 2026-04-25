@@ -3,6 +3,7 @@
 // After verification: ComputeUA360_CnOffset kernel PASSED
 
 #include "vit_types.h"
+#include "vit_translated.h"
 
 // --- User-provided C++ implementation ---
 // VIT Translation Scaffold
