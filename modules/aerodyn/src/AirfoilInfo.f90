@@ -45,43 +45,17 @@ MODULE AirfoilInfo
    integer, parameter                           :: MaxNumAFCoeffs = 7 !cl,cd,cm,cpMin, UA:f_st, FullySeparate, FullyAttached
 
 
-    ! Auto-generated interface for C++ implementation of Calculate_Cn
+    ! Auto-generated interface for C++ implementation of ComputeUA360_CnOffset
     INTERFACE
-        SUBROUTINE calculate_cn_c(alpha, n_alpha, Cl, n_Cl, Cd, n_Cd, Cd0, Calculate_Cn_result) BIND(C, NAME='calculate_cn_c')
-            USE ISO_C_BINDING
-            REAL(C_DOUBLE), INTENT(IN) :: alpha(*)
-            INTEGER(C_INT), VALUE :: n_alpha
-            REAL(C_DOUBLE), INTENT(IN) :: Cl(*)
-            INTEGER(C_INT), VALUE :: n_Cl
-            REAL(C_DOUBLE), INTENT(IN) :: Cd(*)
-            INTEGER(C_INT), VALUE :: n_Cd
-            REAL(C_DOUBLE), VALUE :: Cd0
-            REAL(C_DOUBLE), INTENT(OUT) :: Calculate_Cn_result(*)
-        END SUBROUTINE calculate_cn_c
-    END INTERFACE
-
-
-    ! Auto-generated interface for C++ implementation of FindBoundingTables
-    INTERFACE
-        SUBROUTINE findboundingtables_c(p, secondaryDepVal, lowerTable, upperTable, xVals) BIND(C, NAME='findboundingtables_c')
+        FUNCTION computeua360_cnoffset_c(p, cn_cl, n_cn_cl, Row, iLower) BIND(C, NAME='computeua360_cnoffset_c')
             USE ISO_C_BINDING
             TYPE(C_PTR), VALUE :: p
-            REAL(C_DOUBLE), VALUE :: secondaryDepVal
-            INTEGER(C_INT), INTENT(OUT) :: lowerTable
-            INTEGER(C_INT), INTENT(OUT) :: upperTable
-            REAL(C_DOUBLE), INTENT(OUT) :: xVals(*)
-        END SUBROUTINE findboundingtables_c
-    END INTERFACE
-
-
-    ! Auto-generated interface for C++ implementation of Compute_iLoweriUpper
-    INTERFACE
-        SUBROUTINE compute_iloweriupper_c(p, iLower, iUpper) BIND(C, NAME='compute_iloweriupper_c')
-            USE ISO_C_BINDING
-            TYPE(C_PTR), VALUE :: p
-            INTEGER(C_INT), INTENT(OUT) :: iLower
-            INTEGER(C_INT), INTENT(OUT) :: iUpper
-        END SUBROUTINE compute_iloweriupper_c
+            REAL(C_DOUBLE), INTENT(IN) :: cn_cl(*)
+            INTEGER(C_INT), VALUE :: n_cn_cl
+            INTEGER(C_INT), VALUE :: Row
+            INTEGER(C_INT), VALUE :: iLower
+            REAL(C_DOUBLE) :: computeua360_cnoffset_c
+        END FUNCTION computeua360_cnoffset_c
     END INTERFACE
 
 CONTAINS
@@ -1192,16 +1166,23 @@ ALPHA_LOOP: DO Row=1,p%Table(iTable)%NumAlf-1
 
    END SUBROUTINE CalculateUACoeffs
 !----------------------------------------------------------------------------------------------------------------------------------
-    FUNCTION Calculate_Cn(alpha, Cl, Cd, Cd0) RESULT(Cn)
-        USE ISO_C_BINDING
-        IMPLICIT NONE
-        REAL(8), INTENT(IN) :: alpha(:)
-        REAL(8), INTENT(IN) :: Cl(:)
-        REAL(8), INTENT(IN) :: Cd(:)
-        REAL(8), INTENT(IN) :: Cd0
-        REAL(8), DIMENSION(SIZE(ALPHA)) :: Cn
-        CALL calculate_cn_c(alpha, SIZE(alpha), Cl, SIZE(Cl), Cd, SIZE(Cd), Cd0, Cn)
-    END FUNCTION Calculate_Cn
+   FUNCTION Calculate_Cn (alpha, Cl, Cd, Cd0) RESULT(Cn)
+      REAL(ReKi),               intent(in   ) :: alpha(:)                   ! alpha
+      REAL(ReKi),               intent(in   ) :: Cl(:)                      ! cl
+      REAL(ReKi),               intent(in   ) :: Cd(:)                      ! cd
+      REAL(ReKi),               intent(in   ) :: Cd0
+      REAL(ReKi)                              :: Cn(size(alpha))            ! cn (result of this function)
+      
+      integer(IntKi)                          :: NumAlf
+      integer(IntKi)                          :: Row
+   
+      NumAlf = size(alpha)
+      
+      do Row=1,NumAlf
+         cn(Row) = Cl(Row)*cos(alpha(Row)) + (Cd(Row) - Cd0)*sin(alpha(Row))
+      end do
+      
+   END FUNCTION Calculate_Cn
 !----------------------------------------------------------------------------------------------------------------------------------
    SUBROUTINE Calculate_C_alpha(alpha, Cn, Cl, Default_Cn_alpha, Default_Cl_alpha, Default_alpha0, ErrStat, ErrMsg)
       REAL(ReKi),               intent(in   ) :: alpha(:)                   ! alpha
@@ -1330,18 +1311,21 @@ ALPHA_LOOP: DO Row=1,p%Table(iTable)%NumAlf-1
 
    END SUBROUTINE ComputeUASeparationFunction_onCl
 !----------------------------------------------------------------------------------------------------------------------------------  
-    SUBROUTINE Compute_iLoweriUpper(p, iLower, iUpper)
-        USE ISO_C_BINDING
-        USE vit_afi_table_type_view, ONLY: afi_table_type_view_t, vit_populate_afi_table_type
-        IMPLICIT NONE
-        TYPE(AFI_TABLE_TYPE), INTENT(IN), TARGET :: p
-        INTEGER(4), INTENT(OUT) :: iLower
-        INTEGER(4), INTENT(OUT) :: iUpper
-        TYPE(afi_table_type_view_t), TARGET :: p_view
-        ! Populate view structs from Fortran types
-        CALL vit_populate_afi_table_type(p, p_view)
-        CALL compute_iloweriupper_c(C_LOC(p_view), iLower, iUpper)
-    END SUBROUTINE Compute_iLoweriUpper
+   SUBROUTINE Compute_iLoweriUpper(p, iLower, iUpper)
+      TYPE (AFI_Table_Type),    intent(in   ) :: p                             ! This structure stores all the module parameters that are set by AirfoilInfo during the initialization phase.
+      INTEGER(IntKi)          , intent(  out) :: iLower                        ! The lower index separating the region around 0
+      INTEGER(IntKi)          , intent(  out) :: iUpper                        ! The upper index separating the region around 0
+      
+      !------------------------------------------------
+      ! get bounds
+      !------------------------------------------------
+      iLower = minloc( p%alpha , DIM=1, MASK=p%alpha >= p%UA_BL%alphaLower)
+      iUpper = maxloc( p%alpha , DIM=1, MASK=p%alpha <= p%UA_BL%alphaUpper)
+      
+      iLower = max(1, min(p%NumAlf-1,iLower)) ! 1 <= iLower <= NumAlf-1
+      iUpper = max(2, min(p%NumAlf  ,iUpper)) ! 2 <= iUpper <= NumAlf
+
+   END SUBROUTINE Compute_iLoweriUpper
 !----------------------------------------------------------------------------------------------------------------------------------  
    SUBROUTINE ComputeUASeparationFunction_zero(p, ColUAf, cn_cl)
       TYPE (AFI_Table_Type),    intent(inout) :: p                             ! This structure stores all the module parameters that are set by AirfoilInfo during the initialization phase.
@@ -1589,41 +1573,52 @@ ALPHA_LOOP: DO Row=1,p%Table(iTable)%NumAlf-1
 
    END SUBROUTINE ComputeUA360_updateCnSeparated
 !----------------------------------------------------------------------------------------------------------------------------------  
-   REAL(ReKi) FUNCTION ComputeUA360_CnOffset(p, cn_cl, Row, iLower) RESULT(offset)
-      TYPE (AFI_Table_Type),    intent(in   ) :: p                             ! This structure stores all the module parameters that are set by AirfoilInfo during the initialization phase.
-      REAL(ReKi),               intent(in   ) :: cn_cl(:)                      ! cn or cl, whichever variable we are computing this on
-      INTEGER(IntKi)          , intent(in   ) :: Row                           ! The row of a table to be parsed in the FileInfo structure.
-      INTEGER(IntKi)          , intent(in   ) :: iLower                        ! The lower index separating the region around 0
-   
-      REAL(ReKi)                              :: CnOffset                     ! Mathematical trick: offset to Cn making formulation of f-separation behave for strange polars with negative stall at positive Cn values (usually soiled polars for thick airfoils)
-      REAL(ReKi)                              :: SlopeScale
-         
-   
-      ! compute cnOffset
-      if (cn_cl(iLower) > -0.05) then
-         CnOffset = cn_cl(iLower) + 0.05
-      else
-         CnOffset = 0.0_ReKi
-      end if
-      
-      SlopeScale = 0.1_ReKi*R2D
-      offset = CnOffset * ( tanh(SlopeScale*(p%alpha(Row)+PiBy2)) - tanh(SlopeScale*(p%alpha(Row)-PiBy2)) ) / 2.0_ReKi; !Only apply Cn offset in vicinity of AoA 0 deg
-   END FUNCTION ComputeUA360_CnOffset
-!----------------------------------------------------------------------------------------------------------------------------------  
-    SUBROUTINE FindBoundingTables(p, secondaryDepVal, lowerTable, upperTable, xVals)
+    FUNCTION ComputeUA360_CnOffset(p, cn_cl, Row, iLower) RESULT(offset)
         USE ISO_C_BINDING
-        USE vit_afi_parametertype_view, ONLY: afi_parametertype_view_t, vit_populate_afi_parametertype
+        USE vit_afi_table_type_view, ONLY: afi_table_type_view_t, vit_populate_afi_table_type
         IMPLICIT NONE
-        TYPE(AFI_PARAMETERTYPE), INTENT(IN), TARGET :: p
-        REAL(8), INTENT(IN) :: secondaryDepVal
-        INTEGER(4), INTENT(OUT) :: lowerTable
-        INTEGER(4), INTENT(OUT) :: upperTable
-        REAL(8), INTENT(OUT) :: xVals(2)
-        TYPE(afi_parametertype_view_t), TARGET :: p_view
+        TYPE(AFI_TABLE_TYPE), INTENT(IN), TARGET :: p
+        REAL(8), INTENT(IN) :: cn_cl(:)
+        INTEGER(4), INTENT(IN) :: Row
+        INTEGER(4), INTENT(IN) :: iLower
+        REAL(8) :: offset
+        TYPE(afi_table_type_view_t), TARGET :: p_view
         ! Populate view structs from Fortran types
-        CALL vit_populate_afi_parametertype(p, p_view)
-        CALL findboundingtables_c(C_LOC(p_view), secondaryDepVal, lowerTable, upperTable, xVals)
-    END SUBROUTINE FindBoundingTables
+        CALL vit_populate_afi_table_type(p, p_view)
+        offset = REAL(computeua360_cnoffset_c(C_LOC(p_view), cn_cl, SIZE(cn_cl), Row, iLower), 8)
+    END FUNCTION ComputeUA360_CnOffset
+!----------------------------------------------------------------------------------------------------------------------------------  
+subroutine FindBoundingTables(p, secondaryDepVal, lowerTable, upperTable, xVals)
+
+   TYPE (AFI_ParameterType), intent(in   ) :: p                          ! This structure stores all the module parameters that are set by AirfoilInfo during the initialization phase.
+   real(ReKi),               intent(in   ) :: secondaryDepVal            ! Interpolate secondary values (Re or UserProp) based on this value
+
+   integer(IntKi),           intent(  out) :: lowerTable                 ! index of the lower airfoil table p%secondVals(lowerTable) <= secondaryDepVal <= p%secondVals(upperTable)
+   integer(IntKi),           intent(  out) :: upperTable                 ! index of the upper airfoil table ( = lowerTable+1 )
+   real(ReKi),               intent(  out) :: xVals(2)                   ! this takes the place of time in the extrapInterp routines generated by the Registry
+   
+   integer(IntKi)                          :: iMid
+
+   ! compare algorithm with InterpBinReal
+   lowerTable  = 1
+   upperTable  = p%NumTabs
+
+   DO WHILE ( upperTable-lowerTable > 1 )
+
+      iMid = ( upperTable + lowerTable )/2
+
+      IF ( secondaryDepVal >= p%secondVals(iMid) ) THEN
+         lowerTable = iMid
+      ELSE
+         upperTable = iMid
+      END IF
+
+   END DO
+   
+   xVals(1) = p%secondVals(lowerTable)
+   xVals(2) = p%secondVals(upperTable)
+
+end subroutine FindBoundingTables
 !----------------------------------------------------------------------------------------------------------------------------------  
 subroutine AFI_ComputeUACoefs2D( secondaryDepVal, p, UA_BL, errStat, errMsg )
 ! This routine is calculates the UA parameters for a set of tables which are dependent a 2nd user-defined varible, could be Re or Cntrl, etc.

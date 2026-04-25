@@ -42,6 +42,7 @@ add_library(basicaerolib STATIC
   src/vit_afi_parametertype_view.f90
   src/findboundingtables.cpp
   src/compute_iloweriupper.cpp
+  src/computeua360_cnoffset.cpp
 )
 target_link_libraries(basicaerolib ifwlib nwtclibs stdc++)
 

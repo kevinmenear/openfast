@@ -41,6 +41,9 @@ translations:
   Compute_iLoweriUpper:
     status: integrated
     cpp_file: translations/AirfoilInfo/compute_iloweriupper.cpp
+  ComputeUA360_CnOffset:
+    status: integrated
+    cpp_file: translations/AirfoilInfo/computeua360_cnoffset.cpp
 types:
   AFI_ParameterType:
     strategy: view

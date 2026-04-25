@@ -6,9 +6,10 @@ Per-function extraction parameters for KGen state capture. Line numbers are for 
 
 | Function | Caller | Source file | Test case | Invocation | Cases |
 |----------|--------|-------------|-----------|------------|-------|
-| Calculate_Cn | AFI_Init → ReadAFfile | AirfoilInfo.f90 | ad_BAR_SineMotion | 0:0:1-5 | 20 |
+| Calculate_Cn | CalculateUACoeffs (line 974, else branch) | AirfoilInfo.f90 | ad_BAR_SineMotion | 0:0:1-5 | 20 |
 | FindBoundingTables | AFI_ComputeAirfoilCoefs2D | AirfoilInfo.f90 | ad_MHK_RM1_Fixed | 0:0:1-5 | 21 |
 | Compute_iLoweriUpper | CalculateUACoeffs (`.not. UA_f_cn` branch) | AirfoilInfo.f90 | ad_BAR_SineMotion_UA4_DBEMT3 | 0:0:1-20 | 20 |
+| ComputeUA360_CnOffset | ComputeUA360_updateSeparationF (line 1482) | AirfoilInfo.f90 | ad_Kite_OLAF | 0:0:1-20 | 21 |
 
 ## Finding Call Sites
 
@@ -31,6 +32,7 @@ python3 -c "import json; cg=json.load(open('vit/analysis/aerodyn/call_graph.json
 ## Notes
 
 - **Invocation range:** Default `0:0:1-5` works for runtime functions. Use `0:0:1-20` for init-time functions (called once per airfoil during AFI_Init).
-- **UA-gated functions** require `ad_BAR_SineMotion_UA4_DBEMT3` (UA_Mod=4). The default `ad_BAR_SineMotion` has UA_Mod=0.
+- **UA-gated functions (UA_f_cn=FALSE branch)** require `ad_BAR_SineMotion_UA4_DBEMT3` (UA_Mod=4, makes `UA_f_cn=FALSE`).
+- **UA-gated functions (UA_f_cn=TRUE branch, ComputeUA360_*)** require `ad_Kite_OLAF` (UA_Mod=3, makes `UA_f_cn=TRUE`). Also needs `InclUAdata=TRUE` in the airfoil files (BAR airfoils have FALSE).
 - **Multi-table functions** require `ad_MHK_RM1_Fixed` (AFTabMod=2). Default has AFTabMod=1.
 - **OLAF/FVW functions** require an OLAF test case (e.g., `ad_BAR_OLAF`). BEMT test cases don't exercise FVW code paths.

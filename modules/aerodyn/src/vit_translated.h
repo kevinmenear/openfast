@@ -15,6 +15,7 @@ extern "C" {
 void calculate_cn_c(double* alpha, int n_alpha, double* Cl, int n_Cl, double* Cd, int n_Cd, double Cd0, double* Calculate_Cn_result);
 void findboundingtables_c(afi_parametertype_view_t* p, double secondaryDepVal, int* lowerTable, int* upperTable, double* xVals);
 void compute_iloweriupper_c(afi_table_type_view_t* p, int* iLower, int* iUpper);
+double computeua360_cnoffset_c(afi_table_type_view_t* p, double* cn_cl, int n_cn_cl, int Row, int iLower);
 
 #ifdef __cplusplus
 }
