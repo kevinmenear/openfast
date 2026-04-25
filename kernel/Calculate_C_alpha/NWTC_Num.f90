@@ -30,7 +30,7 @@ MODULE NWTC_Num
 !..................................................................................................................................
    
     USE nwtc_io 
-    USE kgen_utils_mod, ONLY: kgen_dp, kgen_array_sumcheck 
+    USE kgen_utils_mod
     USE tprof_mod, ONLY: tstart, tstop, tnull, tprnt 
 
     IMPLICIT NONE 

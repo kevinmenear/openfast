@@ -1,0 +1,424 @@
+!KGEN-generated Fortran source file 
+  
+!Generated at : 2026-04-25 19:27:48 
+!KGEN version : 0.8.1 
+  
+!**********************************************************************************************************************************
+! LICENSING
+! Copyright (C) 2015-2018  National Renewable Energy Laboratory
+!    This file is part of AeroDyn.
+! Licensed under the Apache License, Version 2.0 (the "License");
+! you may not use this file except in compliance with the License.
+! You may obtain a copy of the License at
+!     http://www.apache.org/licenses/LICENSE-2.0
+! Unless required by applicable law or agreed to in writing, software
+! distributed under the License is distributed on an "AS IS" BASIS,
+! WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+! See the License for the specific language governing permissions and
+! limitations under the License.
+!**********************************************************************************************************************************
+
+
+!
+!
+!
+!
+!
+MODULE AirfoilInfo
+   ! This module contains airfoil-related routines with non-system-specific logic and references.
+! Redo this routing to get rid of some of the phases.  For instance, AFI_Init should be calle directly.
+
+
+    USE airfoilinfo_types 
+    USE kgen_utils_mod, ONLY: kgen_dp, kgen_array_sumcheck 
+    USE tprof_mod, ONLY: tstart, tstop, tnull, tprnt 
+
+    IMPLICIT NONE 
+
+    PRIVATE 
+
+
+    PUBLIC calculateuacoeffs 
+
+CONTAINS
+
+
+   !=============================================================================
+   
+
+
+   !=============================================================================
+   !> This routine checks the init input values for AFI and makes sure they are valid
+   !! before using them.
+   
+
+
+   !=============================================================================
+  
+
+
+!----------------------------------------------------------------------------------------------------------------------------------  
+SUBROUTINE calculateuacoeffs(kgen_unit, kgen_measure, kgen_isverified, kgen_filepath, p, coluaf) 
+    USE kgen_utils_mod, ONLY: kgen_dp, kgen_array_sumcheck 
+    USE kgen_utils_mod, ONLY: kgen_perturb_real 
+    USE nwtc_num, ONLY: kr_externs_out_nwtc_num 
+    USE kgen_utils_mod, ONLY: check_t, kgen_init_check, kgen_init_verify, kgen_tolerance, kgen_minvalue, kgen_verboselevel, &
+    &CHECK_IDENTICAL, CHECK_IN_TOL, CHECK_OUT_TOL 
+    TYPE(afi_table_type), INTENT(INOUT) :: p 
+    INTEGER(KIND=intki), INTENT(INOUT) :: coluaf 
+   
+      
+    INTEGER(KIND=intki) :: iupper, ilower 
+      
+      ! note that we don't get here with constant data, so NumAlf>2
+
+    REAL(KIND=reki) :: cn(p%numalf) 
+      
+      
+      
+
+    INTEGER, INTENT(IN) :: kgen_unit 
+    REAL(KIND=kgen_dp), INTENT(OUT) :: kgen_measure 
+    LOGICAL, INTENT(OUT) :: kgen_isverified 
+    CHARACTER(LEN=*), INTENT(IN) :: kgen_filepath 
+    LOGICAL :: kgen_istrue 
+    REAL(KIND=8) :: kgen_array_sum 
+    INTEGER :: kgen_intvar, kgen_ierr 
+    INTEGER :: kgen_mpirank, kgen_openmptid, kgen_kernelinvoke 
+    LOGICAL :: kgen_evalstage, kgen_warmupstage, kgen_mainstage 
+    COMMON / state / kgen_mpirank, kgen_openmptid, kgen_kernelinvoke, kgen_evalstage, kgen_warmupstage, kgen_mainstage 
+    INTEGER, PARAMETER :: KGEN_MAXITER = 1 
+      
+    TYPE(check_t) :: check_status 
+    INTEGER*8 :: kgen_start_clock, kgen_stop_clock, kgen_rate_clock 
+    REAL(KIND=kgen_dp) :: gkgen_measure 
+    TYPE(afi_table_type) :: kgenref_p 
+    INTEGER(KIND=intki) :: kgenref_ilower 
+    INTEGER(KIND=intki) :: kgenref_iupper 
+      
+    !parent block preprocessing 
+    kgen_mpirank = 0 
+      
+    !local input variables 
+    READ (UNIT = kgen_unit) ilower 
+    READ (UNIT = kgen_unit) iupper 
+    READ (UNIT = kgen_unit) kgen_istrue 
+    IF (kgen_istrue) THEN 
+        READ (UNIT = kgen_unit) kgen_array_sum 
+        READ (UNIT = kgen_unit) cn 
+        CALL kgen_array_sumcheck("cn", kgen_array_sum, DBLE(SUM(cn, mask=(cn .eq. cn))), .TRUE.) 
+    END IF   
+      
+    !extern output variables 
+    CALL kr_externs_out_nwtc_num(kgen_unit) 
+      
+    !local output variables 
+    CALL kr_airfoilinfo_types_afi_table_type(kgenref_p, kgen_unit, "kgenref_p", .FALSE.) 
+    READ (UNIT = kgen_unit) kgenref_ilower 
+    READ (UNIT = kgen_unit) kgenref_iupper 
+
+
+      
+
+
+    IF (kgen_evalstage) THEN 
+    END IF   
+    IF (kgen_warmupstage) THEN 
+    END IF   
+    IF (kgen_mainstage) THEN 
+    END IF   
+      
+    !Uncomment following call statement to turn on perturbation experiment. 
+    !Adjust perturbation value and/or kind parameter if required. 
+    !CALL kgen_perturb_real( your_variable, 1.0E-15_8 ) 
+      
+      
+    !call to kgen kernel 
+               call ComputeUA360_AttachedFlow(p, ColUAf, Cn, iLower, iUpper)
+               IF (kgen_mainstage) THEN 
+                     
+                   !verify init 
+                   CALL kgen_init_verify(tolerance=1.D-14, minvalue=1.D-14, verboseLevel=1) 
+                   CALL kgen_init_check(check_status, rank=kgen_mpirank) 
+                     
+                   !extern verify variables 
+                     
+                   !local verify variables 
+                   CALL kv_airfoilinfo_types_afi_table_type("p", check_status, p, kgenref_p) 
+                   CALL kv_calculateuacoeffs_integer__intki("iupper", check_status, iupper, kgenref_iupper) 
+                   CALL kv_calculateuacoeffs_integer__intki("ilower", check_status, ilower, kgenref_ilower) 
+                   IF (check_status%rank == 0) THEN 
+                       WRITE (*, *) "" 
+                   END IF   
+                   IF (kgen_verboseLevel > 0) THEN 
+                       IF (check_status%rank == 0) THEN 
+                           WRITE (*, *) "Number of output variables: ", check_status%numTotal 
+                           WRITE (*, *) "Number of identical variables: ", check_status%numIdentical 
+                           WRITE (*, *) "Number of non-identical variables within tolerance: ", check_status%numInTol 
+                           WRITE (*, *) "Number of non-identical variables out of tolerance: ", check_status%numOutTol 
+                           WRITE (*, *) "Tolerance: ", kgen_tolerance 
+                       END IF   
+                   END IF   
+                   IF (check_status%rank == 0) THEN 
+                       WRITE (*, *) "" 
+                   END IF   
+                   IF (check_status%numOutTol > 0) THEN 
+                       IF (check_status%rank == 0) THEN 
+                           WRITE (*, *) "Verification FAILED with" // TRIM(ADJUSTL(kgen_filepath)) 
+                       END IF   
+                       check_status%Passed = .FALSE. 
+                       kgen_isverified = .FALSE. 
+                   ELSE 
+                       IF (check_status%rank == 0) THEN 
+                           WRITE (*, *) "Verification PASSED with " // TRIM(ADJUSTL(kgen_filepath)) 
+                       END IF   
+                       check_status%Passed = .TRUE. 
+                       kgen_isverified = .TRUE. 
+                   END IF   
+                   IF (check_status%rank == 0) THEN 
+                       WRITE (*, *) "" 
+                   END IF   
+                   CALL SYSTEM_CLOCK(kgen_start_clock, kgen_rate_clock) 
+                   DO kgen_intvar = 1, KGEN_MAXITER 
+               call ComputeUA360_AttachedFlow(p, ColUAf, Cn, iLower, iUpper)
+                   END DO   
+                   CALL SYSTEM_CLOCK(kgen_stop_clock, kgen_rate_clock) 
+                   kgen_measure = 1.0D6*(kgen_stop_clock - kgen_start_clock)/DBLE(kgen_rate_clock*KGEN_MAXITER) 
+                   IF (check_status%rank==0) THEN 
+                       WRITE (*, *) "ComputeUA360_AttachedFlow : Time per call (usec): ", kgen_measure 
+                   END IF   
+               END IF   
+               IF (kgen_warmupstage) THEN 
+               END IF   
+               IF (kgen_evalstage) THEN 
+               END IF   
+
+
+                 
+               CONTAINS 
+                 
+
+               !verify state subroutine for kv_calculateuacoeffs_integer__intki 
+               RECURSIVE SUBROUTINE kv_calculateuacoeffs_integer__intki(varname, check_status, var, kgenref_var) 
+                   CHARACTER(LEN=*), INTENT(IN) :: varname 
+                   TYPE(check_t), INTENT(INOUT) :: check_status 
+                   INTEGER(KIND=intki), INTENT(IN) :: var, kgenref_var 
+                   INTEGER :: check_result 
+                   LOGICAL :: is_print = .FALSE. 
+                     
+                   integer(KIND=intki) :: diff 
+                     
+                   check_status%numTotal = check_status%numTotal + 1 
+                     
+                   IF (var == kgenref_var) THEN 
+                       check_status%numIdentical = check_status%numIdentical + 1 
+                       IF (kgen_verboseLevel > 1) THEN 
+                           IF (check_status%rank == 0) THEN 
+                               WRITE (*, *) trim(adjustl(varname)), " is IDENTICAL." 
+                           END IF   
+                       END IF   
+                       check_result = CHECK_IDENTICAL 
+                   ELSE 
+                       diff = ABS(var - kgenref_var) 
+                       IF (diff <= kgen_tolerance) THEN 
+                           check_status%numInTol = check_status%numInTol + 1 
+                           IF (kgen_verboseLevel > 1) THEN 
+                               IF (check_status%rank == 0) THEN 
+                                   WRITE (*, *) trim(adjustl(varname)), " is NOT IDENTICAL(within tolerance)." 
+                               END IF   
+                           END IF   
+                           check_result = CHECK_IN_TOL 
+                       ELSE 
+                           check_status%numOutTol = check_status%numOutTol + 1 
+                           IF (kgen_verboseLevel > 0) THEN 
+                               IF (check_status%rank == 0) THEN 
+                                   WRITE (*, *) trim(adjustl(varname)), " is NOT IDENTICAL(out of tolerance)." 
+                               END IF   
+                           END IF   
+                           check_result = CHECK_OUT_TOL 
+                       END IF   
+                   END IF   
+                   IF (check_result == CHECK_IDENTICAL) THEN 
+                       IF (kgen_verboseLevel > 2) THEN 
+                           IF (check_status%rank == 0) THEN 
+                               WRITE (*, *) "Difference is ", 0 
+                               WRITE (*, *) "" 
+                           END IF   
+                       END IF   
+                   ELSE IF (check_result == CHECK_OUT_TOL) THEN 
+                       IF (kgen_verboseLevel > 0) THEN 
+                           IF (check_status%rank == 0) THEN 
+                               WRITE (*, *) "Difference is ", diff 
+                               WRITE (*, *) "" 
+                           END IF   
+                       END IF   
+                   ELSE IF (check_result == CHECK_IN_TOL) THEN 
+                       IF (kgen_verboseLevel > 1) THEN 
+                           IF (check_status%rank == 0) THEN 
+                               WRITE (*, *) "Difference is ", diff 
+                               WRITE (*, *) "" 
+                           END IF   
+                       END IF   
+                   END IF   
+                     
+               END SUBROUTINE kv_calculateuacoeffs_integer__intki 
+                 
+END SUBROUTINE calculateuacoeffs 
+!----------------------------------------------------------------------------------------------------------------------------------
+
+!----------------------------------------------------------------------------------------------------------------------------------
+
+
+!----------------------------------------------------------------------------------------------------------------------------------
+
+
+!----------------------------------------------------------------------------------------------------------------------------------  
+   SUBROUTINE Compute_iLoweriUpper(p, iLower, iUpper)
+      TYPE (AFI_Table_Type),    intent(in   ) :: p                             ! This structure stores all the module parameters that are set by AirfoilInfo during the initialization phase.
+      INTEGER(IntKi)          , intent(  out) :: iLower                        ! The lower index separating the region around 0
+      INTEGER(IntKi)          , intent(  out) :: iUpper                        ! The upper index separating the region around 0
+      !------------------------------------------------
+      ! get bounds
+      !------------------------------------------------
+      
+      iLower = minloc( p%alpha , DIM=1, MASK=p%alpha >= p%UA_BL%alphaLower)
+      iUpper = maxloc( p%alpha , DIM=1, MASK=p%alpha <= p%UA_BL%alphaUpper)
+      
+      iLower = max(1, min(p%NumAlf-1,iLower)) ! 1 <= iLower <= NumAlf-1
+      iUpper = max(2, min(p%NumAlf  ,iUpper)) ! 2 <= iUpper <= NumAlf
+
+   END SUBROUTINE Compute_iLoweriUpper
+!----------------------------------------------------------------------------------------------------------------------------------  
+
+
+!----------------------------------------------------------------------------------------------------------------------------------  
+   SUBROUTINE ComputeUA360_AttachedFlow(p, ColUAf, cn_cl, iLower, iUpper)
+      TYPE (AFI_Table_Type),    intent(inout) :: p                             ! This structure stores all the module parameters that are set by AirfoilInfo during the initialization phase.
+      integer(IntKi),           intent(in   ) :: ColUAf                        ! column for UA f_st (based on Cl or cn)
+      REAL(ReKi),               intent(in   ) :: cn_cl(:)                      ! cn or cl, whichever variable we are computing this on
+      INTEGER(IntKi)          , intent(  out) :: iLower                        ! The lower index separating the region around 0
+      INTEGER(IntKi)          , intent(  out) :: iUpper                        ! The upper index separating the region around 0
+   
+      REAL(ReKi)                              :: roots(p%NumAlf)
+      REAL(ReKi)                              :: x_(3), f_(3)
+      
+      REAL(ReKi)                              :: CnSlopeUpper, alpha0Upper
+      REAL(ReKi)                              :: CnSlopeLower, alpha0Lower
+      REAL(ReKi)                              :: CnSlopeReverseFlow           ! Cn slope versus angle of attack for reverse flow, 1/rad
+
+      
+      INTEGER(IntKi)                          :: Row                           ! The row of a table to be parsed in the FileInfo structure.
+      INTEGER(IntKi)                          :: iRoot
+      INTEGER(IntKi)                          :: col_fa                        ! column for UA cn/cl_fa (fully attached cn or cl)
+      INTEGER(IntKi)                          :: Indx
+      INTEGER(IntKi)                          :: nZeros
+      !------------------------------------------------
+      ! set column numbers
+      !------------------------------------------------
+      
+      
+      col_fa = ColUAf + 2
+      !------------------------------------------------
+      ! get bounds
+      !------------------------------------------------
+
+      call Compute_iLoweriUpper(p, iLower, iUpper)
+
+      p%UA_BL%alphaLower = p%alpha(iLower) ! note we are overwriting values here to make them consistent in the linear equation
+      p%UA_BL%alphaUpper = p%alpha(iUpper) ! note we are overwriting values here to make them consistent in the linear equation
+      
+      p%UA_BL%c_alphaLower = cn_cl(iLower) ! for vortex calculations (x5, HGMV model)
+      p%UA_BL%c_alphaUpper = cn_cl(iUpper) ! for vortex calculations (x5, HGMV model)
+      !------------------------------------------------
+      ! From dynamicStallLUT.m/updateCnAttached()
+      !------------------------------------------------
+      CnSlopeUpper = ( cn_cl(iUpper-1) - cn_cl(iUpper) ) / ( p%alpha(iUpper-1) - p%alpha(iUpper) )
+      if (EqualRealNos(CnSlopeUpper, 0.0_ReKi)) then
+         alpha0Upper = p%alpha(iUpper)
+      else
+         alpha0Upper  = p%alpha(iUpper) - cn_cl(iUpper)/CnSlopeUpper;
+      end if
+      
+      CnSlopeLower = ( cn_cl(iLower) - cn_cl(iLower+1) ) / ( p%alpha(iLower) - p%alpha(iLower+1) )
+      if (EqualRealNos(CnSlopeLower, 0.0_ReKi)) then
+         alpha0Lower = p%alpha(iLower)
+      else
+         alpha0Lower  = p%alpha(iLower) - cn_cl(iLower)/CnSlopeLower;
+      end if
+      ! Find reverse flow Cn = 0 near positive 180 deg (and not in the range (- 45, 45) degrees)
+      
+      call fZeros(p%alpha, cn_cl, roots, nZeros, Period=TwoPi)
+      p%UA_BL%alpha0ReverseFlow = p%alpha(1) !  default value, in case there aren't any roots. Maybe this should be an error?
+      if (nZeros > 0) then
+         iRoot = maxloc( abs(roots(1:nZeros)), DIM=1, MASK=abs(roots(1:nZeros)) >= 45.0_ReKi*D2R )
+         if (iRoot > 0) then
+            p%UA_BL%alpha0ReverseFlow = roots(iRoot)
+            if (p%UA_BL%alpha0ReverseFlow < -PiBy2) p%UA_BL%alpha0ReverseFlow = p%UA_BL%alpha0ReverseFlow + TwoPi !bjj check this value along with alphaBreakLower subtracting the TwoPi
+         end if
+      end if
+      CnSlopeReverseFlow = -TwoPi;
+      ! Find intersections
+
+      
+      p%UA_BL%alphaBreakUpper = ( CnSlopeReverseFlow *  p%UA_BL%alpha0ReverseFlow          - CnSlopeUpper*alpha0Upper ) / ( CnSlopeReverseFlow - CnSlopeUpper );
+      p%UA_BL%CnBreakUpper    = CnSlopeUpper*( p%UA_BL%alphaBreakUpper - alpha0Upper );
+            
+      p%UA_BL%alphaBreakLower = ( CnSlopeReverseFlow * (p%UA_BL%alpha0ReverseFlow - TwoPi) - CnSlopeLower*alpha0Lower ) / ( CnSlopeReverseFlow - CnSlopeLower );
+      p%UA_BL%CnBreakLower    = CnSlopeLower*( p%UA_BL%alphaBreakLower - alpha0Lower );
+      ! set fully attached values:
+
+      Indx = 1
+      x_ = (/ p%UA_BL%alpha0ReverseFlow-TwoPi, p%UA_BL%alphaBreakLower, p%alpha(iLower) /)
+      f_ = (/ 0.0_ReKi,                        p%UA_BL%CnBreakLower,    cn_cl(iLower) /)
+      do Row=1,iLower-1
+         p%Coefs(Row,col_fa) = InterpExtrapStp(p%alpha(Row), x_, f_, Indx, size(x_))
+      end do
+      
+      do Row=iLower,iUpper
+         p%Coefs(Row,col_fa) = cn_cl(Row)
+      end do
+      
+      x_ = (/ p%alpha(iUpper), p%UA_BL%alphaBreakUpper, p%UA_BL%alpha0ReverseFlow /)
+      f_ = (/ cn_cl(iUpper)  , p%UA_BL%CnBreakUpper,    0.0_ReKi /)
+      do Row=iUpper+1,p%NumAlf
+         p%Coefs(Row,col_fa) = InterpExtrapStp(p%alpha(Row), x_, f_, Indx, size(x_))
+      end do
+      
+   END SUBROUTINE ComputeUA360_AttachedFlow
+!----------------------------------------------------------------------------------------------------------------------------------  
+
+
+!----------------------------------------------------------------------------------------------------------------------------------  
+
+!----------------------------------------------------------------------------------------------------------------------------------  
+
+!----------------------------------------------------------------------------------------------------------------------------------  
+
+!----------------------------------------------------------------------------------------------------------------------------------  
+
+!----------------------------------------------------------------------------------------------------------------------------------  
+
+
+!----------------------------------------------------------------------------------------------------------------------------------  
+         
+
+
+!----------------------------------------------------------------------------------------------------------------------------------  
+!> This routine calculates Cl, Cd, Cm, (and Cpmin) for a set of tables which are dependent on AOA as well as a 2nd user-defined varible, could be Re or Cntrl, etc.
+
+
+!----------------------------------------------------------------------------------------------------------------------------------  
+!> This routine calculates Cl, Cd, Cm, (and Cpmin) for a set of tables which are dependent on AOA as well as a 2nd user-defined varible, could be Re or Cntrl, etc.
+
+
+!=============================================================================
+
+
+!=============================================================================
+
+!=============================================================================
+
+
+!=============================================================================
+   
+END MODULE AirfoilInfo

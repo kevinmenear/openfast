@@ -18,18 +18,10 @@
 
 #include "vit_types.h"
 #include <cmath>
-#include <limits>
+#include "vit_nwtc.h"
 
 // 2D column-major access: Coefs(Row, Col) in Fortran = Coefs[(Col-1)*nrows + (Row-1)] in C
 #define COEFS(row1, col1) p->Coefs[((col1)-1) * p->n_Coefs_rows + ((row1)-1)]
-
-// EqualRealNos: returns true if two doubles are approximately equal (within machine precision)
-static inline bool EqualRealNos(double a, double b) {
-    const double Eps = std::numeric_limits<double>::epsilon();
-    const double Tol = 100.0 * Eps / 2.0;
-    double Fraction = std::max(std::abs(a + b), 1.0);
-    return std::abs(a - b) <= Fraction * Tol;
-}
 
 void ComputeUA360_updateCnSeparated(afi_table_type_view_t* p, int ColUAf, double* cn_cl, int n_cn_cl, int iLower) {
     // Column numbers (1-based, matching Fortran)

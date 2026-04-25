@@ -217,7 +217,6 @@ SUBROUTINE calculateuacoeffs(kgen_unit, kgen_measure, kgen_isverified, kgen_file
                            END IF   
                        END IF   
                        check_result = CHECK_IDENTICAL 
-                       WRITE(*, *) "[VIT_FIELD] ", trim(adjustl(varname)), " | IDENTICAL | ", var, " | ", kgenref_var
                    ELSE 
                        diff = ABS(var - kgenref_var) 
                        IF (diff <= kgen_tolerance) THEN 
@@ -228,7 +227,6 @@ SUBROUTINE calculateuacoeffs(kgen_unit, kgen_measure, kgen_isverified, kgen_file
                                END IF   
                            END IF   
                            check_result = CHECK_IN_TOL 
-                           WRITE(*, *) "[VIT_FIELD] ", trim(adjustl(varname)), " | IN_TOL | ", var, " | ", kgenref_var, " | ", diff
                        ELSE 
                            check_status%numOutTol = check_status%numOutTol + 1 
                            IF (kgen_verboseLevel > 0) THEN 
@@ -237,7 +235,6 @@ SUBROUTINE calculateuacoeffs(kgen_unit, kgen_measure, kgen_isverified, kgen_file
                                END IF   
                            END IF   
                            check_result = CHECK_OUT_TOL 
-                           WRITE(*, *) "[VIT_FIELD] ", trim(adjustl(varname)), " | OUT_TOL | ", var, " | ", kgenref_var, " | ", diff
                        END IF   
                    END IF   
                    IF (check_result == CHECK_IDENTICAL) THEN 
@@ -277,7 +274,7 @@ END SUBROUTINE calculateuacoeffs
 !----------------------------------------------------------------------------------------------------------------------------------  
     SUBROUTINE Compute_iLoweriUpper(p, iLower, iUpper)
         USE ISO_C_BINDING
-        USE vit_afi_table_type_view, ONLY: afi_table_type_view_t, vit_populate_afi_table_type, vit_original_afi_table_type
+        USE vit_afi_table_type_view, ONLY: afi_table_type_view_t, vit_populate_afi_table_type, vit_original_afi_table_type, vit_copy_scalars_to_afi_table_type
         IMPLICIT NONE
         TYPE(AFI_TABLE_TYPE), INTENT(IN), TARGET :: p
         INTEGER(4), INTENT(OUT) :: iLower
@@ -288,6 +285,7 @@ END SUBROUTINE calculateuacoeffs
         ! Stash original Fortran pointers for callee bridges
         vit_original_afi_table_type => p
         CALL compute_iloweriupper_c(C_LOC(p_view), iLower, iUpper)
+        ! Copy modified scalars back from view to Fortran type
     END SUBROUTINE Compute_iLoweriUpper
 !----------------------------------------------------------------------------------------------------------------------------------  
 

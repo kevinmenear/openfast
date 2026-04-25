@@ -16,12 +16,10 @@
 // Status: unverified
 // Generated: 2026-04-25T09:42:16Z
 
-#include <cmath>
 #include "vit_types.h"
+#include "vit_nwtc.h"
 
 double ComputeUA360_CnOffset(afi_table_type_view_t* p, double* cn_cl, int n_cn_cl, int Row, int iLower) {
-    const double R2D = 180.0 / M_PI;
-    const double PiBy2 = M_PI / 2.0;
 
     // Compute cnOffset — mathematical trick for strange polars
     double CnOffset;

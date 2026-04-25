@@ -762,7 +762,6 @@ MODULE AirfoilInfo_Types
               END IF   
           END IF   
           check_result = CHECK_IDENTICAL 
-          WRITE(*, *) "[VIT_FIELD] alpha0 | IDENTICAL | ", var%alpha0, " | ", kgenref_var%alpha0
       ELSE 
           diff_alpha0 = ABS(var%alpha0 - kgenref_var%alpha0) 
           IF (diff_alpha0 <= kgen_tolerance) THEN 
@@ -773,7 +772,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_IN_TOL 
-              WRITE(*, *) "[VIT_FIELD] alpha0 | IN_TOL | ", var%alpha0, " | ", kgenref_var%alpha0, " | ", diff_alpha0
           ELSE 
               dtype_check_status%numOutTol = dtype_check_status%numOutTol + 1 
               IF (kgen_verboseLevel > 1) THEN 
@@ -782,7 +780,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_OUT_TOL 
-              WRITE(*, *) "[VIT_FIELD] alpha0 | OUT_TOL | ", var%alpha0, " | ", kgenref_var%alpha0, " | ", diff_alpha0
           END IF   
       END IF   
       IF (check_result == CHECK_IDENTICAL) THEN 
@@ -813,7 +810,6 @@ MODULE AirfoilInfo_Types
               END IF   
           END IF   
           check_result = CHECK_IDENTICAL 
-          WRITE(*, *) "[VIT_FIELD] alpha1 | IDENTICAL | ", var%alpha1, " | ", kgenref_var%alpha1
       ELSE 
           diff_alpha1 = ABS(var%alpha1 - kgenref_var%alpha1) 
           IF (diff_alpha1 <= kgen_tolerance) THEN 
@@ -824,7 +820,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_IN_TOL 
-              WRITE(*, *) "[VIT_FIELD] alpha1 | IN_TOL | ", var%alpha1, " | ", kgenref_var%alpha1, " | ", diff_alpha1
           ELSE 
               dtype_check_status%numOutTol = dtype_check_status%numOutTol + 1 
               IF (kgen_verboseLevel > 1) THEN 
@@ -833,7 +828,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_OUT_TOL 
-              WRITE(*, *) "[VIT_FIELD] alpha1 | OUT_TOL | ", var%alpha1, " | ", kgenref_var%alpha1, " | ", diff_alpha1
           END IF   
       END IF   
       IF (check_result == CHECK_IDENTICAL) THEN 
@@ -864,7 +858,6 @@ MODULE AirfoilInfo_Types
               END IF   
           END IF   
           check_result = CHECK_IDENTICAL 
-          WRITE(*, *) "[VIT_FIELD] alpha2 | IDENTICAL | ", var%alpha2, " | ", kgenref_var%alpha2
       ELSE 
           diff_alpha2 = ABS(var%alpha2 - kgenref_var%alpha2) 
           IF (diff_alpha2 <= kgen_tolerance) THEN 
@@ -875,7 +868,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_IN_TOL 
-              WRITE(*, *) "[VIT_FIELD] alpha2 | IN_TOL | ", var%alpha2, " | ", kgenref_var%alpha2, " | ", diff_alpha2
           ELSE 
               dtype_check_status%numOutTol = dtype_check_status%numOutTol + 1 
               IF (kgen_verboseLevel > 1) THEN 
@@ -884,7 +876,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_OUT_TOL 
-              WRITE(*, *) "[VIT_FIELD] alpha2 | OUT_TOL | ", var%alpha2, " | ", kgenref_var%alpha2, " | ", diff_alpha2
           END IF   
       END IF   
       IF (check_result == CHECK_IDENTICAL) THEN 
@@ -915,7 +906,6 @@ MODULE AirfoilInfo_Types
               END IF   
           END IF   
           check_result = CHECK_IDENTICAL 
-          WRITE(*, *) "[VIT_FIELD] eta_e | IDENTICAL | ", var%eta_e, " | ", kgenref_var%eta_e
       ELSE 
           diff_eta_e = ABS(var%eta_e - kgenref_var%eta_e) 
           IF (diff_eta_e <= kgen_tolerance) THEN 
@@ -926,7 +916,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_IN_TOL 
-              WRITE(*, *) "[VIT_FIELD] eta_e | IN_TOL | ", var%eta_e, " | ", kgenref_var%eta_e, " | ", diff_eta_e
           ELSE 
               dtype_check_status%numOutTol = dtype_check_status%numOutTol + 1 
               IF (kgen_verboseLevel > 1) THEN 
@@ -935,7 +924,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_OUT_TOL 
-              WRITE(*, *) "[VIT_FIELD] eta_e | OUT_TOL | ", var%eta_e, " | ", kgenref_var%eta_e, " | ", diff_eta_e
           END IF   
       END IF   
       IF (check_result == CHECK_IDENTICAL) THEN 
@@ -966,7 +954,6 @@ MODULE AirfoilInfo_Types
               END IF   
           END IF   
           check_result = CHECK_IDENTICAL 
-          WRITE(*, *) "[VIT_FIELD] c_nalpha | IDENTICAL | ", var%c_nalpha, " | ", kgenref_var%c_nalpha
       ELSE 
           diff_c_nalpha = ABS(var%c_nalpha - kgenref_var%c_nalpha) 
           IF (diff_c_nalpha <= kgen_tolerance) THEN 
@@ -977,7 +964,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_IN_TOL 
-              WRITE(*, *) "[VIT_FIELD] c_nalpha | IN_TOL | ", var%c_nalpha, " | ", kgenref_var%c_nalpha, " | ", diff_c_nalpha
           ELSE 
               dtype_check_status%numOutTol = dtype_check_status%numOutTol + 1 
               IF (kgen_verboseLevel > 1) THEN 
@@ -986,7 +972,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_OUT_TOL 
-              WRITE(*, *) "[VIT_FIELD] c_nalpha | OUT_TOL | ", var%c_nalpha, " | ", kgenref_var%c_nalpha, " | ", diff_c_nalpha
           END IF   
       END IF   
       IF (check_result == CHECK_IDENTICAL) THEN 
@@ -1017,7 +1002,6 @@ MODULE AirfoilInfo_Types
               END IF   
           END IF   
           check_result = CHECK_IDENTICAL 
-          WRITE(*, *) "[VIT_FIELD] c_lalpha | IDENTICAL | ", var%c_lalpha, " | ", kgenref_var%c_lalpha
       ELSE 
           diff_c_lalpha = ABS(var%c_lalpha - kgenref_var%c_lalpha) 
           IF (diff_c_lalpha <= kgen_tolerance) THEN 
@@ -1028,7 +1012,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_IN_TOL 
-              WRITE(*, *) "[VIT_FIELD] c_lalpha | IN_TOL | ", var%c_lalpha, " | ", kgenref_var%c_lalpha, " | ", diff_c_lalpha
           ELSE 
               dtype_check_status%numOutTol = dtype_check_status%numOutTol + 1 
               IF (kgen_verboseLevel > 1) THEN 
@@ -1037,7 +1020,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_OUT_TOL 
-              WRITE(*, *) "[VIT_FIELD] c_lalpha | OUT_TOL | ", var%c_lalpha, " | ", kgenref_var%c_lalpha, " | ", diff_c_lalpha
           END IF   
       END IF   
       IF (check_result == CHECK_IDENTICAL) THEN 
@@ -1068,7 +1050,6 @@ MODULE AirfoilInfo_Types
               END IF   
           END IF   
           check_result = CHECK_IDENTICAL 
-          WRITE(*, *) "[VIT_FIELD] t_f0 | IDENTICAL | ", var%t_f0, " | ", kgenref_var%t_f0
       ELSE 
           diff_t_f0 = ABS(var%t_f0 - kgenref_var%t_f0) 
           IF (diff_t_f0 <= kgen_tolerance) THEN 
@@ -1079,7 +1060,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_IN_TOL 
-              WRITE(*, *) "[VIT_FIELD] t_f0 | IN_TOL | ", var%t_f0, " | ", kgenref_var%t_f0, " | ", diff_t_f0
           ELSE 
               dtype_check_status%numOutTol = dtype_check_status%numOutTol + 1 
               IF (kgen_verboseLevel > 1) THEN 
@@ -1088,7 +1068,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_OUT_TOL 
-              WRITE(*, *) "[VIT_FIELD] t_f0 | OUT_TOL | ", var%t_f0, " | ", kgenref_var%t_f0, " | ", diff_t_f0
           END IF   
       END IF   
       IF (check_result == CHECK_IDENTICAL) THEN 
@@ -1119,7 +1098,6 @@ MODULE AirfoilInfo_Types
               END IF   
           END IF   
           check_result = CHECK_IDENTICAL 
-          WRITE(*, *) "[VIT_FIELD] t_v0 | IDENTICAL | ", var%t_v0, " | ", kgenref_var%t_v0
       ELSE 
           diff_t_v0 = ABS(var%t_v0 - kgenref_var%t_v0) 
           IF (diff_t_v0 <= kgen_tolerance) THEN 
@@ -1130,7 +1108,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_IN_TOL 
-              WRITE(*, *) "[VIT_FIELD] t_v0 | IN_TOL | ", var%t_v0, " | ", kgenref_var%t_v0, " | ", diff_t_v0
           ELSE 
               dtype_check_status%numOutTol = dtype_check_status%numOutTol + 1 
               IF (kgen_verboseLevel > 1) THEN 
@@ -1139,7 +1116,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_OUT_TOL 
-              WRITE(*, *) "[VIT_FIELD] t_v0 | OUT_TOL | ", var%t_v0, " | ", kgenref_var%t_v0, " | ", diff_t_v0
           END IF   
       END IF   
       IF (check_result == CHECK_IDENTICAL) THEN 
@@ -1170,7 +1146,6 @@ MODULE AirfoilInfo_Types
               END IF   
           END IF   
           check_result = CHECK_IDENTICAL 
-          WRITE(*, *) "[VIT_FIELD] t_p | IDENTICAL | ", var%t_p, " | ", kgenref_var%t_p
       ELSE 
           diff_t_p = ABS(var%t_p - kgenref_var%t_p) 
           IF (diff_t_p <= kgen_tolerance) THEN 
@@ -1181,7 +1156,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_IN_TOL 
-              WRITE(*, *) "[VIT_FIELD] t_p | IN_TOL | ", var%t_p, " | ", kgenref_var%t_p, " | ", diff_t_p
           ELSE 
               dtype_check_status%numOutTol = dtype_check_status%numOutTol + 1 
               IF (kgen_verboseLevel > 1) THEN 
@@ -1190,7 +1164,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_OUT_TOL 
-              WRITE(*, *) "[VIT_FIELD] t_p | OUT_TOL | ", var%t_p, " | ", kgenref_var%t_p, " | ", diff_t_p
           END IF   
       END IF   
       IF (check_result == CHECK_IDENTICAL) THEN 
@@ -1221,7 +1194,6 @@ MODULE AirfoilInfo_Types
               END IF   
           END IF   
           check_result = CHECK_IDENTICAL 
-          WRITE(*, *) "[VIT_FIELD] t_vl | IDENTICAL | ", var%t_vl, " | ", kgenref_var%t_vl
       ELSE 
           diff_t_vl = ABS(var%t_vl - kgenref_var%t_vl) 
           IF (diff_t_vl <= kgen_tolerance) THEN 
@@ -1232,7 +1204,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_IN_TOL 
-              WRITE(*, *) "[VIT_FIELD] t_vl | IN_TOL | ", var%t_vl, " | ", kgenref_var%t_vl, " | ", diff_t_vl
           ELSE 
               dtype_check_status%numOutTol = dtype_check_status%numOutTol + 1 
               IF (kgen_verboseLevel > 1) THEN 
@@ -1241,7 +1212,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_OUT_TOL 
-              WRITE(*, *) "[VIT_FIELD] t_vl | OUT_TOL | ", var%t_vl, " | ", kgenref_var%t_vl, " | ", diff_t_vl
           END IF   
       END IF   
       IF (check_result == CHECK_IDENTICAL) THEN 
@@ -1272,7 +1242,6 @@ MODULE AirfoilInfo_Types
               END IF   
           END IF   
           check_result = CHECK_IDENTICAL 
-          WRITE(*, *) "[VIT_FIELD] b1 | IDENTICAL | ", var%b1, " | ", kgenref_var%b1
       ELSE 
           diff_b1 = ABS(var%b1 - kgenref_var%b1) 
           IF (diff_b1 <= kgen_tolerance) THEN 
@@ -1283,7 +1252,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_IN_TOL 
-              WRITE(*, *) "[VIT_FIELD] b1 | IN_TOL | ", var%b1, " | ", kgenref_var%b1, " | ", diff_b1
           ELSE 
               dtype_check_status%numOutTol = dtype_check_status%numOutTol + 1 
               IF (kgen_verboseLevel > 1) THEN 
@@ -1292,7 +1260,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_OUT_TOL 
-              WRITE(*, *) "[VIT_FIELD] b1 | OUT_TOL | ", var%b1, " | ", kgenref_var%b1, " | ", diff_b1
           END IF   
       END IF   
       IF (check_result == CHECK_IDENTICAL) THEN 
@@ -1323,7 +1290,6 @@ MODULE AirfoilInfo_Types
               END IF   
           END IF   
           check_result = CHECK_IDENTICAL 
-          WRITE(*, *) "[VIT_FIELD] b2 | IDENTICAL | ", var%b2, " | ", kgenref_var%b2
       ELSE 
           diff_b2 = ABS(var%b2 - kgenref_var%b2) 
           IF (diff_b2 <= kgen_tolerance) THEN 
@@ -1334,7 +1300,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_IN_TOL 
-              WRITE(*, *) "[VIT_FIELD] b2 | IN_TOL | ", var%b2, " | ", kgenref_var%b2, " | ", diff_b2
           ELSE 
               dtype_check_status%numOutTol = dtype_check_status%numOutTol + 1 
               IF (kgen_verboseLevel > 1) THEN 
@@ -1343,7 +1308,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_OUT_TOL 
-              WRITE(*, *) "[VIT_FIELD] b2 | OUT_TOL | ", var%b2, " | ", kgenref_var%b2, " | ", diff_b2
           END IF   
       END IF   
       IF (check_result == CHECK_IDENTICAL) THEN 
@@ -1374,7 +1338,6 @@ MODULE AirfoilInfo_Types
               END IF   
           END IF   
           check_result = CHECK_IDENTICAL 
-          WRITE(*, *) "[VIT_FIELD] b5 | IDENTICAL | ", var%b5, " | ", kgenref_var%b5
       ELSE 
           diff_b5 = ABS(var%b5 - kgenref_var%b5) 
           IF (diff_b5 <= kgen_tolerance) THEN 
@@ -1385,7 +1348,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_IN_TOL 
-              WRITE(*, *) "[VIT_FIELD] b5 | IN_TOL | ", var%b5, " | ", kgenref_var%b5, " | ", diff_b5
           ELSE 
               dtype_check_status%numOutTol = dtype_check_status%numOutTol + 1 
               IF (kgen_verboseLevel > 1) THEN 
@@ -1394,7 +1356,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_OUT_TOL 
-              WRITE(*, *) "[VIT_FIELD] b5 | OUT_TOL | ", var%b5, " | ", kgenref_var%b5, " | ", diff_b5
           END IF   
       END IF   
       IF (check_result == CHECK_IDENTICAL) THEN 
@@ -1425,7 +1386,6 @@ MODULE AirfoilInfo_Types
               END IF   
           END IF   
           check_result = CHECK_IDENTICAL 
-          WRITE(*, *) "[VIT_FIELD] a1 | IDENTICAL | ", var%a1, " | ", kgenref_var%a1
       ELSE 
           diff_a1 = ABS(var%a1 - kgenref_var%a1) 
           IF (diff_a1 <= kgen_tolerance) THEN 
@@ -1436,7 +1396,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_IN_TOL 
-              WRITE(*, *) "[VIT_FIELD] a1 | IN_TOL | ", var%a1, " | ", kgenref_var%a1, " | ", diff_a1
           ELSE 
               dtype_check_status%numOutTol = dtype_check_status%numOutTol + 1 
               IF (kgen_verboseLevel > 1) THEN 
@@ -1445,7 +1404,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_OUT_TOL 
-              WRITE(*, *) "[VIT_FIELD] a1 | OUT_TOL | ", var%a1, " | ", kgenref_var%a1, " | ", diff_a1
           END IF   
       END IF   
       IF (check_result == CHECK_IDENTICAL) THEN 
@@ -1476,7 +1434,6 @@ MODULE AirfoilInfo_Types
               END IF   
           END IF   
           check_result = CHECK_IDENTICAL 
-          WRITE(*, *) "[VIT_FIELD] a2 | IDENTICAL | ", var%a2, " | ", kgenref_var%a2
       ELSE 
           diff_a2 = ABS(var%a2 - kgenref_var%a2) 
           IF (diff_a2 <= kgen_tolerance) THEN 
@@ -1487,7 +1444,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_IN_TOL 
-              WRITE(*, *) "[VIT_FIELD] a2 | IN_TOL | ", var%a2, " | ", kgenref_var%a2, " | ", diff_a2
           ELSE 
               dtype_check_status%numOutTol = dtype_check_status%numOutTol + 1 
               IF (kgen_verboseLevel > 1) THEN 
@@ -1496,7 +1452,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_OUT_TOL 
-              WRITE(*, *) "[VIT_FIELD] a2 | OUT_TOL | ", var%a2, " | ", kgenref_var%a2, " | ", diff_a2
           END IF   
       END IF   
       IF (check_result == CHECK_IDENTICAL) THEN 
@@ -1527,7 +1482,6 @@ MODULE AirfoilInfo_Types
               END IF   
           END IF   
           check_result = CHECK_IDENTICAL 
-          WRITE(*, *) "[VIT_FIELD] a5 | IDENTICAL | ", var%a5, " | ", kgenref_var%a5
       ELSE 
           diff_a5 = ABS(var%a5 - kgenref_var%a5) 
           IF (diff_a5 <= kgen_tolerance) THEN 
@@ -1538,7 +1492,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_IN_TOL 
-              WRITE(*, *) "[VIT_FIELD] a5 | IN_TOL | ", var%a5, " | ", kgenref_var%a5, " | ", diff_a5
           ELSE 
               dtype_check_status%numOutTol = dtype_check_status%numOutTol + 1 
               IF (kgen_verboseLevel > 1) THEN 
@@ -1547,7 +1500,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_OUT_TOL 
-              WRITE(*, *) "[VIT_FIELD] a5 | OUT_TOL | ", var%a5, " | ", kgenref_var%a5, " | ", diff_a5
           END IF   
       END IF   
       IF (check_result == CHECK_IDENTICAL) THEN 
@@ -1578,7 +1530,6 @@ MODULE AirfoilInfo_Types
               END IF   
           END IF   
           check_result = CHECK_IDENTICAL 
-          WRITE(*, *) "[VIT_FIELD] s1 | IDENTICAL | ", var%s1, " | ", kgenref_var%s1
       ELSE 
           diff_s1 = ABS(var%s1 - kgenref_var%s1) 
           IF (diff_s1 <= kgen_tolerance) THEN 
@@ -1589,7 +1540,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_IN_TOL 
-              WRITE(*, *) "[VIT_FIELD] s1 | IN_TOL | ", var%s1, " | ", kgenref_var%s1, " | ", diff_s1
           ELSE 
               dtype_check_status%numOutTol = dtype_check_status%numOutTol + 1 
               IF (kgen_verboseLevel > 1) THEN 
@@ -1598,7 +1548,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_OUT_TOL 
-              WRITE(*, *) "[VIT_FIELD] s1 | OUT_TOL | ", var%s1, " | ", kgenref_var%s1, " | ", diff_s1
           END IF   
       END IF   
       IF (check_result == CHECK_IDENTICAL) THEN 
@@ -1629,7 +1578,6 @@ MODULE AirfoilInfo_Types
               END IF   
           END IF   
           check_result = CHECK_IDENTICAL 
-          WRITE(*, *) "[VIT_FIELD] s2 | IDENTICAL | ", var%s2, " | ", kgenref_var%s2
       ELSE 
           diff_s2 = ABS(var%s2 - kgenref_var%s2) 
           IF (diff_s2 <= kgen_tolerance) THEN 
@@ -1640,7 +1588,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_IN_TOL 
-              WRITE(*, *) "[VIT_FIELD] s2 | IN_TOL | ", var%s2, " | ", kgenref_var%s2, " | ", diff_s2
           ELSE 
               dtype_check_status%numOutTol = dtype_check_status%numOutTol + 1 
               IF (kgen_verboseLevel > 1) THEN 
@@ -1649,7 +1596,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_OUT_TOL 
-              WRITE(*, *) "[VIT_FIELD] s2 | OUT_TOL | ", var%s2, " | ", kgenref_var%s2, " | ", diff_s2
           END IF   
       END IF   
       IF (check_result == CHECK_IDENTICAL) THEN 
@@ -1680,7 +1626,6 @@ MODULE AirfoilInfo_Types
               END IF   
           END IF   
           check_result = CHECK_IDENTICAL 
-          WRITE(*, *) "[VIT_FIELD] s3 | IDENTICAL | ", var%s3, " | ", kgenref_var%s3
       ELSE 
           diff_s3 = ABS(var%s3 - kgenref_var%s3) 
           IF (diff_s3 <= kgen_tolerance) THEN 
@@ -1691,7 +1636,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_IN_TOL 
-              WRITE(*, *) "[VIT_FIELD] s3 | IN_TOL | ", var%s3, " | ", kgenref_var%s3, " | ", diff_s3
           ELSE 
               dtype_check_status%numOutTol = dtype_check_status%numOutTol + 1 
               IF (kgen_verboseLevel > 1) THEN 
@@ -1700,7 +1644,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_OUT_TOL 
-              WRITE(*, *) "[VIT_FIELD] s3 | OUT_TOL | ", var%s3, " | ", kgenref_var%s3, " | ", diff_s3
           END IF   
       END IF   
       IF (check_result == CHECK_IDENTICAL) THEN 
@@ -1731,7 +1674,6 @@ MODULE AirfoilInfo_Types
               END IF   
           END IF   
           check_result = CHECK_IDENTICAL 
-          WRITE(*, *) "[VIT_FIELD] s4 | IDENTICAL | ", var%s4, " | ", kgenref_var%s4
       ELSE 
           diff_s4 = ABS(var%s4 - kgenref_var%s4) 
           IF (diff_s4 <= kgen_tolerance) THEN 
@@ -1742,7 +1684,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_IN_TOL 
-              WRITE(*, *) "[VIT_FIELD] s4 | IN_TOL | ", var%s4, " | ", kgenref_var%s4, " | ", diff_s4
           ELSE 
               dtype_check_status%numOutTol = dtype_check_status%numOutTol + 1 
               IF (kgen_verboseLevel > 1) THEN 
@@ -1751,7 +1692,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_OUT_TOL 
-              WRITE(*, *) "[VIT_FIELD] s4 | OUT_TOL | ", var%s4, " | ", kgenref_var%s4, " | ", diff_s4
           END IF   
       END IF   
       IF (check_result == CHECK_IDENTICAL) THEN 
@@ -1782,7 +1722,6 @@ MODULE AirfoilInfo_Types
               END IF   
           END IF   
           check_result = CHECK_IDENTICAL 
-          WRITE(*, *) "[VIT_FIELD] cn1 | IDENTICAL | ", var%cn1, " | ", kgenref_var%cn1
       ELSE 
           diff_cn1 = ABS(var%cn1 - kgenref_var%cn1) 
           IF (diff_cn1 <= kgen_tolerance) THEN 
@@ -1793,7 +1732,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_IN_TOL 
-              WRITE(*, *) "[VIT_FIELD] cn1 | IN_TOL | ", var%cn1, " | ", kgenref_var%cn1, " | ", diff_cn1
           ELSE 
               dtype_check_status%numOutTol = dtype_check_status%numOutTol + 1 
               IF (kgen_verboseLevel > 1) THEN 
@@ -1802,7 +1740,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_OUT_TOL 
-              WRITE(*, *) "[VIT_FIELD] cn1 | OUT_TOL | ", var%cn1, " | ", kgenref_var%cn1, " | ", diff_cn1
           END IF   
       END IF   
       IF (check_result == CHECK_IDENTICAL) THEN 
@@ -1833,7 +1770,6 @@ MODULE AirfoilInfo_Types
               END IF   
           END IF   
           check_result = CHECK_IDENTICAL 
-          WRITE(*, *) "[VIT_FIELD] cn2 | IDENTICAL | ", var%cn2, " | ", kgenref_var%cn2
       ELSE 
           diff_cn2 = ABS(var%cn2 - kgenref_var%cn2) 
           IF (diff_cn2 <= kgen_tolerance) THEN 
@@ -1844,7 +1780,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_IN_TOL 
-              WRITE(*, *) "[VIT_FIELD] cn2 | IN_TOL | ", var%cn2, " | ", kgenref_var%cn2, " | ", diff_cn2
           ELSE 
               dtype_check_status%numOutTol = dtype_check_status%numOutTol + 1 
               IF (kgen_verboseLevel > 1) THEN 
@@ -1853,7 +1788,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_OUT_TOL 
-              WRITE(*, *) "[VIT_FIELD] cn2 | OUT_TOL | ", var%cn2, " | ", kgenref_var%cn2, " | ", diff_cn2
           END IF   
       END IF   
       IF (check_result == CHECK_IDENTICAL) THEN 
@@ -1884,7 +1818,6 @@ MODULE AirfoilInfo_Types
               END IF   
           END IF   
           check_result = CHECK_IDENTICAL 
-          WRITE(*, *) "[VIT_FIELD] st_sh | IDENTICAL | ", var%st_sh, " | ", kgenref_var%st_sh
       ELSE 
           diff_st_sh = ABS(var%st_sh - kgenref_var%st_sh) 
           IF (diff_st_sh <= kgen_tolerance) THEN 
@@ -1895,7 +1828,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_IN_TOL 
-              WRITE(*, *) "[VIT_FIELD] st_sh | IN_TOL | ", var%st_sh, " | ", kgenref_var%st_sh, " | ", diff_st_sh
           ELSE 
               dtype_check_status%numOutTol = dtype_check_status%numOutTol + 1 
               IF (kgen_verboseLevel > 1) THEN 
@@ -1904,7 +1836,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_OUT_TOL 
-              WRITE(*, *) "[VIT_FIELD] st_sh | OUT_TOL | ", var%st_sh, " | ", kgenref_var%st_sh, " | ", diff_st_sh
           END IF   
       END IF   
       IF (check_result == CHECK_IDENTICAL) THEN 
@@ -1935,7 +1866,6 @@ MODULE AirfoilInfo_Types
               END IF   
           END IF   
           check_result = CHECK_IDENTICAL 
-          WRITE(*, *) "[VIT_FIELD] cd0 | IDENTICAL | ", var%cd0, " | ", kgenref_var%cd0
       ELSE 
           diff_cd0 = ABS(var%cd0 - kgenref_var%cd0) 
           IF (diff_cd0 <= kgen_tolerance) THEN 
@@ -1946,7 +1876,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_IN_TOL 
-              WRITE(*, *) "[VIT_FIELD] cd0 | IN_TOL | ", var%cd0, " | ", kgenref_var%cd0, " | ", diff_cd0
           ELSE 
               dtype_check_status%numOutTol = dtype_check_status%numOutTol + 1 
               IF (kgen_verboseLevel > 1) THEN 
@@ -1955,7 +1884,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_OUT_TOL 
-              WRITE(*, *) "[VIT_FIELD] cd0 | OUT_TOL | ", var%cd0, " | ", kgenref_var%cd0, " | ", diff_cd0
           END IF   
       END IF   
       IF (check_result == CHECK_IDENTICAL) THEN 
@@ -1986,7 +1914,6 @@ MODULE AirfoilInfo_Types
               END IF   
           END IF   
           check_result = CHECK_IDENTICAL 
-          WRITE(*, *) "[VIT_FIELD] cm0 | IDENTICAL | ", var%cm0, " | ", kgenref_var%cm0
       ELSE 
           diff_cm0 = ABS(var%cm0 - kgenref_var%cm0) 
           IF (diff_cm0 <= kgen_tolerance) THEN 
@@ -1997,7 +1924,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_IN_TOL 
-              WRITE(*, *) "[VIT_FIELD] cm0 | IN_TOL | ", var%cm0, " | ", kgenref_var%cm0, " | ", diff_cm0
           ELSE 
               dtype_check_status%numOutTol = dtype_check_status%numOutTol + 1 
               IF (kgen_verboseLevel > 1) THEN 
@@ -2006,7 +1932,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_OUT_TOL 
-              WRITE(*, *) "[VIT_FIELD] cm0 | OUT_TOL | ", var%cm0, " | ", kgenref_var%cm0, " | ", diff_cm0
           END IF   
       END IF   
       IF (check_result == CHECK_IDENTICAL) THEN 
@@ -2037,7 +1962,6 @@ MODULE AirfoilInfo_Types
               END IF   
           END IF   
           check_result = CHECK_IDENTICAL 
-          WRITE(*, *) "[VIT_FIELD] k0 | IDENTICAL | ", var%k0, " | ", kgenref_var%k0
       ELSE 
           diff_k0 = ABS(var%k0 - kgenref_var%k0) 
           IF (diff_k0 <= kgen_tolerance) THEN 
@@ -2048,7 +1972,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_IN_TOL 
-              WRITE(*, *) "[VIT_FIELD] k0 | IN_TOL | ", var%k0, " | ", kgenref_var%k0, " | ", diff_k0
           ELSE 
               dtype_check_status%numOutTol = dtype_check_status%numOutTol + 1 
               IF (kgen_verboseLevel > 1) THEN 
@@ -2057,7 +1980,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_OUT_TOL 
-              WRITE(*, *) "[VIT_FIELD] k0 | OUT_TOL | ", var%k0, " | ", kgenref_var%k0, " | ", diff_k0
           END IF   
       END IF   
       IF (check_result == CHECK_IDENTICAL) THEN 
@@ -2088,7 +2010,6 @@ MODULE AirfoilInfo_Types
               END IF   
           END IF   
           check_result = CHECK_IDENTICAL 
-          WRITE(*, *) "[VIT_FIELD] k1 | IDENTICAL | ", var%k1, " | ", kgenref_var%k1
       ELSE 
           diff_k1 = ABS(var%k1 - kgenref_var%k1) 
           IF (diff_k1 <= kgen_tolerance) THEN 
@@ -2099,7 +2020,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_IN_TOL 
-              WRITE(*, *) "[VIT_FIELD] k1 | IN_TOL | ", var%k1, " | ", kgenref_var%k1, " | ", diff_k1
           ELSE 
               dtype_check_status%numOutTol = dtype_check_status%numOutTol + 1 
               IF (kgen_verboseLevel > 1) THEN 
@@ -2108,7 +2028,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_OUT_TOL 
-              WRITE(*, *) "[VIT_FIELD] k1 | OUT_TOL | ", var%k1, " | ", kgenref_var%k1, " | ", diff_k1
           END IF   
       END IF   
       IF (check_result == CHECK_IDENTICAL) THEN 
@@ -2139,7 +2058,6 @@ MODULE AirfoilInfo_Types
               END IF   
           END IF   
           check_result = CHECK_IDENTICAL 
-          WRITE(*, *) "[VIT_FIELD] k2 | IDENTICAL | ", var%k2, " | ", kgenref_var%k2
       ELSE 
           diff_k2 = ABS(var%k2 - kgenref_var%k2) 
           IF (diff_k2 <= kgen_tolerance) THEN 
@@ -2150,7 +2068,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_IN_TOL 
-              WRITE(*, *) "[VIT_FIELD] k2 | IN_TOL | ", var%k2, " | ", kgenref_var%k2, " | ", diff_k2
           ELSE 
               dtype_check_status%numOutTol = dtype_check_status%numOutTol + 1 
               IF (kgen_verboseLevel > 1) THEN 
@@ -2159,7 +2076,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_OUT_TOL 
-              WRITE(*, *) "[VIT_FIELD] k2 | OUT_TOL | ", var%k2, " | ", kgenref_var%k2, " | ", diff_k2
           END IF   
       END IF   
       IF (check_result == CHECK_IDENTICAL) THEN 
@@ -2190,7 +2106,6 @@ MODULE AirfoilInfo_Types
               END IF   
           END IF   
           check_result = CHECK_IDENTICAL 
-          WRITE(*, *) "[VIT_FIELD] k3 | IDENTICAL | ", var%k3, " | ", kgenref_var%k3
       ELSE 
           diff_k3 = ABS(var%k3 - kgenref_var%k3) 
           IF (diff_k3 <= kgen_tolerance) THEN 
@@ -2201,7 +2116,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_IN_TOL 
-              WRITE(*, *) "[VIT_FIELD] k3 | IN_TOL | ", var%k3, " | ", kgenref_var%k3, " | ", diff_k3
           ELSE 
               dtype_check_status%numOutTol = dtype_check_status%numOutTol + 1 
               IF (kgen_verboseLevel > 1) THEN 
@@ -2210,7 +2124,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_OUT_TOL 
-              WRITE(*, *) "[VIT_FIELD] k3 | OUT_TOL | ", var%k3, " | ", kgenref_var%k3, " | ", diff_k3
           END IF   
       END IF   
       IF (check_result == CHECK_IDENTICAL) THEN 
@@ -2241,7 +2154,6 @@ MODULE AirfoilInfo_Types
               END IF   
           END IF   
           check_result = CHECK_IDENTICAL 
-          WRITE(*, *) "[VIT_FIELD] k1_hat | IDENTICAL | ", var%k1_hat, " | ", kgenref_var%k1_hat
       ELSE 
           diff_k1_hat = ABS(var%k1_hat - kgenref_var%k1_hat) 
           IF (diff_k1_hat <= kgen_tolerance) THEN 
@@ -2252,7 +2164,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_IN_TOL 
-              WRITE(*, *) "[VIT_FIELD] k1_hat | IN_TOL | ", var%k1_hat, " | ", kgenref_var%k1_hat, " | ", diff_k1_hat
           ELSE 
               dtype_check_status%numOutTol = dtype_check_status%numOutTol + 1 
               IF (kgen_verboseLevel > 1) THEN 
@@ -2261,7 +2172,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_OUT_TOL 
-              WRITE(*, *) "[VIT_FIELD] k1_hat | OUT_TOL | ", var%k1_hat, " | ", kgenref_var%k1_hat, " | ", diff_k1_hat
           END IF   
       END IF   
       IF (check_result == CHECK_IDENTICAL) THEN 
@@ -2292,7 +2202,6 @@ MODULE AirfoilInfo_Types
               END IF   
           END IF   
           check_result = CHECK_IDENTICAL 
-          WRITE(*, *) "[VIT_FIELD] x_cp_bar | IDENTICAL | ", var%x_cp_bar, " | ", kgenref_var%x_cp_bar
       ELSE 
           diff_x_cp_bar = ABS(var%x_cp_bar - kgenref_var%x_cp_bar) 
           IF (diff_x_cp_bar <= kgen_tolerance) THEN 
@@ -2303,7 +2212,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_IN_TOL 
-              WRITE(*, *) "[VIT_FIELD] x_cp_bar | IN_TOL | ", var%x_cp_bar, " | ", kgenref_var%x_cp_bar, " | ", diff_x_cp_bar
           ELSE 
               dtype_check_status%numOutTol = dtype_check_status%numOutTol + 1 
               IF (kgen_verboseLevel > 1) THEN 
@@ -2312,7 +2220,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_OUT_TOL 
-              WRITE(*, *) "[VIT_FIELD] x_cp_bar | OUT_TOL | ", var%x_cp_bar, " | ", kgenref_var%x_cp_bar, " | ", diff_x_cp_bar
           END IF   
       END IF   
       IF (check_result == CHECK_IDENTICAL) THEN 
@@ -2343,7 +2250,6 @@ MODULE AirfoilInfo_Types
               END IF   
           END IF   
           check_result = CHECK_IDENTICAL 
-          WRITE(*, *) "[VIT_FIELD] uacutout | IDENTICAL | ", var%uacutout, " | ", kgenref_var%uacutout
       ELSE 
           diff_uacutout = ABS(var%uacutout - kgenref_var%uacutout) 
           IF (diff_uacutout <= kgen_tolerance) THEN 
@@ -2354,7 +2260,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_IN_TOL 
-              WRITE(*, *) "[VIT_FIELD] uacutout | IN_TOL | ", var%uacutout, " | ", kgenref_var%uacutout, " | ", diff_uacutout
           ELSE 
               dtype_check_status%numOutTol = dtype_check_status%numOutTol + 1 
               IF (kgen_verboseLevel > 1) THEN 
@@ -2363,7 +2268,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_OUT_TOL 
-              WRITE(*, *) "[VIT_FIELD] uacutout | OUT_TOL | ", var%uacutout, " | ", kgenref_var%uacutout, " | ", diff_uacutout
           END IF   
       END IF   
       IF (check_result == CHECK_IDENTICAL) THEN 
@@ -2394,7 +2298,6 @@ MODULE AirfoilInfo_Types
               END IF   
           END IF   
           check_result = CHECK_IDENTICAL 
-          WRITE(*, *) "[VIT_FIELD] uacutout_delta | IDENTICAL | ", var%uacutout_delta, " | ", kgenref_var%uacutout_delta
       ELSE 
           diff_uacutout_delta = ABS(var%uacutout_delta - kgenref_var%uacutout_delta) 
           IF (diff_uacutout_delta <= kgen_tolerance) THEN 
@@ -2405,7 +2308,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_IN_TOL 
-              WRITE(*, *) "[VIT_FIELD] uacutout_delta | IN_TOL | ", var%uacutout_delta, " | ", kgenref_var%uacutout_delta, " | ", diff_uacutout_delta
           ELSE 
               dtype_check_status%numOutTol = dtype_check_status%numOutTol + 1 
               IF (kgen_verboseLevel > 1) THEN 
@@ -2414,7 +2316,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_OUT_TOL 
-              WRITE(*, *) "[VIT_FIELD] uacutout_delta | OUT_TOL | ", var%uacutout_delta, " | ", kgenref_var%uacutout_delta, " | ", diff_uacutout_delta
           END IF   
       END IF   
       IF (check_result == CHECK_IDENTICAL) THEN 
@@ -2445,7 +2346,6 @@ MODULE AirfoilInfo_Types
               END IF   
           END IF   
           check_result = CHECK_IDENTICAL 
-          WRITE(*, *) "[VIT_FIELD] uacutout_blend | IDENTICAL | ", var%uacutout_blend, " | ", kgenref_var%uacutout_blend
       ELSE 
           diff_uacutout_blend = ABS(var%uacutout_blend - kgenref_var%uacutout_blend) 
           IF (diff_uacutout_blend <= kgen_tolerance) THEN 
@@ -2456,7 +2356,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_IN_TOL 
-              WRITE(*, *) "[VIT_FIELD] uacutout_blend | IN_TOL | ", var%uacutout_blend, " | ", kgenref_var%uacutout_blend, " | ", diff_uacutout_blend
           ELSE 
               dtype_check_status%numOutTol = dtype_check_status%numOutTol + 1 
               IF (kgen_verboseLevel > 1) THEN 
@@ -2465,7 +2364,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_OUT_TOL 
-              WRITE(*, *) "[VIT_FIELD] uacutout_blend | OUT_TOL | ", var%uacutout_blend, " | ", kgenref_var%uacutout_blend, " | ", diff_uacutout_blend
           END IF   
       END IF   
       IF (check_result == CHECK_IDENTICAL) THEN 
@@ -2496,7 +2394,6 @@ MODULE AirfoilInfo_Types
               END IF   
           END IF   
           check_result = CHECK_IDENTICAL 
-          WRITE(*, *) "[VIT_FIELD] filtcutoff | IDENTICAL | ", var%filtcutoff, " | ", kgenref_var%filtcutoff
       ELSE 
           diff_filtcutoff = ABS(var%filtcutoff - kgenref_var%filtcutoff) 
           IF (diff_filtcutoff <= kgen_tolerance) THEN 
@@ -2507,7 +2404,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_IN_TOL 
-              WRITE(*, *) "[VIT_FIELD] filtcutoff | IN_TOL | ", var%filtcutoff, " | ", kgenref_var%filtcutoff, " | ", diff_filtcutoff
           ELSE 
               dtype_check_status%numOutTol = dtype_check_status%numOutTol + 1 
               IF (kgen_verboseLevel > 1) THEN 
@@ -2516,7 +2412,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_OUT_TOL 
-              WRITE(*, *) "[VIT_FIELD] filtcutoff | OUT_TOL | ", var%filtcutoff, " | ", kgenref_var%filtcutoff, " | ", diff_filtcutoff
           END IF   
       END IF   
       IF (check_result == CHECK_IDENTICAL) THEN 
@@ -2547,7 +2442,6 @@ MODULE AirfoilInfo_Types
               END IF   
           END IF   
           check_result = CHECK_IDENTICAL 
-          WRITE(*, *) "[VIT_FIELD] alphaupper | IDENTICAL | ", var%alphaupper, " | ", kgenref_var%alphaupper
       ELSE 
           diff_alphaupper = ABS(var%alphaupper - kgenref_var%alphaupper) 
           IF (diff_alphaupper <= kgen_tolerance) THEN 
@@ -2558,7 +2452,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_IN_TOL 
-              WRITE(*, *) "[VIT_FIELD] alphaupper | IN_TOL | ", var%alphaupper, " | ", kgenref_var%alphaupper, " | ", diff_alphaupper
           ELSE 
               dtype_check_status%numOutTol = dtype_check_status%numOutTol + 1 
               IF (kgen_verboseLevel > 1) THEN 
@@ -2567,7 +2460,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_OUT_TOL 
-              WRITE(*, *) "[VIT_FIELD] alphaupper | OUT_TOL | ", var%alphaupper, " | ", kgenref_var%alphaupper, " | ", diff_alphaupper
           END IF   
       END IF   
       IF (check_result == CHECK_IDENTICAL) THEN 
@@ -2598,7 +2490,6 @@ MODULE AirfoilInfo_Types
               END IF   
           END IF   
           check_result = CHECK_IDENTICAL 
-          WRITE(*, *) "[VIT_FIELD] alphalower | IDENTICAL | ", var%alphalower, " | ", kgenref_var%alphalower
       ELSE 
           diff_alphalower = ABS(var%alphalower - kgenref_var%alphalower) 
           IF (diff_alphalower <= kgen_tolerance) THEN 
@@ -2609,7 +2500,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_IN_TOL 
-              WRITE(*, *) "[VIT_FIELD] alphalower | IN_TOL | ", var%alphalower, " | ", kgenref_var%alphalower, " | ", diff_alphalower
           ELSE 
               dtype_check_status%numOutTol = dtype_check_status%numOutTol + 1 
               IF (kgen_verboseLevel > 1) THEN 
@@ -2618,7 +2508,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_OUT_TOL 
-              WRITE(*, *) "[VIT_FIELD] alphalower | OUT_TOL | ", var%alphalower, " | ", kgenref_var%alphalower, " | ", diff_alphalower
           END IF   
       END IF   
       IF (check_result == CHECK_IDENTICAL) THEN 
@@ -2649,7 +2538,6 @@ MODULE AirfoilInfo_Types
               END IF   
           END IF   
           check_result = CHECK_IDENTICAL 
-          WRITE(*, *) "[VIT_FIELD] c_alphalower | IDENTICAL | ", var%c_alphalower, " | ", kgenref_var%c_alphalower
       ELSE 
           diff_c_alphalower = ABS(var%c_alphalower - kgenref_var%c_alphalower) 
           IF (diff_c_alphalower <= kgen_tolerance) THEN 
@@ -2660,7 +2548,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_IN_TOL 
-              WRITE(*, *) "[VIT_FIELD] c_alphalower | IN_TOL | ", var%c_alphalower, " | ", kgenref_var%c_alphalower, " | ", diff_c_alphalower
           ELSE 
               dtype_check_status%numOutTol = dtype_check_status%numOutTol + 1 
               IF (kgen_verboseLevel > 1) THEN 
@@ -2669,7 +2556,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_OUT_TOL 
-              WRITE(*, *) "[VIT_FIELD] c_alphalower | OUT_TOL | ", var%c_alphalower, " | ", kgenref_var%c_alphalower, " | ", diff_c_alphalower
           END IF   
       END IF   
       IF (check_result == CHECK_IDENTICAL) THEN 
@@ -2700,7 +2586,6 @@ MODULE AirfoilInfo_Types
               END IF   
           END IF   
           check_result = CHECK_IDENTICAL 
-          WRITE(*, *) "[VIT_FIELD] c_alphaupper | IDENTICAL | ", var%c_alphaupper, " | ", kgenref_var%c_alphaupper
       ELSE 
           diff_c_alphaupper = ABS(var%c_alphaupper - kgenref_var%c_alphaupper) 
           IF (diff_c_alphaupper <= kgen_tolerance) THEN 
@@ -2711,7 +2596,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_IN_TOL 
-              WRITE(*, *) "[VIT_FIELD] c_alphaupper | IN_TOL | ", var%c_alphaupper, " | ", kgenref_var%c_alphaupper, " | ", diff_c_alphaupper
           ELSE 
               dtype_check_status%numOutTol = dtype_check_status%numOutTol + 1 
               IF (kgen_verboseLevel > 1) THEN 
@@ -2720,7 +2604,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_OUT_TOL 
-              WRITE(*, *) "[VIT_FIELD] c_alphaupper | OUT_TOL | ", var%c_alphaupper, " | ", kgenref_var%c_alphaupper, " | ", diff_c_alphaupper
           END IF   
       END IF   
       IF (check_result == CHECK_IDENTICAL) THEN 
@@ -2751,7 +2634,6 @@ MODULE AirfoilInfo_Types
               END IF   
           END IF   
           check_result = CHECK_IDENTICAL 
-          WRITE(*, *) "[VIT_FIELD] alpha0reverseflow | IDENTICAL | ", var%alpha0reverseflow, " | ", kgenref_var%alpha0reverseflow
       ELSE 
           diff_alpha0reverseflow = ABS(var%alpha0reverseflow - kgenref_var%alpha0reverseflow) 
           IF (diff_alpha0reverseflow <= kgen_tolerance) THEN 
@@ -2762,7 +2644,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_IN_TOL 
-              WRITE(*, *) "[VIT_FIELD] alpha0reverseflow | IN_TOL | ", var%alpha0reverseflow, " | ", kgenref_var%alpha0reverseflow, " | ", diff_alpha0reverseflow
           ELSE 
               dtype_check_status%numOutTol = dtype_check_status%numOutTol + 1 
               IF (kgen_verboseLevel > 1) THEN 
@@ -2771,7 +2652,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_OUT_TOL 
-              WRITE(*, *) "[VIT_FIELD] alpha0reverseflow | OUT_TOL | ", var%alpha0reverseflow, " | ", kgenref_var%alpha0reverseflow, " | ", diff_alpha0reverseflow
           END IF   
       END IF   
       IF (check_result == CHECK_IDENTICAL) THEN 
@@ -2802,7 +2682,6 @@ MODULE AirfoilInfo_Types
               END IF   
           END IF   
           check_result = CHECK_IDENTICAL 
-          WRITE(*, *) "[VIT_FIELD] alphabreakupper | IDENTICAL | ", var%alphabreakupper, " | ", kgenref_var%alphabreakupper
       ELSE 
           diff_alphabreakupper = ABS(var%alphabreakupper - kgenref_var%alphabreakupper) 
           IF (diff_alphabreakupper <= kgen_tolerance) THEN 
@@ -2813,7 +2692,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_IN_TOL 
-              WRITE(*, *) "[VIT_FIELD] alphabreakupper | IN_TOL | ", var%alphabreakupper, " | ", kgenref_var%alphabreakupper, " | ", diff_alphabreakupper
           ELSE 
               dtype_check_status%numOutTol = dtype_check_status%numOutTol + 1 
               IF (kgen_verboseLevel > 1) THEN 
@@ -2822,7 +2700,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_OUT_TOL 
-              WRITE(*, *) "[VIT_FIELD] alphabreakupper | OUT_TOL | ", var%alphabreakupper, " | ", kgenref_var%alphabreakupper, " | ", diff_alphabreakupper
           END IF   
       END IF   
       IF (check_result == CHECK_IDENTICAL) THEN 
@@ -2853,7 +2730,6 @@ MODULE AirfoilInfo_Types
               END IF   
           END IF   
           check_result = CHECK_IDENTICAL 
-          WRITE(*, *) "[VIT_FIELD] cnbreakupper | IDENTICAL | ", var%cnbreakupper, " | ", kgenref_var%cnbreakupper
       ELSE 
           diff_cnbreakupper = ABS(var%cnbreakupper - kgenref_var%cnbreakupper) 
           IF (diff_cnbreakupper <= kgen_tolerance) THEN 
@@ -2864,7 +2740,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_IN_TOL 
-              WRITE(*, *) "[VIT_FIELD] cnbreakupper | IN_TOL | ", var%cnbreakupper, " | ", kgenref_var%cnbreakupper, " | ", diff_cnbreakupper
           ELSE 
               dtype_check_status%numOutTol = dtype_check_status%numOutTol + 1 
               IF (kgen_verboseLevel > 1) THEN 
@@ -2873,7 +2748,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_OUT_TOL 
-              WRITE(*, *) "[VIT_FIELD] cnbreakupper | OUT_TOL | ", var%cnbreakupper, " | ", kgenref_var%cnbreakupper, " | ", diff_cnbreakupper
           END IF   
       END IF   
       IF (check_result == CHECK_IDENTICAL) THEN 
@@ -2904,7 +2778,6 @@ MODULE AirfoilInfo_Types
               END IF   
           END IF   
           check_result = CHECK_IDENTICAL 
-          WRITE(*, *) "[VIT_FIELD] alphabreaklower | IDENTICAL | ", var%alphabreaklower, " | ", kgenref_var%alphabreaklower
       ELSE 
           diff_alphabreaklower = ABS(var%alphabreaklower - kgenref_var%alphabreaklower) 
           IF (diff_alphabreaklower <= kgen_tolerance) THEN 
@@ -2915,7 +2788,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_IN_TOL 
-              WRITE(*, *) "[VIT_FIELD] alphabreaklower | IN_TOL | ", var%alphabreaklower, " | ", kgenref_var%alphabreaklower, " | ", diff_alphabreaklower
           ELSE 
               dtype_check_status%numOutTol = dtype_check_status%numOutTol + 1 
               IF (kgen_verboseLevel > 1) THEN 
@@ -2924,7 +2796,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_OUT_TOL 
-              WRITE(*, *) "[VIT_FIELD] alphabreaklower | OUT_TOL | ", var%alphabreaklower, " | ", kgenref_var%alphabreaklower, " | ", diff_alphabreaklower
           END IF   
       END IF   
       IF (check_result == CHECK_IDENTICAL) THEN 
@@ -2955,7 +2826,6 @@ MODULE AirfoilInfo_Types
               END IF   
           END IF   
           check_result = CHECK_IDENTICAL 
-          WRITE(*, *) "[VIT_FIELD] cnbreaklower | IDENTICAL | ", var%cnbreaklower, " | ", kgenref_var%cnbreaklower
       ELSE 
           diff_cnbreaklower = ABS(var%cnbreaklower - kgenref_var%cnbreaklower) 
           IF (diff_cnbreaklower <= kgen_tolerance) THEN 
@@ -2966,7 +2836,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_IN_TOL 
-              WRITE(*, *) "[VIT_FIELD] cnbreaklower | IN_TOL | ", var%cnbreaklower, " | ", kgenref_var%cnbreaklower, " | ", diff_cnbreaklower
           ELSE 
               dtype_check_status%numOutTol = dtype_check_status%numOutTol + 1 
               IF (kgen_verboseLevel > 1) THEN 
@@ -2975,7 +2844,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_OUT_TOL 
-              WRITE(*, *) "[VIT_FIELD] cnbreaklower | OUT_TOL | ", var%cnbreaklower, " | ", kgenref_var%cnbreaklower, " | ", diff_cnbreaklower
           END IF   
       END IF   
       IF (check_result == CHECK_IDENTICAL) THEN 
@@ -3040,7 +2908,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_IDENTICAL 
-              WRITE(*, *) "[VIT_ARRAY] alpha | IDENTICAL | size=", SIZE(var%alpha)
           ELSE 
               ALLOCATE (buf1_alpha(SIZE(var%alpha,dim=1))) 
               ALLOCATE (buf2_alpha(SIZE(var%alpha,dim=1))) 
@@ -3062,7 +2929,6 @@ MODULE AirfoilInfo_Types
                       END IF   
                   END IF   
                   check_result = CHECK_OUT_TOL 
-                  WRITE(*, *) "[VIT_ARRAY] alpha | OUT_TOL | n_diff=", n_alpha, " | rms=", rmsdiff_alpha
               ELSE 
                   dtype_check_status%numInTol = dtype_check_status%numInTol + 1 
                   IF (kgen_verboseLevel > 1) THEN 
@@ -3071,7 +2937,6 @@ MODULE AirfoilInfo_Types
                       END IF   
                   END IF   
                   check_result = CHECK_IN_TOL 
-                  WRITE(*, *) "[VIT_ARRAY] alpha | IN_TOL | n_diff=", n_alpha, " | rms=", rmsdiff_alpha
               END IF   
           END IF   
           IF (check_result == CHECK_IDENTICAL) THEN 
@@ -3111,7 +2976,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_IDENTICAL 
-              WRITE(*, *) "[VIT_ARRAY] coefs | IDENTICAL | size=", SIZE(var%coefs)
           ELSE 
               ALLOCATE (buf1_coefs(SIZE(var%coefs,dim=1),SIZE(var%coefs,dim=2))) 
               ALLOCATE (buf2_coefs(SIZE(var%coefs,dim=1),SIZE(var%coefs,dim=2))) 
@@ -3133,7 +2997,6 @@ MODULE AirfoilInfo_Types
                       END IF   
                   END IF   
                   check_result = CHECK_OUT_TOL 
-                  WRITE(*, *) "[VIT_ARRAY] coefs | OUT_TOL | n_diff=", n_coefs, " | rms=", rmsdiff_coefs
               ELSE 
                   dtype_check_status%numInTol = dtype_check_status%numInTol + 1 
                   IF (kgen_verboseLevel > 1) THEN 
@@ -3142,7 +3005,6 @@ MODULE AirfoilInfo_Types
                       END IF   
                   END IF   
                   check_result = CHECK_IN_TOL 
-                  WRITE(*, *) "[VIT_ARRAY] coefs | IN_TOL | n_diff=", n_coefs, " | rms=", rmsdiff_coefs
               END IF   
           END IF   
           IF (check_result == CHECK_IDENTICAL) THEN 
@@ -3182,7 +3044,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_IDENTICAL 
-              WRITE(*, *) "[VIT_ARRAY] splinecoefs | IDENTICAL | size=", SIZE(var%splinecoefs)
           ELSE 
               ALLOCATE (buf1_splinecoefs(SIZE(var%splinecoefs,dim=1),SIZE(var%splinecoefs,dim=2),SIZE(var%splinecoefs,dim=3))) 
               ALLOCATE (buf2_splinecoefs(SIZE(var%splinecoefs,dim=1),SIZE(var%splinecoefs,dim=2),SIZE(var%splinecoefs,dim=3))) 
@@ -3204,7 +3065,6 @@ MODULE AirfoilInfo_Types
                       END IF   
                   END IF   
                   check_result = CHECK_OUT_TOL 
-                  WRITE(*, *) "[VIT_ARRAY] splinecoefs | OUT_TOL | n_diff=", n_splinecoefs, " | rms=", rmsdiff_splinecoefs
               ELSE 
                   dtype_check_status%numInTol = dtype_check_status%numInTol + 1 
                   IF (kgen_verboseLevel > 1) THEN 
@@ -3213,7 +3073,6 @@ MODULE AirfoilInfo_Types
                       END IF   
                   END IF   
                   check_result = CHECK_IN_TOL 
-                  WRITE(*, *) "[VIT_ARRAY] splinecoefs | IN_TOL | n_diff=", n_splinecoefs, " | rms=", rmsdiff_splinecoefs
               END IF   
           END IF   
           IF (check_result == CHECK_IDENTICAL) THEN 
@@ -3255,7 +3114,6 @@ MODULE AirfoilInfo_Types
               END IF   
           END IF   
           check_result = CHECK_IDENTICAL 
-          WRITE(*, *) "[VIT_FIELD] userprop | IDENTICAL | ", var%userprop, " | ", kgenref_var%userprop
       ELSE 
           diff_userprop = ABS(var%userprop - kgenref_var%userprop) 
           IF (diff_userprop <= kgen_tolerance) THEN 
@@ -3266,7 +3124,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_IN_TOL 
-              WRITE(*, *) "[VIT_FIELD] userprop | IN_TOL | ", var%userprop, " | ", kgenref_var%userprop, " | ", diff_userprop
           ELSE 
               dtype_check_status%numOutTol = dtype_check_status%numOutTol + 1 
               IF (kgen_verboseLevel > 1) THEN 
@@ -3275,7 +3132,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_OUT_TOL 
-              WRITE(*, *) "[VIT_FIELD] userprop | OUT_TOL | ", var%userprop, " | ", kgenref_var%userprop, " | ", diff_userprop
           END IF   
       END IF   
       IF (check_result == CHECK_IDENTICAL) THEN 
@@ -3306,7 +3162,6 @@ MODULE AirfoilInfo_Types
               END IF   
           END IF   
           check_result = CHECK_IDENTICAL 
-          WRITE(*, *) "[VIT_FIELD] re | IDENTICAL | ", var%re, " | ", kgenref_var%re
       ELSE 
           diff_re = ABS(var%re - kgenref_var%re) 
           IF (diff_re <= kgen_tolerance) THEN 
@@ -3317,7 +3172,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_IN_TOL 
-              WRITE(*, *) "[VIT_FIELD] re | IN_TOL | ", var%re, " | ", kgenref_var%re, " | ", diff_re
           ELSE 
               dtype_check_status%numOutTol = dtype_check_status%numOutTol + 1 
               IF (kgen_verboseLevel > 1) THEN 
@@ -3326,7 +3180,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_OUT_TOL 
-              WRITE(*, *) "[VIT_FIELD] re | OUT_TOL | ", var%re, " | ", kgenref_var%re, " | ", diff_re
           END IF   
       END IF   
       IF (check_result == CHECK_IDENTICAL) THEN 
@@ -3357,7 +3210,6 @@ MODULE AirfoilInfo_Types
               END IF   
           END IF   
           check_result = CHECK_IDENTICAL 
-          WRITE(*, *) "[VIT_FIELD] numalf | IDENTICAL | ", var%numalf, " | ", kgenref_var%numalf
       ELSE 
           diff_numalf = ABS(var%numalf - kgenref_var%numalf) 
           IF (diff_numalf <= kgen_tolerance) THEN 
@@ -3368,7 +3220,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_IN_TOL 
-              WRITE(*, *) "[VIT_FIELD] numalf | IN_TOL | ", var%numalf, " | ", kgenref_var%numalf, " | ", diff_numalf
           ELSE 
               dtype_check_status%numOutTol = dtype_check_status%numOutTol + 1 
               IF (kgen_verboseLevel > 1) THEN 
@@ -3377,7 +3228,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_OUT_TOL 
-              WRITE(*, *) "[VIT_FIELD] numalf | OUT_TOL | ", var%numalf, " | ", kgenref_var%numalf, " | ", diff_numalf
           END IF   
       END IF   
       IF (check_result == CHECK_IDENTICAL) THEN 
@@ -3407,7 +3257,6 @@ MODULE AirfoilInfo_Types
               END IF   
           END IF   
           check_result = CHECK_IDENTICAL 
-          WRITE(*, *) "[VIT_FIELD] numalf | IDENTICAL | ", var%numalf, " | ", kgenref_var%numalf
       ELSE 
           dtype_check_status%numOutTol = dtype_check_status%numOutTol + 1 
           IF (kgen_verboseLevel > 1) THEN 
@@ -3416,7 +3265,6 @@ MODULE AirfoilInfo_Types
               END IF   
           END IF   
           check_result = CHECK_OUT_TOL 
-          WRITE(*, *) "[VIT_FIELD] numalf | OUT_TOL | ", var%numalf, " | ", kgenref_var%numalf, " | ", diff_numalf
       END IF   
       IF (check_result == CHECK_IDENTICAL) THEN 
           CONTINUE 
@@ -3445,7 +3293,6 @@ MODULE AirfoilInfo_Types
               END IF   
           END IF   
           check_result = CHECK_IDENTICAL 
-          WRITE(*, *) "[VIT_FIELD] numalf | IDENTICAL | ", var%numalf, " | ", kgenref_var%numalf
       ELSE 
           dtype_check_status%numOutTol = dtype_check_status%numOutTol + 1 
           IF (kgen_verboseLevel > 1) THEN 
@@ -3454,7 +3301,6 @@ MODULE AirfoilInfo_Types
               END IF   
           END IF   
           check_result = CHECK_OUT_TOL 
-          WRITE(*, *) "[VIT_FIELD] numalf | OUT_TOL | ", var%numalf, " | ", kgenref_var%numalf, " | ", diff_numalf
       END IF   
       IF (check_result == CHECK_IDENTICAL) THEN 
           CONTINUE 
@@ -3485,7 +3331,6 @@ MODULE AirfoilInfo_Types
               END IF   
           END IF   
           check_result = CHECK_IDENTICAL 
-          WRITE(*, *) "[VIT_FIELD] numalf | IDENTICAL | ", var%numalf, " | ", kgenref_var%numalf
       ELSE IF (comp_check_status%numOutTol > 0) THEN 
           dtype_check_status%numOutTol = dtype_check_status%numOutTol + 1 
           IF (kgen_verboseLevel > 1) THEN 
@@ -3494,7 +3339,6 @@ MODULE AirfoilInfo_Types
               END IF   
           END IF   
           check_result = CHECK_OUT_TOL 
-          WRITE(*, *) "[VIT_FIELD] numalf | OUT_TOL | ", var%numalf, " | ", kgenref_var%numalf, " | ", diff_numalf
       ELSE IF (comp_check_status%numInTol > 0) THEN 
           dtype_check_status%numInTol = dtype_check_status%numInTol + 1 
           IF (kgen_verboseLevel > 1) THEN 
@@ -3503,7 +3347,6 @@ MODULE AirfoilInfo_Types
               END IF   
           END IF   
           check_result = CHECK_IN_TOL 
-          WRITE(*, *) "[VIT_FIELD] numalf | IN_TOL | ", var%numalf, " | ", kgenref_var%numalf, " | ", diff_numalf
       END IF   
       IF (check_result == CHECK_IDENTICAL) THEN 
           CONTINUE 
@@ -3582,7 +3425,6 @@ MODULE AirfoilInfo_Types
               END IF   
           END IF   
           check_result = CHECK_IDENTICAL 
-          WRITE(*, *) "[VIT_FIELD] colcd | IDENTICAL | ", var%colcd, " | ", kgenref_var%colcd
       ELSE 
           diff_colcd = ABS(var%colcd - kgenref_var%colcd) 
           IF (diff_colcd <= kgen_tolerance) THEN 
@@ -3593,7 +3435,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_IN_TOL 
-              WRITE(*, *) "[VIT_FIELD] colcd | IN_TOL | ", var%colcd, " | ", kgenref_var%colcd, " | ", diff_colcd
           ELSE 
               dtype_check_status%numOutTol = dtype_check_status%numOutTol + 1 
               IF (kgen_verboseLevel > 1) THEN 
@@ -3602,7 +3443,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_OUT_TOL 
-              WRITE(*, *) "[VIT_FIELD] colcd | OUT_TOL | ", var%colcd, " | ", kgenref_var%colcd, " | ", diff_colcd
           END IF   
       END IF   
       IF (check_result == CHECK_IDENTICAL) THEN 
@@ -3633,7 +3473,6 @@ MODULE AirfoilInfo_Types
               END IF   
           END IF   
           check_result = CHECK_IDENTICAL 
-          WRITE(*, *) "[VIT_FIELD] colcl | IDENTICAL | ", var%colcl, " | ", kgenref_var%colcl
       ELSE 
           diff_colcl = ABS(var%colcl - kgenref_var%colcl) 
           IF (diff_colcl <= kgen_tolerance) THEN 
@@ -3644,7 +3483,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_IN_TOL 
-              WRITE(*, *) "[VIT_FIELD] colcl | IN_TOL | ", var%colcl, " | ", kgenref_var%colcl, " | ", diff_colcl
           ELSE 
               dtype_check_status%numOutTol = dtype_check_status%numOutTol + 1 
               IF (kgen_verboseLevel > 1) THEN 
@@ -3653,7 +3491,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_OUT_TOL 
-              WRITE(*, *) "[VIT_FIELD] colcl | OUT_TOL | ", var%colcl, " | ", kgenref_var%colcl, " | ", diff_colcl
           END IF   
       END IF   
       IF (check_result == CHECK_IDENTICAL) THEN 
@@ -3684,7 +3521,6 @@ MODULE AirfoilInfo_Types
               END IF   
           END IF   
           check_result = CHECK_IDENTICAL 
-          WRITE(*, *) "[VIT_FIELD] colcm | IDENTICAL | ", var%colcm, " | ", kgenref_var%colcm
       ELSE 
           diff_colcm = ABS(var%colcm - kgenref_var%colcm) 
           IF (diff_colcm <= kgen_tolerance) THEN 
@@ -3695,7 +3531,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_IN_TOL 
-              WRITE(*, *) "[VIT_FIELD] colcm | IN_TOL | ", var%colcm, " | ", kgenref_var%colcm, " | ", diff_colcm
           ELSE 
               dtype_check_status%numOutTol = dtype_check_status%numOutTol + 1 
               IF (kgen_verboseLevel > 1) THEN 
@@ -3704,7 +3539,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_OUT_TOL 
-              WRITE(*, *) "[VIT_FIELD] colcm | OUT_TOL | ", var%colcm, " | ", kgenref_var%colcm, " | ", diff_colcm
           END IF   
       END IF   
       IF (check_result == CHECK_IDENTICAL) THEN 
@@ -3735,7 +3569,6 @@ MODULE AirfoilInfo_Types
               END IF   
           END IF   
           check_result = CHECK_IDENTICAL 
-          WRITE(*, *) "[VIT_FIELD] colcpmin | IDENTICAL | ", var%colcpmin, " | ", kgenref_var%colcpmin
       ELSE 
           diff_colcpmin = ABS(var%colcpmin - kgenref_var%colcpmin) 
           IF (diff_colcpmin <= kgen_tolerance) THEN 
@@ -3746,7 +3579,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_IN_TOL 
-              WRITE(*, *) "[VIT_FIELD] colcpmin | IN_TOL | ", var%colcpmin, " | ", kgenref_var%colcpmin, " | ", diff_colcpmin
           ELSE 
               dtype_check_status%numOutTol = dtype_check_status%numOutTol + 1 
               IF (kgen_verboseLevel > 1) THEN 
@@ -3755,7 +3587,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_OUT_TOL 
-              WRITE(*, *) "[VIT_FIELD] colcpmin | OUT_TOL | ", var%colcpmin, " | ", kgenref_var%colcpmin, " | ", diff_colcpmin
           END IF   
       END IF   
       IF (check_result == CHECK_IDENTICAL) THEN 
@@ -3786,7 +3617,6 @@ MODULE AirfoilInfo_Types
               END IF   
           END IF   
           check_result = CHECK_IDENTICAL 
-          WRITE(*, *) "[VIT_FIELD] coluaf | IDENTICAL | ", var%coluaf, " | ", kgenref_var%coluaf
       ELSE 
           diff_coluaf = ABS(var%coluaf - kgenref_var%coluaf) 
           IF (diff_coluaf <= kgen_tolerance) THEN 
@@ -3797,7 +3627,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_IN_TOL 
-              WRITE(*, *) "[VIT_FIELD] coluaf | IN_TOL | ", var%coluaf, " | ", kgenref_var%coluaf, " | ", diff_coluaf
           ELSE 
               dtype_check_status%numOutTol = dtype_check_status%numOutTol + 1 
               IF (kgen_verboseLevel > 1) THEN 
@@ -3806,7 +3635,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_OUT_TOL 
-              WRITE(*, *) "[VIT_FIELD] coluaf | OUT_TOL | ", var%coluaf, " | ", kgenref_var%coluaf, " | ", diff_coluaf
           END IF   
       END IF   
       IF (check_result == CHECK_IDENTICAL) THEN 
@@ -3837,7 +3665,6 @@ MODULE AirfoilInfo_Types
               END IF   
           END IF   
           check_result = CHECK_IDENTICAL 
-          WRITE(*, *) "[VIT_FIELD] aftabmod | IDENTICAL | ", var%aftabmod, " | ", kgenref_var%aftabmod
       ELSE 
           diff_aftabmod = ABS(var%aftabmod - kgenref_var%aftabmod) 
           IF (diff_aftabmod <= kgen_tolerance) THEN 
@@ -3848,7 +3675,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_IN_TOL 
-              WRITE(*, *) "[VIT_FIELD] aftabmod | IN_TOL | ", var%aftabmod, " | ", kgenref_var%aftabmod, " | ", diff_aftabmod
           ELSE 
               dtype_check_status%numOutTol = dtype_check_status%numOutTol + 1 
               IF (kgen_verboseLevel > 1) THEN 
@@ -3857,7 +3683,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_OUT_TOL 
-              WRITE(*, *) "[VIT_FIELD] aftabmod | OUT_TOL | ", var%aftabmod, " | ", kgenref_var%aftabmod, " | ", diff_aftabmod
           END IF   
       END IF   
       IF (check_result == CHECK_IDENTICAL) THEN 
@@ -3888,7 +3713,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_IDENTICAL 
-              WRITE(*, *) "[VIT_ARRAY] secondvals | IDENTICAL | size=", SIZE(var%secondvals)
           ELSE 
               ALLOCATE (buf1_secondvals(SIZE(var%secondvals,dim=1))) 
               ALLOCATE (buf2_secondvals(SIZE(var%secondvals,dim=1))) 
@@ -3910,7 +3734,6 @@ MODULE AirfoilInfo_Types
                       END IF   
                   END IF   
                   check_result = CHECK_OUT_TOL 
-                  WRITE(*, *) "[VIT_ARRAY] secondvals | OUT_TOL | n_diff=", n_secondvals, " | rms=", rmsdiff_secondvals
               ELSE 
                   dtype_check_status%numInTol = dtype_check_status%numInTol + 1 
                   IF (kgen_verboseLevel > 1) THEN 
@@ -3919,7 +3742,6 @@ MODULE AirfoilInfo_Types
                       END IF   
                   END IF   
                   check_result = CHECK_IN_TOL 
-                  WRITE(*, *) "[VIT_ARRAY] secondvals | IN_TOL | n_diff=", n_secondvals, " | rms=", rmsdiff_secondvals
               END IF   
           END IF   
           IF (check_result == CHECK_IDENTICAL) THEN 
@@ -3961,7 +3783,6 @@ MODULE AirfoilInfo_Types
               END IF   
           END IF   
           check_result = CHECK_IDENTICAL 
-          WRITE(*, *) "[VIT_FIELD] interpord | IDENTICAL | ", var%interpord, " | ", kgenref_var%interpord
       ELSE 
           diff_interpord = ABS(var%interpord - kgenref_var%interpord) 
           IF (diff_interpord <= kgen_tolerance) THEN 
@@ -3972,7 +3793,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_IN_TOL 
-              WRITE(*, *) "[VIT_FIELD] interpord | IN_TOL | ", var%interpord, " | ", kgenref_var%interpord, " | ", diff_interpord
           ELSE 
               dtype_check_status%numOutTol = dtype_check_status%numOutTol + 1 
               IF (kgen_verboseLevel > 1) THEN 
@@ -3981,7 +3801,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_OUT_TOL 
-              WRITE(*, *) "[VIT_FIELD] interpord | OUT_TOL | ", var%interpord, " | ", kgenref_var%interpord, " | ", diff_interpord
           END IF   
       END IF   
       IF (check_result == CHECK_IDENTICAL) THEN 
@@ -4012,7 +3831,6 @@ MODULE AirfoilInfo_Types
               END IF   
           END IF   
           check_result = CHECK_IDENTICAL 
-          WRITE(*, *) "[VIT_FIELD] relthickness | IDENTICAL | ", var%relthickness, " | ", kgenref_var%relthickness
       ELSE 
           diff_relthickness = ABS(var%relthickness - kgenref_var%relthickness) 
           IF (diff_relthickness <= kgen_tolerance) THEN 
@@ -4023,7 +3841,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_IN_TOL 
-              WRITE(*, *) "[VIT_FIELD] relthickness | IN_TOL | ", var%relthickness, " | ", kgenref_var%relthickness, " | ", diff_relthickness
           ELSE 
               dtype_check_status%numOutTol = dtype_check_status%numOutTol + 1 
               IF (kgen_verboseLevel > 1) THEN 
@@ -4032,7 +3849,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_OUT_TOL 
-              WRITE(*, *) "[VIT_FIELD] relthickness | OUT_TOL | ", var%relthickness, " | ", kgenref_var%relthickness, " | ", diff_relthickness
           END IF   
       END IF   
       IF (check_result == CHECK_IDENTICAL) THEN 
@@ -4063,7 +3879,6 @@ MODULE AirfoilInfo_Types
               END IF   
           END IF   
           check_result = CHECK_IDENTICAL 
-          WRITE(*, *) "[VIT_FIELD] nondimarea | IDENTICAL | ", var%nondimarea, " | ", kgenref_var%nondimarea
       ELSE 
           diff_nondimarea = ABS(var%nondimarea - kgenref_var%nondimarea) 
           IF (diff_nondimarea <= kgen_tolerance) THEN 
@@ -4074,7 +3889,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_IN_TOL 
-              WRITE(*, *) "[VIT_FIELD] nondimarea | IN_TOL | ", var%nondimarea, " | ", kgenref_var%nondimarea, " | ", diff_nondimarea
           ELSE 
               dtype_check_status%numOutTol = dtype_check_status%numOutTol + 1 
               IF (kgen_verboseLevel > 1) THEN 
@@ -4083,7 +3897,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_OUT_TOL 
-              WRITE(*, *) "[VIT_FIELD] nondimarea | OUT_TOL | ", var%nondimarea, " | ", kgenref_var%nondimarea, " | ", diff_nondimarea
           END IF   
       END IF   
       IF (check_result == CHECK_IDENTICAL) THEN 
@@ -4114,7 +3927,6 @@ MODULE AirfoilInfo_Types
               END IF   
           END IF   
           check_result = CHECK_IDENTICAL 
-          WRITE(*, *) "[VIT_FIELD] numcoords | IDENTICAL | ", var%numcoords, " | ", kgenref_var%numcoords
       ELSE 
           diff_numcoords = ABS(var%numcoords - kgenref_var%numcoords) 
           IF (diff_numcoords <= kgen_tolerance) THEN 
@@ -4125,7 +3937,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_IN_TOL 
-              WRITE(*, *) "[VIT_FIELD] numcoords | IN_TOL | ", var%numcoords, " | ", kgenref_var%numcoords, " | ", diff_numcoords
           ELSE 
               dtype_check_status%numOutTol = dtype_check_status%numOutTol + 1 
               IF (kgen_verboseLevel > 1) THEN 
@@ -4134,7 +3945,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_OUT_TOL 
-              WRITE(*, *) "[VIT_FIELD] numcoords | OUT_TOL | ", var%numcoords, " | ", kgenref_var%numcoords, " | ", diff_numcoords
           END IF   
       END IF   
       IF (check_result == CHECK_IDENTICAL) THEN 
@@ -4165,7 +3975,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_IDENTICAL 
-              WRITE(*, *) "[VIT_ARRAY] x_coord | IDENTICAL | size=", SIZE(var%x_coord)
           ELSE 
               ALLOCATE (buf1_x_coord(SIZE(var%x_coord,dim=1))) 
               ALLOCATE (buf2_x_coord(SIZE(var%x_coord,dim=1))) 
@@ -4187,7 +3996,6 @@ MODULE AirfoilInfo_Types
                       END IF   
                   END IF   
                   check_result = CHECK_OUT_TOL 
-                  WRITE(*, *) "[VIT_ARRAY] x_coord | OUT_TOL | n_diff=", n_x_coord, " | rms=", rmsdiff_x_coord
               ELSE 
                   dtype_check_status%numInTol = dtype_check_status%numInTol + 1 
                   IF (kgen_verboseLevel > 1) THEN 
@@ -4196,7 +4004,6 @@ MODULE AirfoilInfo_Types
                       END IF   
                   END IF   
                   check_result = CHECK_IN_TOL 
-                  WRITE(*, *) "[VIT_ARRAY] x_coord | IN_TOL | n_diff=", n_x_coord, " | rms=", rmsdiff_x_coord
               END IF   
           END IF   
           IF (check_result == CHECK_IDENTICAL) THEN 
@@ -4238,7 +4045,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_IDENTICAL 
-              WRITE(*, *) "[VIT_ARRAY] y_coord | IDENTICAL | size=", SIZE(var%y_coord)
           ELSE 
               ALLOCATE (buf1_y_coord(SIZE(var%y_coord,dim=1))) 
               ALLOCATE (buf2_y_coord(SIZE(var%y_coord,dim=1))) 
@@ -4260,7 +4066,6 @@ MODULE AirfoilInfo_Types
                       END IF   
                   END IF   
                   check_result = CHECK_OUT_TOL 
-                  WRITE(*, *) "[VIT_ARRAY] y_coord | OUT_TOL | n_diff=", n_y_coord, " | rms=", rmsdiff_y_coord
               ELSE 
                   dtype_check_status%numInTol = dtype_check_status%numInTol + 1 
                   IF (kgen_verboseLevel > 1) THEN 
@@ -4269,7 +4074,6 @@ MODULE AirfoilInfo_Types
                       END IF   
                   END IF   
                   check_result = CHECK_IN_TOL 
-                  WRITE(*, *) "[VIT_ARRAY] y_coord | IN_TOL | n_diff=", n_y_coord, " | rms=", rmsdiff_y_coord
               END IF   
           END IF   
           IF (check_result == CHECK_IDENTICAL) THEN 
@@ -4311,7 +4115,6 @@ MODULE AirfoilInfo_Types
               END IF   
           END IF   
           check_result = CHECK_IDENTICAL 
-          WRITE(*, *) "[VIT_FIELD] numtabs | IDENTICAL | ", var%numtabs, " | ", kgenref_var%numtabs
       ELSE 
           diff_numtabs = ABS(var%numtabs - kgenref_var%numtabs) 
           IF (diff_numtabs <= kgen_tolerance) THEN 
@@ -4322,7 +4125,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_IN_TOL 
-              WRITE(*, *) "[VIT_FIELD] numtabs | IN_TOL | ", var%numtabs, " | ", kgenref_var%numtabs, " | ", diff_numtabs
           ELSE 
               dtype_check_status%numOutTol = dtype_check_status%numOutTol + 1 
               IF (kgen_verboseLevel > 1) THEN 
@@ -4331,7 +4133,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_OUT_TOL 
-              WRITE(*, *) "[VIT_FIELD] numtabs | OUT_TOL | ", var%numtabs, " | ", kgenref_var%numtabs, " | ", diff_numtabs
           END IF   
       END IF   
       IF (check_result == CHECK_IDENTICAL) THEN 
@@ -4367,7 +4168,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_IDENTICAL 
-              WRITE(*, *) "[VIT_FIELD] numtabs | IDENTICAL | ", var%numtabs, " | ", kgenref_var%numtabs
           ELSE IF (comp_check_status%numOutTol > 0) THEN 
               dtype_check_status%numOutTol = dtype_check_status%numOutTol + 1 
               IF (kgen_verboseLevel > 1) THEN 
@@ -4376,7 +4176,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_OUT_TOL 
-              WRITE(*, *) "[VIT_FIELD] numtabs | OUT_TOL | ", var%numtabs, " | ", kgenref_var%numtabs, " | ", diff_numtabs
           ELSE IF (comp_check_status%numInTol > 0) THEN 
               dtype_check_status%numInTol = dtype_check_status%numInTol + 1 
               IF (kgen_verboseLevel > 1) THEN 
@@ -4385,7 +4184,6 @@ MODULE AirfoilInfo_Types
                   END IF   
               END IF   
               check_result = CHECK_IN_TOL 
-              WRITE(*, *) "[VIT_FIELD] numtabs | IN_TOL | ", var%numtabs, " | ", kgenref_var%numtabs, " | ", diff_numtabs
           END IF   
           IF (check_result == CHECK_IDENTICAL) THEN 
               CONTINUE 
@@ -4422,7 +4220,6 @@ MODULE AirfoilInfo_Types
               END IF   
           END IF   
           check_result = CHECK_IDENTICAL 
-          WRITE(*, *) "[VIT_FIELD] bl_file | IDENTICAL | ", var%bl_file, " | ", kgenref_var%bl_file
       ELSE 
           dtype_check_status%numOutTol = dtype_check_status%numOutTol + 1 
           IF (kgen_verboseLevel > 1) THEN 
@@ -4431,7 +4228,6 @@ MODULE AirfoilInfo_Types
               END IF   
           END IF   
           check_result = CHECK_OUT_TOL 
-          WRITE(*, *) "[VIT_FIELD] bl_file | OUT_TOL | ", var%bl_file, " | ", kgenref_var%bl_file
       END IF   
       IF (check_result == CHECK_IDENTICAL) THEN 
           CONTINUE 
@@ -4461,7 +4257,6 @@ MODULE AirfoilInfo_Types
               END IF   
           END IF   
           check_result = CHECK_IDENTICAL 
-          WRITE(*, *) "[VIT_FIELD] filename | IDENTICAL | ", var%filename, " | ", kgenref_var%filename
       ELSE 
           dtype_check_status%numOutTol = dtype_check_status%numOutTol + 1 
           IF (kgen_verboseLevel > 1) THEN 
@@ -4470,7 +4265,6 @@ MODULE AirfoilInfo_Types
               END IF   
           END IF   
           check_result = CHECK_OUT_TOL 
-          WRITE(*, *) "[VIT_FIELD] filename | OUT_TOL | ", var%filename, " | ", kgenref_var%filename
       END IF   
       IF (check_result == CHECK_IDENTICAL) THEN 
           CONTINUE 

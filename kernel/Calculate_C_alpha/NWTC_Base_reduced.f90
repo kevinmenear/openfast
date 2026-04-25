@@ -34,7 +34,7 @@ MODULE NWTC_Base
 
 
     USE precision 
-    USE kgen_utils_mod, ONLY: kgen_dp, kgen_array_sumcheck 
+    USE kgen_utils_mod
     USE tprof_mod, ONLY: tstart, tstop, tnull, tprnt 
 
     IMPLICIT NONE 
@@ -79,4 +79,27 @@ MODULE NWTC_Base
        READ (UNIT = kgen_unit) aborterrlev 
    END SUBROUTINE kr_externs_in_nwtc_base 
      
+
+   pure subroutine SetErrStat (ErrStatLcl, ErrMessLcl, ErrStat, ErrMess, RoutineName)
+      
+      INTEGER(IntKi), INTENT(IN   )  :: ErrStatLcl   ! Error status of the operation
+      CHARACTER(*),   INTENT(IN   )  :: ErrMessLcl   ! Error message if ErrStat /= ErrID_None
+                                                                        
+      INTEGER(IntKi), INTENT(INOUT)  :: ErrStat      ! Error status of the operation
+      CHARACTER(*),   INTENT(INOUT)  :: ErrMess      ! Error message if ErrStat /= ErrID_None
+   
+      CHARACTER(*),   INTENT(IN   )  :: RoutineName  ! Name of the routine error occurred in
+      
+      IF ( ErrStatLcl /= ErrID_None ) THEN
+         IF (ErrStat /= ErrID_None) then
+            ErrMess = TRIM(ErrMess)//new_line('a')//TRIM(RoutineName)//':'//TRIM(ErrMessLcl)
+         else
+            ErrMess = TRIM(RoutineName)//':'//TRIM(ErrMessLcl)
+         END IF
+         ErrStat = MAX(ErrStat, ErrStatLcl)
+      END IF
+         
+   end subroutine    
+
+
 END MODULE NWTC_Base

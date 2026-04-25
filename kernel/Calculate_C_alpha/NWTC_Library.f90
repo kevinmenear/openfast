@@ -84,7 +84,7 @@ MODULE NWTC_Library
     USE nwtc_num 
     ! Note that ModMesh_Mapping also includes LAPACK routines
     
-    USE kgen_utils_mod, ONLY: kgen_dp, kgen_array_sumcheck 
+    USE kgen_utils_mod
     USE tprof_mod, ONLY: tstart, tstop, tnull, tprnt 
 
     IMPLICIT NONE 

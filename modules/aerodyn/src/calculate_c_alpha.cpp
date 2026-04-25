@@ -15,25 +15,16 @@
 // Status: unverified
 // Generated: 2026-04-25T15:36:21Z
 
-#include <cmath>
 #include <cstdio>
 #include <cstring>
-#include <algorithm>
-#include <limits>
 #include <vector>
+#include "vit_nwtc.h"
 
 // LAPACK dgels_ external (Fortran calling convention)
 extern "C" {
     void dgels_(const char* trans, const int* m, const int* n, const int* nrhs,
                 double* a, const int* lda, double* b, const int* ldb,
                 double* work, const int* lwork, int* info);
-}
-
-static bool EqualRealNos(double a, double b) {
-    constexpr double Eps = std::numeric_limits<double>::epsilon();
-    constexpr double Tol = 100.0 * Eps / 2.0;
-    double Fraction = std::max(std::abs(a + b), 1.0);
-    return std::abs(a - b) <= Fraction * Tol;
 }
 
 void Calculate_C_alpha(double* alpha, int n_alpha, double* Cn, int n_Cn,

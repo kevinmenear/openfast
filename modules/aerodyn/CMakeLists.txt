@@ -48,6 +48,7 @@ add_library(basicaerolib STATIC
   src/computeua360_updatecnseparated.cpp
   src/computeua360_updateseparationf.cpp
   src/computeuaseparationfunction_oncl.cpp
+  src/computeua360_attachedflow.cpp
 )
 target_link_libraries(basicaerolib ifwlib nwtclibs stdc++)
 

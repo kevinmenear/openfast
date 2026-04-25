@@ -103,7 +103,7 @@ CONTAINS
 !----------------------------------------------------------------------------------------------------------------------------------  
     SUBROUTINE FindBoundingTables(p, secondaryDepVal, lowerTable, upperTable, xVals)
         USE ISO_C_BINDING
-        USE vit_afi_parametertype_view, ONLY: afi_parametertype_view_t, vit_populate_afi_parametertype, vit_original_afi_parametertype
+        USE vit_afi_parametertype_view, ONLY: afi_parametertype_view_t, vit_populate_afi_parametertype, vit_original_afi_parametertype, vit_copy_scalars_to_afi_parametertype
         IMPLICIT NONE
         TYPE(AFI_PARAMETERTYPE), INTENT(IN), TARGET :: p
         REAL(8), INTENT(IN) :: secondaryDepVal
@@ -116,6 +116,7 @@ CONTAINS
         ! Stash original Fortran pointers for callee bridges
         vit_original_afi_parametertype => p
         CALL findboundingtables_c(C_LOC(p_view), secondaryDepVal, lowerTable, upperTable, xVals)
+        ! Copy modified scalars back from view to Fortran type
     END SUBROUTINE FindBoundingTables
 !----------------------------------------------------------------------------------------------------------------------------------  
 
@@ -288,7 +289,6 @@ SUBROUTINE afi_computeairfoilcoefs2d(kgen_unit, kgen_measure, kgen_isverified, k
                END IF   
            END IF   
            check_result = CHECK_IDENTICAL 
-           WRITE(*, *) "[VIT_FIELD] ", trim(adjustl(varname)), " | IDENTICAL | ", var, " | ", kgenref_var
        ELSE 
            diff = ABS(var - kgenref_var) 
            IF (diff <= kgen_tolerance) THEN 
@@ -299,7 +299,6 @@ SUBROUTINE afi_computeairfoilcoefs2d(kgen_unit, kgen_measure, kgen_isverified, k
                    END IF   
                END IF   
                check_result = CHECK_IN_TOL 
-               WRITE(*, *) "[VIT_FIELD] ", trim(adjustl(varname)), " | IN_TOL | ", var, " | ", kgenref_var, " | ", diff
            ELSE 
                check_status%numOutTol = check_status%numOutTol + 1 
                IF (kgen_verboseLevel > 0) THEN 
@@ -308,7 +307,6 @@ SUBROUTINE afi_computeairfoilcoefs2d(kgen_unit, kgen_measure, kgen_isverified, k
                    END IF   
                END IF   
                check_result = CHECK_OUT_TOL 
-               WRITE(*, *) "[VIT_FIELD] ", trim(adjustl(varname)), " | OUT_TOL | ", var, " | ", kgenref_var, " | ", diff
            END IF   
        END IF   
        IF (check_result == CHECK_IDENTICAL) THEN 
@@ -359,7 +357,6 @@ SUBROUTINE afi_computeairfoilcoefs2d(kgen_unit, kgen_measure, kgen_isverified, k
                END IF   
            END IF   
            check_result = CHECK_IDENTICAL 
-           WRITE(*, *) "[VIT_ARRAY] ", trim(adjustl(varname)), " | IDENTICAL | size=", SIZE(var)
        ELSE 
            ALLOCATE (buf1(SIZE(var,dim=1))) 
            ALLOCATE (buf2(SIZE(var,dim=1))) 
@@ -381,7 +378,6 @@ SUBROUTINE afi_computeairfoilcoefs2d(kgen_unit, kgen_measure, kgen_isverified, k
                    END IF   
                END IF   
                check_result = CHECK_OUT_TOL 
-               WRITE(*, *) "[VIT_ARRAY] ", trim(adjustl(varname)), " | OUT_TOL | n_diff=", n, " | rms=", rmsdiff
            ELSE 
                check_status%numInTol = check_status%numInTol + 1 
                IF (kgen_verboseLevel > 1) THEN 
@@ -390,7 +386,6 @@ SUBROUTINE afi_computeairfoilcoefs2d(kgen_unit, kgen_measure, kgen_isverified, k
                    END IF   
                END IF   
                check_result = CHECK_IN_TOL 
-               WRITE(*, *) "[VIT_ARRAY] ", trim(adjustl(varname)), " | IN_TOL | n_diff=", n, " | rms=", rmsdiff
            END IF   
        END IF   
        IF (check_result == CHECK_IDENTICAL) THEN 

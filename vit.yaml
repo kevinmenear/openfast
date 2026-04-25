@@ -60,10 +60,10 @@ translations:
   ComputeUASeparationFunction_onCl:
     status: integrated
     cpp_file: translations/AirfoilInfo/computeuaseparationfunction_oncl.cpp
-    cases_passed: 20
-    cases_total: 20
-    cases_skipped: 0
-    kernel_dir: kernel/ComputeUASeparationFunction_onCl
+  ComputeUA360_AttachedFlow:
+    status: integrated
+    cpp_file: translations/AirfoilInfo/computeua360_attachedflow.cpp
+    verification: simulation
 types:
   AFI_ParameterType:
     strategy: view

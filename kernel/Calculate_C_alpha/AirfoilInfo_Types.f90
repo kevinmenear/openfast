@@ -39,10 +39,9 @@
 MODULE AirfoilInfo_Types
 !---------------------------------------------------------------------------------------------------------------------------------
     USE nwtc_library 
-    USE kgen_utils_mod, ONLY: kgen_dp, kgen_array_sumcheck 
+    USE kgen_utils_mod
     USE tprof_mod, ONLY: tstart, tstop, tnull, tprnt 
-    USE kgen_utils_mod, ONLY: check_t, kgen_init_check, kgen_init_verify, kgen_tolerance, kgen_minvalue, kgen_verboselevel, &
-    &CHECK_IDENTICAL, CHECK_IN_TOL, CHECK_OUT_TOL 
+    USE kgen_utils_mod
     IMPLICIT NONE 
 ! =========  AFI_UA_BL_Type  =======
   TYPE, PUBLIC :: AFI_UA_BL_Type
@@ -575,7 +574,8 @@ MODULE AirfoilInfo_Types
         
       CALL kgen_init_check(dtype_check_status, rank=check_status%rank) 
       dtype_check_status%numTotal = dtype_check_status%numTotal + 1 
-      IF (var%alpha0 == kgenref_var%alpha0) THEN 
+      IF ((var%alpha0 == kgenref_var%alpha0) .OR. ((var%alpha0 /= var%alpha0) .AND. (kgenref_var%alpha0 /= kgenref_var%alpha0))) THEN
+        IF (var%alpha0 /= var%alpha0) WRITE(*, *) "localvar%alpha0 is IDENTICAL (both NaN, uninitialized)." 
           dtype_check_status%numIdentical = dtype_check_status%numIdentical + 1 
           IF (kgen_verboseLevel > 2) THEN 
               IF (check_status%rank == 0) THEN 
@@ -622,7 +622,8 @@ MODULE AirfoilInfo_Types
       END IF   
         
       dtype_check_status%numTotal = dtype_check_status%numTotal + 1 
-      IF (var%alpha1 == kgenref_var%alpha1) THEN 
+      IF ((var%alpha1 == kgenref_var%alpha1) .OR. ((var%alpha1 /= var%alpha1) .AND. (kgenref_var%alpha1 /= kgenref_var%alpha1))) THEN
+        IF (var%alpha1 /= var%alpha1) WRITE(*, *) "localvar%alpha1 is IDENTICAL (both NaN, uninitialized)." 
           dtype_check_status%numIdentical = dtype_check_status%numIdentical + 1 
           IF (kgen_verboseLevel > 2) THEN 
               IF (check_status%rank == 0) THEN 
@@ -669,7 +670,8 @@ MODULE AirfoilInfo_Types
       END IF   
         
       dtype_check_status%numTotal = dtype_check_status%numTotal + 1 
-      IF (var%alpha2 == kgenref_var%alpha2) THEN 
+      IF ((var%alpha2 == kgenref_var%alpha2) .OR. ((var%alpha2 /= var%alpha2) .AND. (kgenref_var%alpha2 /= kgenref_var%alpha2))) THEN
+        IF (var%alpha2 /= var%alpha2) WRITE(*, *) "localvar%alpha2 is IDENTICAL (both NaN, uninitialized)." 
           dtype_check_status%numIdentical = dtype_check_status%numIdentical + 1 
           IF (kgen_verboseLevel > 2) THEN 
               IF (check_status%rank == 0) THEN 
@@ -716,7 +718,8 @@ MODULE AirfoilInfo_Types
       END IF   
         
       dtype_check_status%numTotal = dtype_check_status%numTotal + 1 
-      IF (var%eta_e == kgenref_var%eta_e) THEN 
+      IF ((var%eta_e == kgenref_var%eta_e) .OR. ((var%eta_e /= var%eta_e) .AND. (kgenref_var%eta_e /= kgenref_var%eta_e))) THEN
+        IF (var%eta_e /= var%eta_e) WRITE(*, *) "localvar%eta_e is IDENTICAL (both NaN, uninitialized)." 
           dtype_check_status%numIdentical = dtype_check_status%numIdentical + 1 
           IF (kgen_verboseLevel > 2) THEN 
               IF (check_status%rank == 0) THEN 
@@ -763,7 +766,8 @@ MODULE AirfoilInfo_Types
       END IF   
         
       dtype_check_status%numTotal = dtype_check_status%numTotal + 1 
-      IF (var%c_nalpha == kgenref_var%c_nalpha) THEN 
+      IF ((var%c_nalpha == kgenref_var%c_nalpha) .OR. ((var%c_nalpha /= var%c_nalpha) .AND. (kgenref_var%c_nalpha /= kgenref_var%c_nalpha))) THEN
+        IF (var%c_nalpha /= var%c_nalpha) WRITE(*, *) "localvar%c_nalpha is IDENTICAL (both NaN, uninitialized)." 
           dtype_check_status%numIdentical = dtype_check_status%numIdentical + 1 
           IF (kgen_verboseLevel > 2) THEN 
               IF (check_status%rank == 0) THEN 
@@ -810,7 +814,8 @@ MODULE AirfoilInfo_Types
       END IF   
         
       dtype_check_status%numTotal = dtype_check_status%numTotal + 1 
-      IF (var%c_lalpha == kgenref_var%c_lalpha) THEN 
+      IF ((var%c_lalpha == kgenref_var%c_lalpha) .OR. ((var%c_lalpha /= var%c_lalpha) .AND. (kgenref_var%c_lalpha /= kgenref_var%c_lalpha))) THEN
+        IF (var%c_lalpha /= var%c_lalpha) WRITE(*, *) "localvar%c_lalpha is IDENTICAL (both NaN, uninitialized)." 
           dtype_check_status%numIdentical = dtype_check_status%numIdentical + 1 
           IF (kgen_verboseLevel > 2) THEN 
               IF (check_status%rank == 0) THEN 
@@ -857,7 +862,8 @@ MODULE AirfoilInfo_Types
       END IF   
         
       dtype_check_status%numTotal = dtype_check_status%numTotal + 1 
-      IF (var%t_f0 == kgenref_var%t_f0) THEN 
+      IF ((var%t_f0 == kgenref_var%t_f0) .OR. ((var%t_f0 /= var%t_f0) .AND. (kgenref_var%t_f0 /= kgenref_var%t_f0))) THEN
+        IF (var%t_f0 /= var%t_f0) WRITE(*, *) "localvar%t_f0 is IDENTICAL (both NaN, uninitialized)." 
           dtype_check_status%numIdentical = dtype_check_status%numIdentical + 1 
           IF (kgen_verboseLevel > 2) THEN 
               IF (check_status%rank == 0) THEN 
@@ -904,7 +910,8 @@ MODULE AirfoilInfo_Types
       END IF   
         
       dtype_check_status%numTotal = dtype_check_status%numTotal + 1 
-      IF (var%t_v0 == kgenref_var%t_v0) THEN 
+      IF ((var%t_v0 == kgenref_var%t_v0) .OR. ((var%t_v0 /= var%t_v0) .AND. (kgenref_var%t_v0 /= kgenref_var%t_v0))) THEN
+        IF (var%t_v0 /= var%t_v0) WRITE(*, *) "localvar%t_v0 is IDENTICAL (both NaN, uninitialized)." 
           dtype_check_status%numIdentical = dtype_check_status%numIdentical + 1 
           IF (kgen_verboseLevel > 2) THEN 
               IF (check_status%rank == 0) THEN 
@@ -951,7 +958,8 @@ MODULE AirfoilInfo_Types
       END IF   
         
       dtype_check_status%numTotal = dtype_check_status%numTotal + 1 
-      IF (var%t_p == kgenref_var%t_p) THEN 
+      IF ((var%t_p == kgenref_var%t_p) .OR. ((var%t_p /= var%t_p) .AND. (kgenref_var%t_p /= kgenref_var%t_p))) THEN
+        IF (var%t_p /= var%t_p) WRITE(*, *) "localvar%t_p is IDENTICAL (both NaN, uninitialized)." 
           dtype_check_status%numIdentical = dtype_check_status%numIdentical + 1 
           IF (kgen_verboseLevel > 2) THEN 
               IF (check_status%rank == 0) THEN 
@@ -998,7 +1006,8 @@ MODULE AirfoilInfo_Types
       END IF   
         
       dtype_check_status%numTotal = dtype_check_status%numTotal + 1 
-      IF (var%t_vl == kgenref_var%t_vl) THEN 
+      IF ((var%t_vl == kgenref_var%t_vl) .OR. ((var%t_vl /= var%t_vl) .AND. (kgenref_var%t_vl /= kgenref_var%t_vl))) THEN
+        IF (var%t_vl /= var%t_vl) WRITE(*, *) "localvar%t_vl is IDENTICAL (both NaN, uninitialized)." 
           dtype_check_status%numIdentical = dtype_check_status%numIdentical + 1 
           IF (kgen_verboseLevel > 2) THEN 
               IF (check_status%rank == 0) THEN 
@@ -1045,7 +1054,8 @@ MODULE AirfoilInfo_Types
       END IF   
         
       dtype_check_status%numTotal = dtype_check_status%numTotal + 1 
-      IF (var%b1 == kgenref_var%b1) THEN 
+      IF ((var%b1 == kgenref_var%b1) .OR. ((var%b1 /= var%b1) .AND. (kgenref_var%b1 /= kgenref_var%b1))) THEN
+        IF (var%b1 /= var%b1) WRITE(*, *) "localvar%b1 is IDENTICAL (both NaN, uninitialized)." 
           dtype_check_status%numIdentical = dtype_check_status%numIdentical + 1 
           IF (kgen_verboseLevel > 2) THEN 
               IF (check_status%rank == 0) THEN 
@@ -1092,7 +1102,8 @@ MODULE AirfoilInfo_Types
       END IF   
         
       dtype_check_status%numTotal = dtype_check_status%numTotal + 1 
-      IF (var%b2 == kgenref_var%b2) THEN 
+      IF ((var%b2 == kgenref_var%b2) .OR. ((var%b2 /= var%b2) .AND. (kgenref_var%b2 /= kgenref_var%b2))) THEN
+        IF (var%b2 /= var%b2) WRITE(*, *) "localvar%b2 is IDENTICAL (both NaN, uninitialized)." 
           dtype_check_status%numIdentical = dtype_check_status%numIdentical + 1 
           IF (kgen_verboseLevel > 2) THEN 
               IF (check_status%rank == 0) THEN 
@@ -1139,7 +1150,8 @@ MODULE AirfoilInfo_Types
       END IF   
         
       dtype_check_status%numTotal = dtype_check_status%numTotal + 1 
-      IF (var%b5 == kgenref_var%b5) THEN 
+      IF ((var%b5 == kgenref_var%b5) .OR. ((var%b5 /= var%b5) .AND. (kgenref_var%b5 /= kgenref_var%b5))) THEN
+        IF (var%b5 /= var%b5) WRITE(*, *) "localvar%b5 is IDENTICAL (both NaN, uninitialized)." 
           dtype_check_status%numIdentical = dtype_check_status%numIdentical + 1 
           IF (kgen_verboseLevel > 2) THEN 
               IF (check_status%rank == 0) THEN 
@@ -1186,7 +1198,8 @@ MODULE AirfoilInfo_Types
       END IF   
         
       dtype_check_status%numTotal = dtype_check_status%numTotal + 1 
-      IF (var%a1 == kgenref_var%a1) THEN 
+      IF ((var%a1 == kgenref_var%a1) .OR. ((var%a1 /= var%a1) .AND. (kgenref_var%a1 /= kgenref_var%a1))) THEN
+        IF (var%a1 /= var%a1) WRITE(*, *) "localvar%a1 is IDENTICAL (both NaN, uninitialized)." 
           dtype_check_status%numIdentical = dtype_check_status%numIdentical + 1 
           IF (kgen_verboseLevel > 2) THEN 
               IF (check_status%rank == 0) THEN 
@@ -1233,7 +1246,8 @@ MODULE AirfoilInfo_Types
       END IF   
         
       dtype_check_status%numTotal = dtype_check_status%numTotal + 1 
-      IF (var%a2 == kgenref_var%a2) THEN 
+      IF ((var%a2 == kgenref_var%a2) .OR. ((var%a2 /= var%a2) .AND. (kgenref_var%a2 /= kgenref_var%a2))) THEN
+        IF (var%a2 /= var%a2) WRITE(*, *) "localvar%a2 is IDENTICAL (both NaN, uninitialized)." 
           dtype_check_status%numIdentical = dtype_check_status%numIdentical + 1 
           IF (kgen_verboseLevel > 2) THEN 
               IF (check_status%rank == 0) THEN 
@@ -1280,7 +1294,8 @@ MODULE AirfoilInfo_Types
       END IF   
         
       dtype_check_status%numTotal = dtype_check_status%numTotal + 1 
-      IF (var%a5 == kgenref_var%a5) THEN 
+      IF ((var%a5 == kgenref_var%a5) .OR. ((var%a5 /= var%a5) .AND. (kgenref_var%a5 /= kgenref_var%a5))) THEN
+        IF (var%a5 /= var%a5) WRITE(*, *) "localvar%a5 is IDENTICAL (both NaN, uninitialized)." 
           dtype_check_status%numIdentical = dtype_check_status%numIdentical + 1 
           IF (kgen_verboseLevel > 2) THEN 
               IF (check_status%rank == 0) THEN 
@@ -1327,7 +1342,8 @@ MODULE AirfoilInfo_Types
       END IF   
         
       dtype_check_status%numTotal = dtype_check_status%numTotal + 1 
-      IF (var%s1 == kgenref_var%s1) THEN 
+      IF ((var%s1 == kgenref_var%s1) .OR. ((var%s1 /= var%s1) .AND. (kgenref_var%s1 /= kgenref_var%s1))) THEN
+        IF (var%s1 /= var%s1) WRITE(*, *) "localvar%s1 is IDENTICAL (both NaN, uninitialized)." 
           dtype_check_status%numIdentical = dtype_check_status%numIdentical + 1 
           IF (kgen_verboseLevel > 2) THEN 
               IF (check_status%rank == 0) THEN 
@@ -1374,7 +1390,8 @@ MODULE AirfoilInfo_Types
       END IF   
         
       dtype_check_status%numTotal = dtype_check_status%numTotal + 1 
-      IF (var%s2 == kgenref_var%s2) THEN 
+      IF ((var%s2 == kgenref_var%s2) .OR. ((var%s2 /= var%s2) .AND. (kgenref_var%s2 /= kgenref_var%s2))) THEN
+        IF (var%s2 /= var%s2) WRITE(*, *) "localvar%s2 is IDENTICAL (both NaN, uninitialized)." 
           dtype_check_status%numIdentical = dtype_check_status%numIdentical + 1 
           IF (kgen_verboseLevel > 2) THEN 
               IF (check_status%rank == 0) THEN 
@@ -1421,7 +1438,8 @@ MODULE AirfoilInfo_Types
       END IF   
         
       dtype_check_status%numTotal = dtype_check_status%numTotal + 1 
-      IF (var%s3 == kgenref_var%s3) THEN 
+      IF ((var%s3 == kgenref_var%s3) .OR. ((var%s3 /= var%s3) .AND. (kgenref_var%s3 /= kgenref_var%s3))) THEN
+        IF (var%s3 /= var%s3) WRITE(*, *) "localvar%s3 is IDENTICAL (both NaN, uninitialized)." 
           dtype_check_status%numIdentical = dtype_check_status%numIdentical + 1 
           IF (kgen_verboseLevel > 2) THEN 
               IF (check_status%rank == 0) THEN 
@@ -1468,7 +1486,8 @@ MODULE AirfoilInfo_Types
       END IF   
         
       dtype_check_status%numTotal = dtype_check_status%numTotal + 1 
-      IF (var%s4 == kgenref_var%s4) THEN 
+      IF ((var%s4 == kgenref_var%s4) .OR. ((var%s4 /= var%s4) .AND. (kgenref_var%s4 /= kgenref_var%s4))) THEN
+        IF (var%s4 /= var%s4) WRITE(*, *) "localvar%s4 is IDENTICAL (both NaN, uninitialized)." 
           dtype_check_status%numIdentical = dtype_check_status%numIdentical + 1 
           IF (kgen_verboseLevel > 2) THEN 
               IF (check_status%rank == 0) THEN 
@@ -1515,7 +1534,8 @@ MODULE AirfoilInfo_Types
       END IF   
         
       dtype_check_status%numTotal = dtype_check_status%numTotal + 1 
-      IF (var%cn1 == kgenref_var%cn1) THEN 
+      IF ((var%cn1 == kgenref_var%cn1) .OR. ((var%cn1 /= var%cn1) .AND. (kgenref_var%cn1 /= kgenref_var%cn1))) THEN
+        IF (var%cn1 /= var%cn1) WRITE(*, *) "localvar%cn1 is IDENTICAL (both NaN, uninitialized)." 
           dtype_check_status%numIdentical = dtype_check_status%numIdentical + 1 
           IF (kgen_verboseLevel > 2) THEN 
               IF (check_status%rank == 0) THEN 
@@ -1562,7 +1582,8 @@ MODULE AirfoilInfo_Types
       END IF   
         
       dtype_check_status%numTotal = dtype_check_status%numTotal + 1 
-      IF (var%cn2 == kgenref_var%cn2) THEN 
+      IF ((var%cn2 == kgenref_var%cn2) .OR. ((var%cn2 /= var%cn2) .AND. (kgenref_var%cn2 /= kgenref_var%cn2))) THEN
+        IF (var%cn2 /= var%cn2) WRITE(*, *) "localvar%cn2 is IDENTICAL (both NaN, uninitialized)." 
           dtype_check_status%numIdentical = dtype_check_status%numIdentical + 1 
           IF (kgen_verboseLevel > 2) THEN 
               IF (check_status%rank == 0) THEN 
@@ -1609,7 +1630,8 @@ MODULE AirfoilInfo_Types
       END IF   
         
       dtype_check_status%numTotal = dtype_check_status%numTotal + 1 
-      IF (var%st_sh == kgenref_var%st_sh) THEN 
+      IF ((var%st_sh == kgenref_var%st_sh) .OR. ((var%st_sh /= var%st_sh) .AND. (kgenref_var%st_sh /= kgenref_var%st_sh))) THEN
+        IF (var%st_sh /= var%st_sh) WRITE(*, *) "localvar%st_sh is IDENTICAL (both NaN, uninitialized)." 
           dtype_check_status%numIdentical = dtype_check_status%numIdentical + 1 
           IF (kgen_verboseLevel > 2) THEN 
               IF (check_status%rank == 0) THEN 
@@ -1656,7 +1678,8 @@ MODULE AirfoilInfo_Types
       END IF   
         
       dtype_check_status%numTotal = dtype_check_status%numTotal + 1 
-      IF (var%cd0 == kgenref_var%cd0) THEN 
+      IF ((var%cd0 == kgenref_var%cd0) .OR. ((var%cd0 /= var%cd0) .AND. (kgenref_var%cd0 /= kgenref_var%cd0))) THEN
+        IF (var%cd0 /= var%cd0) WRITE(*, *) "localvar%cd0 is IDENTICAL (both NaN, uninitialized)." 
           dtype_check_status%numIdentical = dtype_check_status%numIdentical + 1 
           IF (kgen_verboseLevel > 2) THEN 
               IF (check_status%rank == 0) THEN 
@@ -1703,7 +1726,8 @@ MODULE AirfoilInfo_Types
       END IF   
         
       dtype_check_status%numTotal = dtype_check_status%numTotal + 1 
-      IF (var%cm0 == kgenref_var%cm0) THEN 
+      IF ((var%cm0 == kgenref_var%cm0) .OR. ((var%cm0 /= var%cm0) .AND. (kgenref_var%cm0 /= kgenref_var%cm0))) THEN
+        IF (var%cm0 /= var%cm0) WRITE(*, *) "localvar%cm0 is IDENTICAL (both NaN, uninitialized)." 
           dtype_check_status%numIdentical = dtype_check_status%numIdentical + 1 
           IF (kgen_verboseLevel > 2) THEN 
               IF (check_status%rank == 0) THEN 
@@ -1750,7 +1774,8 @@ MODULE AirfoilInfo_Types
       END IF   
         
       dtype_check_status%numTotal = dtype_check_status%numTotal + 1 
-      IF (var%k0 == kgenref_var%k0) THEN 
+      IF ((var%k0 == kgenref_var%k0) .OR. ((var%k0 /= var%k0) .AND. (kgenref_var%k0 /= kgenref_var%k0))) THEN
+        IF (var%k0 /= var%k0) WRITE(*, *) "localvar%k0 is IDENTICAL (both NaN, uninitialized)." 
           dtype_check_status%numIdentical = dtype_check_status%numIdentical + 1 
           IF (kgen_verboseLevel > 2) THEN 
               IF (check_status%rank == 0) THEN 
@@ -1797,7 +1822,8 @@ MODULE AirfoilInfo_Types
       END IF   
         
       dtype_check_status%numTotal = dtype_check_status%numTotal + 1 
-      IF (var%k1 == kgenref_var%k1) THEN 
+      IF ((var%k1 == kgenref_var%k1) .OR. ((var%k1 /= var%k1) .AND. (kgenref_var%k1 /= kgenref_var%k1))) THEN
+        IF (var%k1 /= var%k1) WRITE(*, *) "localvar%k1 is IDENTICAL (both NaN, uninitialized)." 
           dtype_check_status%numIdentical = dtype_check_status%numIdentical + 1 
           IF (kgen_verboseLevel > 2) THEN 
               IF (check_status%rank == 0) THEN 
@@ -1844,7 +1870,8 @@ MODULE AirfoilInfo_Types
       END IF   
         
       dtype_check_status%numTotal = dtype_check_status%numTotal + 1 
-      IF (var%k2 == kgenref_var%k2) THEN 
+      IF ((var%k2 == kgenref_var%k2) .OR. ((var%k2 /= var%k2) .AND. (kgenref_var%k2 /= kgenref_var%k2))) THEN
+        IF (var%k2 /= var%k2) WRITE(*, *) "localvar%k2 is IDENTICAL (both NaN, uninitialized)." 
           dtype_check_status%numIdentical = dtype_check_status%numIdentical + 1 
           IF (kgen_verboseLevel > 2) THEN 
               IF (check_status%rank == 0) THEN 
@@ -1891,7 +1918,8 @@ MODULE AirfoilInfo_Types
       END IF   
         
       dtype_check_status%numTotal = dtype_check_status%numTotal + 1 
-      IF (var%k3 == kgenref_var%k3) THEN 
+      IF ((var%k3 == kgenref_var%k3) .OR. ((var%k3 /= var%k3) .AND. (kgenref_var%k3 /= kgenref_var%k3))) THEN
+        IF (var%k3 /= var%k3) WRITE(*, *) "localvar%k3 is IDENTICAL (both NaN, uninitialized)." 
           dtype_check_status%numIdentical = dtype_check_status%numIdentical + 1 
           IF (kgen_verboseLevel > 2) THEN 
               IF (check_status%rank == 0) THEN 
@@ -1938,7 +1966,8 @@ MODULE AirfoilInfo_Types
       END IF   
         
       dtype_check_status%numTotal = dtype_check_status%numTotal + 1 
-      IF (var%k1_hat == kgenref_var%k1_hat) THEN 
+      IF ((var%k1_hat == kgenref_var%k1_hat) .OR. ((var%k1_hat /= var%k1_hat) .AND. (kgenref_var%k1_hat /= kgenref_var%k1_hat))) THEN
+        IF (var%k1_hat /= var%k1_hat) WRITE(*, *) "localvar%k1_hat is IDENTICAL (both NaN, uninitialized)." 
           dtype_check_status%numIdentical = dtype_check_status%numIdentical + 1 
           IF (kgen_verboseLevel > 2) THEN 
               IF (check_status%rank == 0) THEN 
@@ -1985,7 +2014,8 @@ MODULE AirfoilInfo_Types
       END IF   
         
       dtype_check_status%numTotal = dtype_check_status%numTotal + 1 
-      IF (var%x_cp_bar == kgenref_var%x_cp_bar) THEN 
+      IF ((var%x_cp_bar == kgenref_var%x_cp_bar) .OR. ((var%x_cp_bar /= var%x_cp_bar) .AND. (kgenref_var%x_cp_bar /= kgenref_var%x_cp_bar))) THEN
+        IF (var%x_cp_bar /= var%x_cp_bar) WRITE(*, *) "localvar%x_cp_bar is IDENTICAL (both NaN, uninitialized)." 
           dtype_check_status%numIdentical = dtype_check_status%numIdentical + 1 
           IF (kgen_verboseLevel > 2) THEN 
               IF (check_status%rank == 0) THEN 
@@ -2032,7 +2062,8 @@ MODULE AirfoilInfo_Types
       END IF   
         
       dtype_check_status%numTotal = dtype_check_status%numTotal + 1 
-      IF (var%uacutout == kgenref_var%uacutout) THEN 
+      IF ((var%uacutout == kgenref_var%uacutout) .OR. ((var%uacutout /= var%uacutout) .AND. (kgenref_var%uacutout /= kgenref_var%uacutout))) THEN
+        IF (var%uacutout /= var%uacutout) WRITE(*, *) "localvar%uacutout is IDENTICAL (both NaN, uninitialized)." 
           dtype_check_status%numIdentical = dtype_check_status%numIdentical + 1 
           IF (kgen_verboseLevel > 2) THEN 
               IF (check_status%rank == 0) THEN 
@@ -2079,7 +2110,8 @@ MODULE AirfoilInfo_Types
       END IF   
         
       dtype_check_status%numTotal = dtype_check_status%numTotal + 1 
-      IF (var%uacutout_delta == kgenref_var%uacutout_delta) THEN 
+      IF ((var%uacutout_delta == kgenref_var%uacutout_delta) .OR. ((var%uacutout_delta /= var%uacutout_delta) .AND. (kgenref_var%uacutout_delta /= kgenref_var%uacutout_delta))) THEN
+        IF (var%uacutout_delta /= var%uacutout_delta) WRITE(*, *) "localvar%uacutout_delta is IDENTICAL (both NaN, uninitialized)." 
           dtype_check_status%numIdentical = dtype_check_status%numIdentical + 1 
           IF (kgen_verboseLevel > 2) THEN 
               IF (check_status%rank == 0) THEN 
@@ -2126,7 +2158,8 @@ MODULE AirfoilInfo_Types
       END IF   
         
       dtype_check_status%numTotal = dtype_check_status%numTotal + 1 
-      IF (var%uacutout_blend == kgenref_var%uacutout_blend) THEN 
+      IF ((var%uacutout_blend == kgenref_var%uacutout_blend) .OR. ((var%uacutout_blend /= var%uacutout_blend) .AND. (kgenref_var%uacutout_blend /= kgenref_var%uacutout_blend))) THEN
+        IF (var%uacutout_blend /= var%uacutout_blend) WRITE(*, *) "localvar%uacutout_blend is IDENTICAL (both NaN, uninitialized)." 
           dtype_check_status%numIdentical = dtype_check_status%numIdentical + 1 
           IF (kgen_verboseLevel > 2) THEN 
               IF (check_status%rank == 0) THEN 
@@ -2173,7 +2206,8 @@ MODULE AirfoilInfo_Types
       END IF   
         
       dtype_check_status%numTotal = dtype_check_status%numTotal + 1 
-      IF (var%filtcutoff == kgenref_var%filtcutoff) THEN 
+      IF ((var%filtcutoff == kgenref_var%filtcutoff) .OR. ((var%filtcutoff /= var%filtcutoff) .AND. (kgenref_var%filtcutoff /= kgenref_var%filtcutoff))) THEN
+        IF (var%filtcutoff /= var%filtcutoff) WRITE(*, *) "localvar%filtcutoff is IDENTICAL (both NaN, uninitialized)." 
           dtype_check_status%numIdentical = dtype_check_status%numIdentical + 1 
           IF (kgen_verboseLevel > 2) THEN 
               IF (check_status%rank == 0) THEN 
@@ -2220,7 +2254,8 @@ MODULE AirfoilInfo_Types
       END IF   
         
       dtype_check_status%numTotal = dtype_check_status%numTotal + 1 
-      IF (var%alphaupper == kgenref_var%alphaupper) THEN 
+      IF ((var%alphaupper == kgenref_var%alphaupper) .OR. ((var%alphaupper /= var%alphaupper) .AND. (kgenref_var%alphaupper /= kgenref_var%alphaupper))) THEN
+        IF (var%alphaupper /= var%alphaupper) WRITE(*, *) "localvar%alphaupper is IDENTICAL (both NaN, uninitialized)." 
           dtype_check_status%numIdentical = dtype_check_status%numIdentical + 1 
           IF (kgen_verboseLevel > 2) THEN 
               IF (check_status%rank == 0) THEN 
@@ -2267,7 +2302,8 @@ MODULE AirfoilInfo_Types
       END IF   
         
       dtype_check_status%numTotal = dtype_check_status%numTotal + 1 
-      IF (var%alphalower == kgenref_var%alphalower) THEN 
+      IF ((var%alphalower == kgenref_var%alphalower) .OR. ((var%alphalower /= var%alphalower) .AND. (kgenref_var%alphalower /= kgenref_var%alphalower))) THEN
+        IF (var%alphalower /= var%alphalower) WRITE(*, *) "localvar%alphalower is IDENTICAL (both NaN, uninitialized)." 
           dtype_check_status%numIdentical = dtype_check_status%numIdentical + 1 
           IF (kgen_verboseLevel > 2) THEN 
               IF (check_status%rank == 0) THEN 
@@ -2314,7 +2350,8 @@ MODULE AirfoilInfo_Types
       END IF   
         
       dtype_check_status%numTotal = dtype_check_status%numTotal + 1 
-      IF (var%c_alphalower == kgenref_var%c_alphalower) THEN 
+      IF ((var%c_alphalower == kgenref_var%c_alphalower) .OR. ((var%c_alphalower /= var%c_alphalower) .AND. (kgenref_var%c_alphalower /= kgenref_var%c_alphalower))) THEN
+        IF (var%c_alphalower /= var%c_alphalower) WRITE(*, *) "localvar%c_alphalower is IDENTICAL (both NaN, uninitialized)." 
           dtype_check_status%numIdentical = dtype_check_status%numIdentical + 1 
           IF (kgen_verboseLevel > 2) THEN 
               IF (check_status%rank == 0) THEN 
@@ -2361,7 +2398,8 @@ MODULE AirfoilInfo_Types
       END IF   
         
       dtype_check_status%numTotal = dtype_check_status%numTotal + 1 
-      IF (var%c_alphaupper == kgenref_var%c_alphaupper) THEN 
+      IF ((var%c_alphaupper == kgenref_var%c_alphaupper) .OR. ((var%c_alphaupper /= var%c_alphaupper) .AND. (kgenref_var%c_alphaupper /= kgenref_var%c_alphaupper))) THEN
+        IF (var%c_alphaupper /= var%c_alphaupper) WRITE(*, *) "localvar%c_alphaupper is IDENTICAL (both NaN, uninitialized)." 
           dtype_check_status%numIdentical = dtype_check_status%numIdentical + 1 
           IF (kgen_verboseLevel > 2) THEN 
               IF (check_status%rank == 0) THEN 
@@ -2408,7 +2446,8 @@ MODULE AirfoilInfo_Types
       END IF   
         
       dtype_check_status%numTotal = dtype_check_status%numTotal + 1 
-      IF (var%alpha0reverseflow == kgenref_var%alpha0reverseflow) THEN 
+      IF ((var%alpha0reverseflow == kgenref_var%alpha0reverseflow) .OR. ((var%alpha0reverseflow /= var%alpha0reverseflow) .AND. (kgenref_var%alpha0reverseflow /= kgenref_var%alpha0reverseflow))) THEN
+        IF (var%alpha0reverseflow /= var%alpha0reverseflow) WRITE(*, *) "localvar%alpha0reverseflow is IDENTICAL (both NaN, uninitialized)." 
           dtype_check_status%numIdentical = dtype_check_status%numIdentical + 1 
           IF (kgen_verboseLevel > 2) THEN 
               IF (check_status%rank == 0) THEN 
@@ -2455,7 +2494,8 @@ MODULE AirfoilInfo_Types
       END IF   
         
       dtype_check_status%numTotal = dtype_check_status%numTotal + 1 
-      IF (var%alphabreakupper == kgenref_var%alphabreakupper) THEN 
+      IF ((var%alphabreakupper == kgenref_var%alphabreakupper) .OR. ((var%alphabreakupper /= var%alphabreakupper) .AND. (kgenref_var%alphabreakupper /= kgenref_var%alphabreakupper))) THEN
+        IF (var%alphabreakupper /= var%alphabreakupper) WRITE(*, *) "localvar%alphabreakupper is IDENTICAL (both NaN, uninitialized)." 
           dtype_check_status%numIdentical = dtype_check_status%numIdentical + 1 
           IF (kgen_verboseLevel > 2) THEN 
               IF (check_status%rank == 0) THEN 
@@ -2502,7 +2542,8 @@ MODULE AirfoilInfo_Types
       END IF   
         
       dtype_check_status%numTotal = dtype_check_status%numTotal + 1 
-      IF (var%cnbreakupper == kgenref_var%cnbreakupper) THEN 
+      IF ((var%cnbreakupper == kgenref_var%cnbreakupper) .OR. ((var%cnbreakupper /= var%cnbreakupper) .AND. (kgenref_var%cnbreakupper /= kgenref_var%cnbreakupper))) THEN
+        IF (var%cnbreakupper /= var%cnbreakupper) WRITE(*, *) "localvar%cnbreakupper is IDENTICAL (both NaN, uninitialized)." 
           dtype_check_status%numIdentical = dtype_check_status%numIdentical + 1 
           IF (kgen_verboseLevel > 2) THEN 
               IF (check_status%rank == 0) THEN 
@@ -2549,7 +2590,8 @@ MODULE AirfoilInfo_Types
       END IF   
         
       dtype_check_status%numTotal = dtype_check_status%numTotal + 1 
-      IF (var%alphabreaklower == kgenref_var%alphabreaklower) THEN 
+      IF ((var%alphabreaklower == kgenref_var%alphabreaklower) .OR. ((var%alphabreaklower /= var%alphabreaklower) .AND. (kgenref_var%alphabreaklower /= kgenref_var%alphabreaklower))) THEN
+        IF (var%alphabreaklower /= var%alphabreaklower) WRITE(*, *) "localvar%alphabreaklower is IDENTICAL (both NaN, uninitialized)." 
           dtype_check_status%numIdentical = dtype_check_status%numIdentical + 1 
           IF (kgen_verboseLevel > 2) THEN 
               IF (check_status%rank == 0) THEN 
@@ -2596,7 +2638,8 @@ MODULE AirfoilInfo_Types
       END IF   
         
       dtype_check_status%numTotal = dtype_check_status%numTotal + 1 
-      IF (var%cnbreaklower == kgenref_var%cnbreaklower) THEN 
+      IF ((var%cnbreaklower == kgenref_var%cnbreaklower) .OR. ((var%cnbreaklower /= var%cnbreaklower) .AND. (kgenref_var%cnbreaklower /= kgenref_var%cnbreaklower))) THEN
+        IF (var%cnbreaklower /= var%cnbreaklower) WRITE(*, *) "localvar%cnbreaklower is IDENTICAL (both NaN, uninitialized)." 
           dtype_check_status%numIdentical = dtype_check_status%numIdentical + 1 
           IF (kgen_verboseLevel > 2) THEN 
               IF (check_status%rank == 0) THEN 
@@ -2883,7 +2926,8 @@ MODULE AirfoilInfo_Types
             
       END IF   
       dtype_check_status%numTotal = dtype_check_status%numTotal + 1 
-      IF (var%userprop == kgenref_var%userprop) THEN 
+      IF ((var%userprop == kgenref_var%userprop) .OR. ((var%userprop /= var%userprop) .AND. (kgenref_var%userprop /= kgenref_var%userprop))) THEN
+        IF (var%userprop /= var%userprop) WRITE(*, *) "localvar%userprop is IDENTICAL (both NaN, uninitialized)." 
           dtype_check_status%numIdentical = dtype_check_status%numIdentical + 1 
           IF (kgen_verboseLevel > 2) THEN 
               IF (check_status%rank == 0) THEN 
@@ -2930,7 +2974,8 @@ MODULE AirfoilInfo_Types
       END IF   
         
       dtype_check_status%numTotal = dtype_check_status%numTotal + 1 
-      IF (var%re == kgenref_var%re) THEN 
+      IF ((var%re == kgenref_var%re) .OR. ((var%re /= var%re) .AND. (kgenref_var%re /= kgenref_var%re))) THEN
+        IF (var%re /= var%re) WRITE(*, *) "localvar%re is IDENTICAL (both NaN, uninitialized)." 
           dtype_check_status%numIdentical = dtype_check_status%numIdentical + 1 
           IF (kgen_verboseLevel > 2) THEN 
               IF (check_status%rank == 0) THEN 
@@ -2977,7 +3022,8 @@ MODULE AirfoilInfo_Types
       END IF   
         
       dtype_check_status%numTotal = dtype_check_status%numTotal + 1 
-      IF (var%numalf == kgenref_var%numalf) THEN 
+      IF ((var%numalf == kgenref_var%numalf) .OR. ((var%numalf /= var%numalf) .AND. (kgenref_var%numalf /= kgenref_var%numalf))) THEN
+        IF (var%numalf /= var%numalf) WRITE(*, *) "localvar%numalf is IDENTICAL (both NaN, uninitialized)." 
           dtype_check_status%numIdentical = dtype_check_status%numIdentical + 1 
           IF (kgen_verboseLevel > 2) THEN 
               IF (check_status%rank == 0) THEN 

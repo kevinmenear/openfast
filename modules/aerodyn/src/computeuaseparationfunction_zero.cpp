@@ -17,14 +17,12 @@
 // Generated: 2026-04-25T18:02:05Z
 
 #include "vit_types.h"
-#include <cmath>
-#include <limits>
+#include "vit_nwtc.h"
 
 // 2D column-major access: Coefs(Row, Col) in Fortran = Coefs[(Col-1)*nrows + (Row-1)] in C
 #define COEFS(row1, col1) p->Coefs[((col1)-1) * p->n_Coefs_rows + ((row1)-1)]
 
 void ComputeUASeparationFunction_zero(afi_table_type_view_t* p, int ColUAf, double* cn_cl, int n_cn_cl) {
-    const double TwoPi = 2.0 * M_PI;
 
     // Column numbers (1-based, matching Fortran)
     int col_fs = ColUAf + 1;

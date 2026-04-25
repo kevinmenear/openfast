@@ -60,6 +60,11 @@ integrate ComputeUA360_updateSeparationF \
 integrate ComputeUASeparationFunction_onCl \
     translations/AirfoilInfo/computeuaseparationfunction_oncl.cpp
 
+# --- Functions with NWTC utility callees (fZeros, InterpExtrapStp) ---
+integrate ComputeUA360_AttachedFlow \
+    translations/AirfoilInfo/computeua360_attachedflow.cpp \
+    "--reverse-copy"
+
 echo ""
 echo "===================="
 echo "Summary: $passed/$total passed, $failed failed"

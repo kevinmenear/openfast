@@ -246,7 +246,6 @@ SUBROUTINE computeua360_updateseparationf(kgen_unit, kgen_measure, kgen_isverifi
                      END IF   
                  END IF   
                  check_result = CHECK_IDENTICAL 
-                 WRITE(*, *) "[VIT_FIELD] ", trim(adjustl(varname)), " | IDENTICAL | ", var, " | ", kgenref_var
              ELSE 
                  diff = ABS(var - kgenref_var) 
                  IF (diff <= kgen_tolerance) THEN 
@@ -257,7 +256,6 @@ SUBROUTINE computeua360_updateseparationf(kgen_unit, kgen_measure, kgen_isverifi
                          END IF   
                      END IF   
                      check_result = CHECK_IN_TOL 
-                     WRITE(*, *) "[VIT_FIELD] ", trim(adjustl(varname)), " | IN_TOL | ", var, " | ", kgenref_var, " | ", diff
                  ELSE 
                      check_status%numOutTol = check_status%numOutTol + 1 
                      IF (kgen_verboseLevel > 0) THEN 
@@ -266,7 +264,6 @@ SUBROUTINE computeua360_updateseparationf(kgen_unit, kgen_measure, kgen_isverifi
                          END IF   
                      END IF   
                      check_result = CHECK_OUT_TOL 
-                     WRITE(*, *) "[VIT_FIELD] ", trim(adjustl(varname)), " | OUT_TOL | ", var, " | ", kgenref_var, " | ", diff
                  END IF   
              END IF   
              IF (check_result == CHECK_IDENTICAL) THEN 

@@ -35,7 +35,8 @@
 MODULE Precision
 !..................................................................................................................................
 
-    USE kgen_utils_mod, ONLY: kgen_dp, kgen_array_sumcheck 
+    USE kgen_utils_mod
+    USE, INTRINSIC :: ISO_FORTRAN_ENV
     USE tprof_mod, ONLY: tstart, tstop, tnull, tprnt 
 
     IMPLICIT NONE 

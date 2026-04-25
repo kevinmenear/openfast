@@ -21,7 +21,7 @@ MODULE NWTC_LAPACK
    !      we need to check this somehow to make sure the right routines are called.
    ! (or define a directive)
    ! http://www.netlib.org/lapack/explore-html/ 
-    USE kgen_utils_mod, ONLY: kgen_dp, kgen_array_sumcheck 
+    USE kgen_utils_mod
     USE tprof_mod, ONLY: tstart, tstop, tnull, tprnt 
    
 
@@ -133,7 +133,7 @@ MODULE NWTC_LAPACK
       INTEGER                        :: NRHS              !< The number of right hand sides, i.e., the number of columns of the matrices B and X. NRHS >=0.
 
       INTEGER(IntKi)                 :: ErrStat2          !< Error level
-      CHARACTER(ErrMsgLen)           :: ErrMsg2           !< Message describing error
+      CHARACTER(8196)           :: ErrMsg2           !< Message describing error
       CHARACTER(*), PARAMETER        :: RoutineName = 'LAPACK_DGELS'
       
       
@@ -219,7 +219,7 @@ MODULE NWTC_LAPACK
       INTEGER                        :: NRHS              !< The number of right hand sides, i.e., the number of columns of the matrices B and X. NRHS >=0.
 
       INTEGER(IntKi)                 :: ErrStat2          !< Error level
-      CHARACTER(ErrMsgLen)           :: ErrMsg2           !< Message describing error
+      CHARACTER(8196)           :: ErrMsg2           !< Message describing error
       CHARACTER(*), PARAMETER        :: RoutineName = 'LAPACK_SGELS'
       
       

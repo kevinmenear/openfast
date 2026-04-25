@@ -127,8 +127,8 @@ typedef struct {
     double UserProp;
     double Re;
     int NumAlf;
-    int ConstData;
-    int InclUAdata;
+    int8_t ConstData;
+    int8_t InclUAdata;
     afi_ua_bl_type_t UA_BL;
 
     // --- ALLOCATABLE fields (pointer + size) ---
