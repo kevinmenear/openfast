@@ -10,7 +10,7 @@ kgen:
     && /workspace/openfast/build/modules/aerodyn/aerodyn_driver ad_driver.dvr
   clean_cmd: cd /workspace/openfast/build/modules/aerodyn && make clean
   install_cmd: ''
-  invocation: 0:0:1-5
+  invocation: 0:0:1-20
 build_system:
   type: cmake
   cmake_file: modules/aerodyn/CMakeLists.txt
