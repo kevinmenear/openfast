@@ -45,36 +45,30 @@ MODULE AirfoilInfo
    integer, parameter                           :: MaxNumAFCoeffs = 7 !cl,cd,cm,cpMin, UA:f_st, FullySeparate, FullyAttached
 
 
-    ! Auto-generated interface for C++ implementation of ComputeUA360_CnOffset
+    ! Auto-generated interface for C++ implementation of ComputeUA360_updateCnSeparated
     INTERFACE
-        FUNCTION computeua360_cnoffset_c(p, cn_cl, n_cn_cl, Row, iLower) BIND(C, NAME='computeua360_cnoffset_c')
+        SUBROUTINE computeua360_updatecnseparated_c(p, ColUAf, cn_cl, n_cn_cl, iLower) BIND(C, NAME='computeua360_updatecnseparated_c')
             USE ISO_C_BINDING
             TYPE(C_PTR), VALUE :: p
+            INTEGER(C_INT), VALUE :: ColUAf
             REAL(C_DOUBLE), INTENT(IN) :: cn_cl(*)
             INTEGER(C_INT), VALUE :: n_cn_cl
-            INTEGER(C_INT), VALUE :: Row
             INTEGER(C_INT), VALUE :: iLower
-            REAL(C_DOUBLE) :: computeua360_cnoffset_c
-        END FUNCTION computeua360_cnoffset_c
+        END SUBROUTINE computeua360_updatecnseparated_c
     END INTERFACE
 
 
-    ! Auto-generated interface for C++ implementation of Calculate_C_alpha
+    ! Auto-generated interface for C++ implementation of ComputeUA360_updateSeparationF
     INTERFACE
-        SUBROUTINE calculate_c_alpha_c(alpha, n_alpha, Cn, n_Cn, Cl, n_Cl, Default_Cn_alpha, Default_Cl_alpha, Default_alpha0, ErrStat, ErrMsg) BIND(C, NAME='calculate_c_alpha_c')
+        SUBROUTINE computeua360_updateseparationf_c(p, ColUAf, cn_cl, n_cn_cl, iLower, iUpper) BIND(C, NAME='computeua360_updateseparationf_c')
             USE ISO_C_BINDING
-            REAL(C_DOUBLE), INTENT(IN) :: alpha(*)
-            INTEGER(C_INT), VALUE :: n_alpha
-            REAL(C_DOUBLE), INTENT(IN) :: Cn(*)
-            INTEGER(C_INT), VALUE :: n_Cn
-            REAL(C_DOUBLE), INTENT(IN) :: Cl(*)
-            INTEGER(C_INT), VALUE :: n_Cl
-            REAL(C_DOUBLE), INTENT(OUT) :: Default_Cn_alpha
-            REAL(C_DOUBLE), INTENT(OUT) :: Default_Cl_alpha
-            REAL(C_DOUBLE), INTENT(OUT) :: Default_alpha0
-            INTEGER(C_INT), INTENT(OUT) :: ErrStat
-            CHARACTER(KIND=C_CHAR), INTENT(OUT) :: ErrMsg(*)
-        END SUBROUTINE calculate_c_alpha_c
+            TYPE(C_PTR), VALUE :: p
+            INTEGER(C_INT), VALUE :: ColUAf
+            REAL(C_DOUBLE), INTENT(IN) :: cn_cl(*)
+            INTEGER(C_INT), VALUE :: n_cn_cl
+            INTEGER(C_INT), VALUE :: iLower
+            INTEGER(C_INT), VALUE :: iUpper
+        END SUBROUTINE computeua360_updateseparationf_c
     END INTERFACE
 
 CONTAINS
@@ -1203,29 +1197,52 @@ ALPHA_LOOP: DO Row=1,p%Table(iTable)%NumAlf-1
       
    END FUNCTION Calculate_Cn
 !----------------------------------------------------------------------------------------------------------------------------------
-    SUBROUTINE Calculate_C_alpha(alpha, Cn, Cl, Default_Cn_alpha, Default_Cl_alpha, Default_alpha0, ErrStat, ErrMsg)
-        USE ISO_C_BINDING
-        IMPLICIT NONE
-        REAL(8), INTENT(IN) :: alpha(:)
-        REAL(8), INTENT(IN) :: Cn(:)
-        REAL(8), INTENT(IN) :: Cl(:)
-        REAL(8), INTENT(OUT) :: Default_Cn_alpha
-        REAL(8), INTENT(OUT) :: Default_Cl_alpha
-        REAL(8), INTENT(OUT) :: Default_alpha0
-        INTEGER(4), INTENT(OUT) :: ErrStat
-        CHARACTER(*), INTENT(OUT) :: ErrMsg
-        CHARACTER(KIND=C_CHAR) :: ErrMsg_c(LEN(ErrMsg))
-        INTEGER :: vit_i_ErrMsg
-        ! Convert CHARACTER args to C_CHAR arrays
-        DO vit_i_ErrMsg = 1, LEN(ErrMsg)
-            ErrMsg_c(vit_i_ErrMsg) = ErrMsg(vit_i_ErrMsg:vit_i_ErrMsg)
-        END DO
-        CALL calculate_c_alpha_c(alpha, SIZE(alpha), Cn, SIZE(Cn), Cl, SIZE(Cl), Default_Cn_alpha, Default_Cl_alpha, Default_alpha0, ErrStat, ErrMsg_c)
-        ! Copy C_CHAR arrays back to CHARACTER args (INTENT OUT/INOUT)
-        DO vit_i_ErrMsg = 1, LEN(ErrMsg)
-            ErrMsg(vit_i_ErrMsg:vit_i_ErrMsg) = ErrMsg_c(vit_i_ErrMsg)
-        END DO
-    END SUBROUTINE Calculate_C_alpha
+   SUBROUTINE Calculate_C_alpha(alpha, Cn, Cl, Default_Cn_alpha, Default_Cl_alpha, Default_alpha0, ErrStat, ErrMsg)
+      REAL(ReKi),               intent(in   ) :: alpha(:)                   ! alpha
+      REAL(ReKi),               intent(in   ) :: Cn(:)                      ! cn
+      REAL(ReKi),               intent(in   ) :: Cl(:)                      ! cl
+   
+      REAL(ReKi),               intent(  out) :: Default_Cn_alpha
+      REAL(ReKi),               intent(  out) :: Default_Cl_alpha
+      REAL(ReKi),               intent(  out) :: Default_alpha0
+      integer(IntKi),           intent(  out) :: errStat                    ! Error status of the operation
+      character(*),             intent(  out) :: errMsg                     ! Error message if ErrStat /= ErrID_None 
+      
+      REAL(ReKi)                              :: A(      size(alpha), 2)
+      REAL(ReKi)                              :: B(max(2,size(alpha)),2)
+
+      if (SIZE(Cn) < 2 .OR. SIZE(Cl) < 2) then
+         ErrMsg='Calculate_C_alpha: Not enough data points to compute Cn and Cl slopes.'
+         ErrStat=ErrID_Fatal
+         Default_Cn_alpha = EPSILON(Default_Cn_alpha)
+         Default_Cl_alpha = EPSILON(Default_Cl_alpha)
+         Default_alpha0 = 0.0_ReKi
+         return
+      end if
+
+      A(:,1) = alpha
+      A(:,2) = 1.0_ReKi
+      
+      if (size(Cn) == 1) then
+         B(:,1) = Cn(1)
+         B(:,2) = Cl(1)
+      else
+         B(:,1) = Cn
+         B(:,2) = Cl
+      end if
+      
+      CALL LAPACK_gels('N', A, B, ErrStat, ErrMsg)
+   
+      Default_Cn_alpha = B(1,1)
+      Default_Cl_alpha = B(1,2)
+      
+      if (.not. EqualRealNos(B(1,1),0.0_ReKi)) then
+         Default_alpha0  = -B(2,1)/B(1,1) ! using the values from Cn_alpha
+      else
+         Default_alpha0 = 0.0_ReKi
+      end if
+         
+   END SUBROUTINE Calculate_C_alpha
 !----------------------------------------------------------------------------------------------------------------------------------
    SUBROUTINE ComputeUASeparationFunction_onCl(p, ColCl, ColUAf, col_fs, col_fa)
       TYPE (AFI_Table_Type),    intent(inout) :: p                             ! This structure stores all the module parameters that are set by AirfoilInfo during the initialization phase.
@@ -1464,125 +1481,55 @@ ALPHA_LOOP: DO Row=1,p%Table(iTable)%NumAlf-1
       
    END SUBROUTINE ComputeUA360_AttachedFlow
 !----------------------------------------------------------------------------------------------------------------------------------  
-   SUBROUTINE ComputeUA360_updateSeparationF( p, ColUAf, cn_cl, iLower, iUpper )
-      TYPE (AFI_Table_Type),    intent(inout) :: p                             ! This structure stores all the module parameters that are set by AirfoilInfo during the initialization phase.
-      integer(IntKi),           intent(in   ) :: ColUAf                        ! column for UA f_st (based on Cl or cn)
-      REAL(ReKi),               intent(in   ) :: cn_cl(:)                      ! cn or cl, whichever variable we are computing this on
-      INTEGER(IntKi)          , intent(in   ) :: iLower                        ! The lower index separating the region around 0
-      INTEGER(IntKi)          , intent(in   ) :: iUpper                        ! The upper index separating the region around 0
-   
-      REAL(ReKi)                              :: Offset
-      REAL(ReKi)                              :: CnRatio
-      REAL(ReKi)                              :: alpha_(p%NumAlf)              ! temporary for calculating periodic f_st
-      REAL(ReKi)                              :: f_st(  p%NumAlf)              ! temporary for calculating periodic f_st
-
-      INTEGER(IntKi)                          :: Row                           ! The row of a table to be parsed in the FileInfo structure.
-      INTEGER(IntKi)                          :: col_fa                        ! column for UA cn/cl_fa (fully attached cn or cl)
-      INTEGER(IntKi)                          :: iReverseFlow                  ! The index where f_st is at a local max near +/-180
-      INTEGER(IntKi)                          :: iUpperBreak                   ! The upper index separating the region around +/-180
-      INTEGER(IntKi)                          :: iLowerBreak                   ! The lower index separating the region around +/-180
-      
-      
-      !------------------------------------------------
-      ! set column numbers
-      !------------------------------------------------
-      col_fa = ColUAf + 2 ! fully attached (column values computed in ComputeUA360_AttachedFlow())
-      
-      ! compute f_st (separation function, f = p%Coefs(Row,ColUAf))
-      do Row=1,p%NumAlf
-         offset = ComputeUA360_CnOffset(p, cn_cl, Row, iLower)
-         if (EqualRealNos(p%Coefs(Row,col_fa),offset)) then
-            CnRatio = 1.0_ReKi
-         else
-            CnRatio = (cn_cl(Row)-offset) / (p%Coefs(Row,col_fa)-offset);  ! offset needed to ensure numerator and denomonator have same sign since sqrt is used next
-         end if
-         CnRatio = max( 0.25_ReKi, CnRatio ); ! below 1/4 we assume full separation and f = 0
-
-         p%Coefs(Row,ColUAf) = ( 2.0_ReKi * sqrt( CnRatio ) - 1.0_ReKi )**2
-            
-         p%Coefs(Row,ColUAf) = min( p%Coefs(Row,ColUAf), 1.0_ReKi )  ! f <= 1
-         p%Coefs(Row,ColUAf) = max( 0.0_ReKi, p%Coefs(Row,ColUAf) )  ! f >= 0
-
-         !if (EqualRealNos( p%Coefs(Row,col_fa), cn_cl(Row)) p%Coefs(Row,ColUAf) = 1.0_ReKi ! Set this below without EqualRealNos()
-      end do
-      
-         ! Where p%Coefs(Row,col_fa) == cn_cl(Row), set f = 1
-      do Row=iLower,iUpper
-         p%Coefs(Row,ColUAf) = 1.0_ReKi 
-      end do
-
-      !-----------------------------------------------------------
-      ! now fix issues if there is a second peak near 180 degrees:
-      !-----------------------------------------------------------
-      iLowerBreak = maxloc( p%alpha , DIM=1, MASK=p%alpha <= p%UA_BL%alphaBreakLower)
-      alpha_ = cshift(p%alpha,iLowerBreak)
-      f_st   = cshift(p%Coefs(:,ColUAf),iLowerBreak)
-      do Row = 2,p%NumAlf
-         if (alpha_(Row) < alpha_(Row-1)) alpha_(Row) = alpha_(Row)+TwoPi
-      end do
-      
-      iReverseFlow = maxloc( f_st, DIM=1, MASK= alpha_ > p%UA_BL%alphaBreakUpper )
-      iUpperBreak = minloc( alpha_ , DIM=1, MASK=alpha_ >= p%UA_BL%alphaBreakUpper)
-
-      ! make sure this is monotonically decreasing from a single peak:
-      do Row=iReverseFlow-1,iUpperBreak+1,-1
-!        if ( f_st(Row-1) > f_st(Row) )    f_st(Row-1) = max(0.0_ReKi, f_st(Row) - ABS( (f_st(Row+1) - f_st(Row) )/(alpha_(Row+1) - alpha_(Row)) * (alpha_(Row)-alpha_(Row-1))))
-         if (EqualRealNos(f_st(Row),0.0_ReKi)) f_st(Row-1) = 0.0_ReKi
-         if ( f_st(Row-1) > f_st(Row) )    f_st(Row) = 0.5_ReKi * (f_st(Row+1) + f_st(Row-1))
-      end do
-      do Row=iReverseFlow+1,p%NumAlf-1
-!        if ( f_st(Row+1) > f_st(Row) )    f_st(Row+1) = max(0.0_ReKi, f_st(Row) - ABS( (f_st(Row-1) - f_st(Row) )/(alpha_(Row-1) - alpha_(Row)) * (alpha_(Row+1) - alpha_(Row))))
-         if (EqualRealNos(f_st(Row),0.0_ReKi)) f_st(Row+1) = 0.0_ReKi
-         if ( f_st(Row+1) > f_st(Row) )    f_st(Row) = 0.5_ReKi * (f_st(Row+1) + f_st(Row-1))
-      end do
-
-      p%Coefs(:,ColUAf)   = cshift(f_st,-iLowerBreak)
-
-      
-   END SUBROUTINE ComputeUA360_updateSeparationF
-!----------------------------------------------------------------------------------------------------------------------------------  
-   SUBROUTINE ComputeUA360_updateCnSeparated( p, ColUAf, cn_cl, iLower )
-      TYPE (AFI_Table_Type),    intent(inout) :: p                             ! This structure stores all the module parameters that are set by AirfoilInfo during the initialization phase.
-      integer(IntKi),           intent(in   ) :: ColUAf                        ! column for UA f_st (based on Cl or cn)
-      REAL(ReKi),               intent(in   ) :: cn_cl(:)                      ! cn or cl, whichever variable we are computing this on
-      INTEGER(IntKi)          , intent(in   ) :: iLower                        ! The lower index separating the region around 0
-   
-      REAL(ReKi)                              :: Offset                       
-      INTEGER(IntKi)                          :: Row                           ! The row of a table to be parsed in the FileInfo structure.
-      INTEGER(IntKi)                          :: col_fa                        ! column for UA cn/cl_fa (fully attached cn or cl)
-      INTEGER(IntKi)                          :: col_fs                        ! column for UA cn/cl_fa (fully separated cn or cl)
-      
-      !------------------------------------------------
-      ! set column numbers
-      !------------------------------------------------
-      col_fa = ColUAf + 2 ! fully attached
-      col_fs = ColUAf + 1 ! fully separate
-
-      do Row=1,p%NumAlf
-         if (EqualRealNos( p%Coefs(Row,ColUAf), 1.0_ReKi )) then
-            offset = ComputeUA360_CnOffset(p, cn_cl, Row, iLower)
-            p%Coefs(Row,col_fs) = 0.5_ReKi * (cn_cl(Row) + offset)
-         else
-            p%Coefs(Row,col_fs) = ( cn_cl(Row) - p%Coefs(Row,col_fa) * p%Coefs(Row,ColUAf) ) / ( 1.0_ReKi - p%Coefs(Row,ColUAf) )
-         end if
-      end do
-
-   END SUBROUTINE ComputeUA360_updateCnSeparated
-!----------------------------------------------------------------------------------------------------------------------------------  
-    FUNCTION ComputeUA360_CnOffset(p, cn_cl, Row, iLower) RESULT(offset)
+    SUBROUTINE ComputeUA360_updateSeparationF(p, ColUAf, cn_cl, iLower, iUpper)
         USE ISO_C_BINDING
         USE vit_afi_table_type_view, ONLY: afi_table_type_view_t, vit_populate_afi_table_type
         IMPLICIT NONE
-        TYPE(AFI_TABLE_TYPE), INTENT(IN), TARGET :: p
+        TYPE(AFI_TABLE_TYPE), INTENT(INOUT), TARGET :: p
+        INTEGER(4), INTENT(IN) :: ColUAf
         REAL(8), INTENT(IN) :: cn_cl(:)
-        INTEGER(4), INTENT(IN) :: Row
         INTEGER(4), INTENT(IN) :: iLower
-        REAL(8) :: offset
+        INTEGER(4), INTENT(IN) :: iUpper
         TYPE(afi_table_type_view_t), TARGET :: p_view
         ! Populate view structs from Fortran types
         CALL vit_populate_afi_table_type(p, p_view)
-        offset = REAL(computeua360_cnoffset_c(C_LOC(p_view), cn_cl, SIZE(cn_cl), Row, iLower), 8)
-    END FUNCTION ComputeUA360_CnOffset
+        CALL computeua360_updateseparationf_c(C_LOC(p_view), ColUAf, cn_cl, SIZE(cn_cl), iLower, iUpper)
+    END SUBROUTINE ComputeUA360_updateSeparationF
+!----------------------------------------------------------------------------------------------------------------------------------  
+    SUBROUTINE ComputeUA360_updateCnSeparated(p, ColUAf, cn_cl, iLower)
+        USE ISO_C_BINDING
+        USE vit_afi_table_type_view, ONLY: afi_table_type_view_t, vit_populate_afi_table_type
+        IMPLICIT NONE
+        TYPE(AFI_TABLE_TYPE), INTENT(INOUT), TARGET :: p
+        INTEGER(4), INTENT(IN) :: ColUAf
+        REAL(8), INTENT(IN) :: cn_cl(:)
+        INTEGER(4), INTENT(IN) :: iLower
+        TYPE(afi_table_type_view_t), TARGET :: p_view
+        ! Populate view structs from Fortran types
+        CALL vit_populate_afi_table_type(p, p_view)
+        CALL computeua360_updatecnseparated_c(C_LOC(p_view), ColUAf, cn_cl, SIZE(cn_cl), iLower)
+    END SUBROUTINE ComputeUA360_updateCnSeparated
+!----------------------------------------------------------------------------------------------------------------------------------  
+   REAL(ReKi) FUNCTION ComputeUA360_CnOffset(p, cn_cl, Row, iLower) RESULT(offset)
+      TYPE (AFI_Table_Type),    intent(in   ) :: p                             ! This structure stores all the module parameters that are set by AirfoilInfo during the initialization phase.
+      REAL(ReKi),               intent(in   ) :: cn_cl(:)                      ! cn or cl, whichever variable we are computing this on
+      INTEGER(IntKi)          , intent(in   ) :: Row                           ! The row of a table to be parsed in the FileInfo structure.
+      INTEGER(IntKi)          , intent(in   ) :: iLower                        ! The lower index separating the region around 0
+   
+      REAL(ReKi)                              :: CnOffset                     ! Mathematical trick: offset to Cn making formulation of f-separation behave for strange polars with negative stall at positive Cn values (usually soiled polars for thick airfoils)
+      REAL(ReKi)                              :: SlopeScale
+         
+   
+      ! compute cnOffset
+      if (cn_cl(iLower) > -0.05) then
+         CnOffset = cn_cl(iLower) + 0.05
+      else
+         CnOffset = 0.0_ReKi
+      end if
+      
+      SlopeScale = 0.1_ReKi*R2D
+      offset = CnOffset * ( tanh(SlopeScale*(p%alpha(Row)+PiBy2)) - tanh(SlopeScale*(p%alpha(Row)-PiBy2)) ) / 2.0_ReKi; !Only apply Cn offset in vicinity of AoA 0 deg
+   END FUNCTION ComputeUA360_CnOffset
 !----------------------------------------------------------------------------------------------------------------------------------  
 subroutine FindBoundingTables(p, secondaryDepVal, lowerTable, upperTable, xVals)
 

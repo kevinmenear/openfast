@@ -44,6 +44,9 @@ add_library(basicaerolib STATIC
   src/compute_iloweriupper.cpp
   src/computeua360_cnoffset.cpp
   src/calculate_c_alpha.cpp
+  src/computeuaseparationfunction_zero.cpp
+  src/computeua360_updatecnseparated.cpp
+  src/computeua360_updateseparationf.cpp
 )
 target_link_libraries(basicaerolib ifwlib nwtclibs stdc++)
 
