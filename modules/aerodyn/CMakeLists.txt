@@ -43,6 +43,7 @@ add_library(basicaerolib STATIC
   src/findboundingtables.cpp
   src/compute_iloweriupper.cpp
   src/computeua360_cnoffset.cpp
+  src/calculate_c_alpha.cpp
 )
 target_link_libraries(basicaerolib ifwlib nwtclibs stdc++)
 

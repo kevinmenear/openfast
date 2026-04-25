@@ -16,6 +16,7 @@ void calculate_cn_c(double* alpha, int n_alpha, double* Cl, int n_Cl, double* Cd
 void findboundingtables_c(afi_parametertype_view_t* p, double secondaryDepVal, int* lowerTable, int* upperTable, double* xVals);
 void compute_iloweriupper_c(afi_table_type_view_t* p, int* iLower, int* iUpper);
 double computeua360_cnoffset_c(afi_table_type_view_t* p, double* cn_cl, int n_cn_cl, int Row, int iLower);
+void calculate_c_alpha_c(double* alpha, int n_alpha, double* Cn, int n_Cn, double* Cl, int n_Cl, double* Default_Cn_alpha, double* Default_Cl_alpha, double* Default_alpha0, int* ErrStat, char* ErrMsg);
 
 #ifdef __cplusplus
 }

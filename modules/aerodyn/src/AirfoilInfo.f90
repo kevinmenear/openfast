@@ -58,6 +58,25 @@ MODULE AirfoilInfo
         END FUNCTION computeua360_cnoffset_c
     END INTERFACE
 
+
+    ! Auto-generated interface for C++ implementation of Calculate_C_alpha
+    INTERFACE
+        SUBROUTINE calculate_c_alpha_c(alpha, n_alpha, Cn, n_Cn, Cl, n_Cl, Default_Cn_alpha, Default_Cl_alpha, Default_alpha0, ErrStat, ErrMsg) BIND(C, NAME='calculate_c_alpha_c')
+            USE ISO_C_BINDING
+            REAL(C_DOUBLE), INTENT(IN) :: alpha(*)
+            INTEGER(C_INT), VALUE :: n_alpha
+            REAL(C_DOUBLE), INTENT(IN) :: Cn(*)
+            INTEGER(C_INT), VALUE :: n_Cn
+            REAL(C_DOUBLE), INTENT(IN) :: Cl(*)
+            INTEGER(C_INT), VALUE :: n_Cl
+            REAL(C_DOUBLE), INTENT(OUT) :: Default_Cn_alpha
+            REAL(C_DOUBLE), INTENT(OUT) :: Default_Cl_alpha
+            REAL(C_DOUBLE), INTENT(OUT) :: Default_alpha0
+            INTEGER(C_INT), INTENT(OUT) :: ErrStat
+            CHARACTER(KIND=C_CHAR), INTENT(OUT) :: ErrMsg(*)
+        END SUBROUTINE calculate_c_alpha_c
+    END INTERFACE
+
 CONTAINS
 
 
@@ -1184,52 +1203,29 @@ ALPHA_LOOP: DO Row=1,p%Table(iTable)%NumAlf-1
       
    END FUNCTION Calculate_Cn
 !----------------------------------------------------------------------------------------------------------------------------------
-   SUBROUTINE Calculate_C_alpha(alpha, Cn, Cl, Default_Cn_alpha, Default_Cl_alpha, Default_alpha0, ErrStat, ErrMsg)
-      REAL(ReKi),               intent(in   ) :: alpha(:)                   ! alpha
-      REAL(ReKi),               intent(in   ) :: Cn(:)                      ! cn
-      REAL(ReKi),               intent(in   ) :: Cl(:)                      ! cl
-   
-      REAL(ReKi),               intent(  out) :: Default_Cn_alpha
-      REAL(ReKi),               intent(  out) :: Default_Cl_alpha
-      REAL(ReKi),               intent(  out) :: Default_alpha0
-      integer(IntKi),           intent(  out) :: errStat                    ! Error status of the operation
-      character(*),             intent(  out) :: errMsg                     ! Error message if ErrStat /= ErrID_None 
-      
-      REAL(ReKi)                              :: A(      size(alpha), 2)
-      REAL(ReKi)                              :: B(max(2,size(alpha)),2)
-
-      if (SIZE(Cn) < 2 .OR. SIZE(Cl) < 2) then
-         ErrMsg='Calculate_C_alpha: Not enough data points to compute Cn and Cl slopes.'
-         ErrStat=ErrID_Fatal
-         Default_Cn_alpha = EPSILON(Default_Cn_alpha)
-         Default_Cl_alpha = EPSILON(Default_Cl_alpha)
-         Default_alpha0 = 0.0_ReKi
-         return
-      end if
-
-      A(:,1) = alpha
-      A(:,2) = 1.0_ReKi
-      
-      if (size(Cn) == 1) then
-         B(:,1) = Cn(1)
-         B(:,2) = Cl(1)
-      else
-         B(:,1) = Cn
-         B(:,2) = Cl
-      end if
-      
-      CALL LAPACK_gels('N', A, B, ErrStat, ErrMsg)
-   
-      Default_Cn_alpha = B(1,1)
-      Default_Cl_alpha = B(1,2)
-      
-      if (.not. EqualRealNos(B(1,1),0.0_ReKi)) then
-         Default_alpha0  = -B(2,1)/B(1,1) ! using the values from Cn_alpha
-      else
-         Default_alpha0 = 0.0_ReKi
-      end if
-         
-   END SUBROUTINE Calculate_C_alpha
+    SUBROUTINE Calculate_C_alpha(alpha, Cn, Cl, Default_Cn_alpha, Default_Cl_alpha, Default_alpha0, ErrStat, ErrMsg)
+        USE ISO_C_BINDING
+        IMPLICIT NONE
+        REAL(8), INTENT(IN) :: alpha(:)
+        REAL(8), INTENT(IN) :: Cn(:)
+        REAL(8), INTENT(IN) :: Cl(:)
+        REAL(8), INTENT(OUT) :: Default_Cn_alpha
+        REAL(8), INTENT(OUT) :: Default_Cl_alpha
+        REAL(8), INTENT(OUT) :: Default_alpha0
+        INTEGER(4), INTENT(OUT) :: ErrStat
+        CHARACTER(*), INTENT(OUT) :: ErrMsg
+        CHARACTER(KIND=C_CHAR) :: ErrMsg_c(LEN(ErrMsg))
+        INTEGER :: vit_i_ErrMsg
+        ! Convert CHARACTER args to C_CHAR arrays
+        DO vit_i_ErrMsg = 1, LEN(ErrMsg)
+            ErrMsg_c(vit_i_ErrMsg) = ErrMsg(vit_i_ErrMsg:vit_i_ErrMsg)
+        END DO
+        CALL calculate_c_alpha_c(alpha, SIZE(alpha), Cn, SIZE(Cn), Cl, SIZE(Cl), Default_Cn_alpha, Default_Cl_alpha, Default_alpha0, ErrStat, ErrMsg_c)
+        ! Copy C_CHAR arrays back to CHARACTER args (INTENT OUT/INOUT)
+        DO vit_i_ErrMsg = 1, LEN(ErrMsg)
+            ErrMsg(vit_i_ErrMsg:vit_i_ErrMsg) = ErrMsg_c(vit_i_ErrMsg)
+        END DO
+    END SUBROUTINE Calculate_C_alpha
 !----------------------------------------------------------------------------------------------------------------------------------
    SUBROUTINE ComputeUASeparationFunction_onCl(p, ColCl, ColUAf, col_fs, col_fa)
       TYPE (AFI_Table_Type),    intent(inout) :: p                             ! This structure stores all the module parameters that are set by AirfoilInfo during the initialization phase.
