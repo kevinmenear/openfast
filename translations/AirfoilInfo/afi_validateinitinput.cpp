@@ -1,0 +1,58 @@
+// VIT Translation Scaffold
+// Function: AFI_ValidateInitInput
+// Source: AirfoilInfo.f90
+// Module: AirfoilInfo
+// Fortran: SUBROUTINE AFI_ValidateInitInput(InitInput, ErrStat, ErrMsg)
+// Source MD5: eef9354f9935
+// VIT: 0.1.0
+// Status: unverified
+// Generated: 2026-04-26T15:04:36Z
+
+#include <cstdio>
+#include <cstring>
+#include "vit_types.h"
+#include "vit_nwtc.h"
+#include "vit_aerodyn_constants.h"
+
+void AFI_ValidateInitInput(afi_initinputtype_t* InitInput, int* ErrStat, char* ErrMsg) {
+    constexpr int ErrID_None = 0;
+    constexpr int ErrID_Fatal = 4;
+    const char* RoutineName = "AFI_Validate";
+
+    *ErrStat = ErrID_None;
+    std::memset(ErrMsg, ' ', ErrMsgLen);
+
+    auto SetErrStat = [&](int level, const char* msg) {
+        if (level != ErrID_None) {
+            if (*ErrStat != ErrID_None) {
+                char tmp[ErrMsgLen + 1];
+                // Trim trailing spaces from existing message
+                int len = ErrMsgLen;
+                while (len > 0 && ErrMsg[len-1] == ' ') len--;
+                ErrMsg[len] = '\0';
+                std::snprintf(tmp, sizeof(tmp), "%s\n%s:%s", ErrMsg, RoutineName, msg);
+                std::memset(ErrMsg, ' ', ErrMsgLen);
+                std::memcpy(ErrMsg, tmp, std::strlen(tmp));
+            } else {
+                char tmp[ErrMsgLen + 1];
+                std::snprintf(tmp, sizeof(tmp), "%s:%s", RoutineName, msg);
+                std::memset(ErrMsg, ' ', ErrMsgLen);
+                std::memcpy(ErrMsg, tmp, std::strlen(tmp));
+            }
+            if (level > *ErrStat) *ErrStat = level;
+        }
+    };
+
+    if (InitInput->InCol_Alfa < 0)
+        SetErrStat(ErrID_Fatal, "InCol_Alfa must not be a negative number.");
+    if (InitInput->InCol_Cl < 0)
+        SetErrStat(ErrID_Fatal, "InCol_Cl must not be a negative number.");
+    if (InitInput->InCol_Cd < 0)
+        SetErrStat(ErrID_Fatal, "InCol_Cd must not be a negative number.");
+    if (InitInput->InCol_Cm < 0)
+        SetErrStat(ErrID_Fatal, "InCol_Cm must not be a negative number.");
+    if (InitInput->InCol_Cpmin < 0)
+        SetErrStat(ErrID_Fatal, "InCol_Cpmin must not be a negative number.");
+    if (InitInput->AFTabMod != AFITable_1 && InitInput->AFTabMod != AFITable_2Re && InitInput->AFTabMod != AFITable_2User)
+        SetErrStat(ErrID_Fatal, "AFTabMod must be 1, 2, or 3.");
+}
