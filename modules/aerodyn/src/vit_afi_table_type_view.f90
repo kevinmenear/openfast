@@ -141,14 +141,14 @@ CONTAINS
 
         ! --- ALLOCATABLE arrays ---
         IF (ALLOCATED(src%Alpha)) THEN
-            view%Alpha = C_LOC(src%Alpha(1))
+            view%Alpha = C_LOC(src%Alpha(LBOUND(src%Alpha,1)))
             view%n_Alpha = INT(SIZE(src%Alpha), C_INT32_T)
         ELSE
             view%Alpha = C_NULL_PTR
             view%n_Alpha = 0
         END IF
         IF (ALLOCATED(src%Coefs)) THEN
-            view%Coefs = C_LOC(src%Coefs(1,1))
+            view%Coefs = C_LOC(src%Coefs(LBOUND(src%Coefs,1),LBOUND(src%Coefs,2)))
             view%n_Coefs_rows = INT(SIZE(src%Coefs, 1), C_INT32_T)
             view%n_Coefs_cols = INT(SIZE(src%Coefs, 2), C_INT32_T)
         ELSE
@@ -157,7 +157,7 @@ CONTAINS
             view%n_Coefs_cols = 0
         END IF
         IF (ALLOCATED(src%SplineCoefs)) THEN
-            view%SplineCoefs = C_LOC(src%SplineCoefs(1,1,1))
+            view%SplineCoefs = C_LOC(src%SplineCoefs(LBOUND(src%SplineCoefs,1),LBOUND(src%SplineCoefs,2),LBOUND(src%SplineCoefs,3)))
             view%n_SplineCoefs_dim1 = INT(SIZE(src%SplineCoefs, 1), C_INT32_T)
             view%n_SplineCoefs_dim2 = INT(SIZE(src%SplineCoefs, 2), C_INT32_T)
             view%n_SplineCoefs_dim3 = INT(SIZE(src%SplineCoefs, 3), C_INT32_T)

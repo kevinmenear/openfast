@@ -200,7 +200,7 @@ int LocateBin(double XVal, const double* XAry, int AryLen) {
 
 void CubicSplineInterpM(double X, const double* XAry, const double* YAry,
                         const double* Coef, double* Res,
-                        int NumPts, int nCols) {
+                        int NumPts, int nCols, int nCoefRows) {
     // Boundary: return first/last row if out of range
     if (X <= XAry[0]) {
         for (int c = 0; c < nCols; c++) {
@@ -225,11 +225,11 @@ void CubicSplineInterpM(double X, const double* XAry, const double* YAry,
 
     // Evaluate cubic polynomial for each column:
     // Fortran: Res(col) = Coef(ILo, col, 0) + Coef(ILo, col, 1)*XOff + ...
-    // Coef layout (column-major): Coef(i, j, k) = Coef[k * (NumPts * nCols) + j * NumPts + i]
-    // With 0-based i: Coef[k * (NumPts * nCols) + c * NumPts + iLo0]
-    int slice = NumPts * nCols;  // stride for 3rd dimension
+    // Coef is (nCoefRows, nCols, 0:3) — nCoefRows = NumPts-1 (one fewer than knots).
+    // Column-major: Coef(i, j, k) = Coef[k * nCoefRows * nCols + j * nCoefRows + (i-1)]
+    int slice = nCoefRows * nCols;  // stride for 3rd dimension
     for (int c = 0; c < nCols; c++) {
-        int base = c * NumPts + iLo0;
+        int base = c * nCoefRows + iLo0;
         Res[c] = Coef[0 * slice + base]
                + Coef[1 * slice + base] * XOff
                + Coef[2 * slice + base] * XOff2

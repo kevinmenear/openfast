@@ -104,13 +104,15 @@ int LocateBin(double XVal, const double* XAry, int AryLen);
 // X: value to interpolate at
 // XAry[0..NumPts-1]: x knots (0-based)
 // YAry: 2D column-major [NumPts rows x nCols cols] (0-based)
-// Coef: 3D column-major [NumPts x nCols x 4] with 0-based 3rd dim (coeff order 0..3)
+// Coef: 3D column-major [nCoefRows x nCols x 4] with 0-based 3rd dim (coeff order 0..3)
+//       Note: nCoefRows = NumPts-1 (one fewer than knot points)
 // Res[0..nCols-1]: output interpolated values (0-based)
 // NumPts: number of knot points
 // nCols: number of output columns
+// nCoefRows: first dimension of Coef array (typically NumPts-1)
 
 void CubicSplineInterpM(double X, const double* XAry, const double* YAry,
                         const double* Coef, double* Res,
-                        int NumPts, int nCols);
+                        int NumPts, int nCols, int nCoefRows);
 
 #endif // VIT_NWTC_H

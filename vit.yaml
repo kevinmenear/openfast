@@ -102,6 +102,9 @@ translations:
   MPi2Pi:
     status: translated
     cpp_file: modules/aerodyn/src/vit_nwtc.cpp
+  AFI_ComputeAirfoilCoefs:
+    status: integrated
+    cpp_file: translations/AirfoilInfo/afi_computeairfoilcoefs.cpp
 types:
   AFI_ParameterType:
     strategy: view

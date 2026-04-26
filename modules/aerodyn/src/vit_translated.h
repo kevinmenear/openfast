@@ -26,6 +26,7 @@ void computeuaseparationfunction_oncl_c(afi_table_type_view_t* p, int ColCl, int
 void computeua360_attachedflow_c(afi_table_type_view_t* p, int ColUAf, double* cn_cl, int n_cn_cl, int* iLower, int* iUpper);
 void calculateuacoeffs_c(afi_ua_bl_default_type_t* CalcDefaults, afi_table_type_view_t* p, int ColCl, int ColCd, int ColCm, int ColUAf, int UAMod);
 void afi_validateinitinput_c(afi_initinputtype_t* InitInput, int* ErrStat, char* ErrMsg);
+void afi_computeairfoilcoefs_c(double AOA, double Re, double UserProp, afi_parametertype_view_t* p, afi_outputtype_t* AFI_interp, int* errStat, char* errMsg);
 
 #ifdef __cplusplus
 }
