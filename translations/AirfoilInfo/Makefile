@@ -6,7 +6,7 @@ FC = gfortran
 CXX = g++
 FC_FLAGS = -fPIC -ffree-line-length-none -cpp -fdefault-real-8 -fdefault-double-8 -ffp-contract=off -DOPENFAST_DOUBLE_PRECISION -DHAS_FORTRAN2008_FEATURES \
            -I. -I/workspace/openfast/build/ftnmods -J.
-CXX_FLAGS = -O2 -fPIC -ffp-contract=off -I. -I/workspace/openfast/modules/aerodyn/src -I/workspace/openfast/translations
+CXX_FLAGS = -O2 -fPIC -ffp-contract=off -I. -I/workspace/openfast/modules/aerodyn/src
 
 # Production build libraries (link order matters)
 LIBS = /workspace/openfast/build/modules/aerodyn/libbasicaerolib.a \
