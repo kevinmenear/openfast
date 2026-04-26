@@ -1,8 +1,5 @@
 // VIT Test-Validate: AFI_ValidateInitInput
-// Tests every error branch in the C++ translation.
-// Note: AFI_ValidateInitInput is PRIVATE in the AirfoilInfo module,
-// so Fortran-side comparison is not possible. C++-only testing.
-// Production verification via 16/16 baselines after integration.
+// Tests every error branch. Calls BOTH C++ and Fortran, asserts they agree.
 
 #include <cstdio>
 #include <cstring>
@@ -13,6 +10,9 @@
 
 static constexpr int ErrID_None = 0;
 static constexpr int ErrID_Fatal = 4;
+
+// Fortran bridge: receives struct as void*, returns ErrStat only
+extern "C" void afi_validateinitinput_f90(void* InitInput_ptr, int* ErrStat, int* ErrMsg_stat);
 
 struct TestResult { const char* name; bool passed; const char* detail; };
 
@@ -27,36 +27,43 @@ afi_initinputtype_t make_valid_input() {
     return input;
 }
 
-TestResult run_test(const char* name, afi_initinputtype_t* input, int expected_err) {
-    int ErrStat = 0;
-    char ErrMsg[ErrMsgLen + 1] = {};
-    AFI_ValidateInitInput(input, &ErrStat, ErrMsg);
-    if (ErrStat != expected_err) {
-        static char detail[256];
-        snprintf(detail, sizeof(detail), "expected ErrStat=%d, got %d", expected_err, ErrStat);
-        return {name, false, detail};
-    }
-    return {name, true, ""};
+struct DualResult { int err_cpp; int err_f90; };
+
+DualResult run_both(afi_initinputtype_t* input) {
+    DualResult r;
+    char msg_cpp[ErrMsgLen + 1] = {};
+    r.err_cpp = 0;
+    AFI_ValidateInitInput(input, &r.err_cpp, msg_cpp);
+    int msg_stat = 0;
+    r.err_f90 = 0;
+    afi_validateinitinput_f90(input, &r.err_f90, &msg_stat);
+    return r;
 }
 
-#define TEST_ERROR(name, setup) \
+#define TEST(name, setup) \
 TestResult test_##name() { \
     auto input = make_valid_input(); \
     setup; \
-    return run_test(#name, &input, ErrID_Fatal); \
+    auto r = run_both(&input); \
+    if (r.err_cpp != r.err_f90) return {#name, false, "C++/Fortran disagree"}; \
+    if (r.err_cpp != ErrID_Fatal) return {#name, false, "expected Fatal"}; \
+    return {#name, true, ""}; \
 }
 
 TestResult test_happy_path() {
     auto input = make_valid_input();
-    return run_test("happy_path", &input, ErrID_None);
+    auto r = run_both(&input);
+    if (r.err_cpp != r.err_f90) return {"happy_path", false, "C++/Fortran disagree"};
+    if (r.err_cpp != ErrID_None) return {"happy_path", false, "expected ErrStat=0"};
+    return {"happy_path", true, ""};
 }
 
-TEST_ERROR(InCol_Alfa_negative, input.InCol_Alfa = -1)
-TEST_ERROR(InCol_Cl_negative, input.InCol_Cl = -1)
-TEST_ERROR(InCol_Cd_negative, input.InCol_Cd = -1)
-TEST_ERROR(InCol_Cm_negative, input.InCol_Cm = -1)
-TEST_ERROR(InCol_Cpmin_negative, input.InCol_Cpmin = -1)
-TEST_ERROR(AFTabMod_invalid, input.AFTabMod = 99)
+TEST(InCol_Alfa_negative, input.InCol_Alfa = -1)
+TEST(InCol_Cl_negative, input.InCol_Cl = -1)
+TEST(InCol_Cd_negative, input.InCol_Cd = -1)
+TEST(InCol_Cm_negative, input.InCol_Cm = -1)
+TEST(InCol_Cpmin_negative, input.InCol_Cpmin = -1)
+TEST(AFTabMod_invalid, input.AFTabMod = 99)
 
 int main() {
     TestResult tests[] = {

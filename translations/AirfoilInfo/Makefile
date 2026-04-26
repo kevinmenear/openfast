@@ -5,7 +5,7 @@
 FC = gfortran
 CXX = g++
 FC_FLAGS = -fPIC -ffree-line-length-none -cpp -fdefault-real-8 -fdefault-double-8 -ffp-contract=off -DOPENFAST_DOUBLE_PRECISION -DHAS_FORTRAN2008_FEATURES \
-           -I/workspace/openfast/build/ftnmods
+           -I. -I/workspace/openfast/build/ftnmods -J.
 CXX_FLAGS = -O2 -fPIC -ffp-contract=off -I. -I/workspace/openfast/modules/aerodyn/src -I/workspace/openfast/translations
 
 # Production build libraries (link order matters)
@@ -21,17 +21,21 @@ LIBS = /workspace/openfast/build/modules/aerodyn/libbasicaerolib.a \
 afi_validateinitinput.hpp: /workspace/openfast/translations/AirfoilInfo/afi_validateinitinput.cpp
 	cp $< $@
 
-test: afi_validateinitinput_test.o afi_validateinitinput_bridge.o
+# Patched source: function made PUBLIC for bridge access
+AirfoilInfo.o: AirfoilInfo.f90
+	$(FC) $(FC_FLAGS) -c $< -o $@
+
+afi_validateinitinput_bridge.o: afi_validateinitinput_bridge.f90 AirfoilInfo.o
+	$(FC) $(FC_FLAGS) -c afi_validateinitinput_bridge.f90 -o $@
+
+test: afi_validateinitinput_test.o afi_validateinitinput_bridge.o AirfoilInfo.o
 	$(CXX) -o $@ $^ $(LIBS)
 
 afi_validateinitinput_test.o: afi_validateinitinput_test.cpp afi_validateinitinput.hpp
 	$(CXX) $(CXX_FLAGS) -c afi_validateinitinput_test.cpp -o $@
 
-afi_validateinitinput_bridge.o: afi_validateinitinput_bridge.f90
-	$(FC) $(FC_FLAGS) -c $< -o $@
-
 run: test
 	./test
 
 clean:
-	rm -f *.o test *.hpp
+	rm -f *.o test *.hpp *.mod
