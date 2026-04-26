@@ -37,6 +37,7 @@ add_library(basicaerolib STATIC
   # AirFoil Info lib
   src/AirfoilInfo.f90
   src/AirfoilInfo_Types.f90
+  src/vit_nwtc.cpp
   src/calculate_cn.cpp
   src/vit_afi_table_type_view.f90
   src/vit_afi_parametertype_view.f90

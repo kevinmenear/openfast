@@ -30,9 +30,13 @@ for f in modules/aerodyn/src/AirfoilInfo.f90; do
 done
 
 # 2. Create C++ stubs for CMakeLists-referenced .cpp files
+#    Skip shared utility files (vit_nwtc.cpp) — these are not per-function wrappers
 stubs=0
 for f in modules/aerodyn/src/*.cpp; do
     [ -f "$f" ] || continue
+    case "$(basename "$f")" in
+        vit_nwtc.cpp) continue ;;  # shared utility, not a wrapper stub
+    esac
     echo "// stub" > "$f"
     stubs=$((stubs + 1))
 done
