@@ -42,6 +42,10 @@ translations:
   FindBoundingTables:
     status: integrated
     cpp_file: translations/AirfoilInfo/findboundingtables.cpp
+    cases_passed: 21
+    cases_total: 21
+    cases_skipped: 0
+    kernel_dir: kernel/FindBoundingTables
   Compute_iLoweriUpper:
     status: integrated
     cpp_file: translations/AirfoilInfo/compute_iloweriupper.cpp
@@ -83,6 +87,21 @@ translations:
   AFI_ValidateInitInput:
     status: integrated
     cpp_file: translations/AirfoilInfo/afi_validateinitinput.cpp
+  AFI_ComputeAirfoilCoefs1D:
+    status: translated
+    cpp_file: translations/AirfoilInfo/afi_computeairfoilcoefs.cpp
+  AFI_ComputeAirfoilCoefs2D:
+    status: translated
+    cpp_file: translations/AirfoilInfo/afi_computeairfoilcoefs.cpp
+  AFI_Output_ExtrapInterp1:
+    status: translated
+    cpp_file: translations/AirfoilInfo/afi_computeairfoilcoefs.cpp
+  CubicSplineInterpM:
+    status: translated
+    cpp_file: modules/aerodyn/src/vit_nwtc.cpp
+  MPi2Pi:
+    status: translated
+    cpp_file: modules/aerodyn/src/vit_nwtc.cpp
 types:
   AFI_ParameterType:
     strategy: view

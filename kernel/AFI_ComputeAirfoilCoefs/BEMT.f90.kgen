@@ -1,0 +1,465 @@
+!KGEN-generated Fortran source file 
+  
+!Generated at : 2026-04-26 16:01:23 
+!KGEN version : 0.8.1 
+  
+!**********************************************************************************************************************************
+! LICENSING
+! Copyright (C) 2015-2016  National Renewable Energy Laboratory
+! Copyright (C) 2016-2017  Envision Energy USA, LTD
+!    This file is part of AeroDyn.
+! Licensed under the Apache License, Version 2.0 (the "License");
+! you may not use this file except in compliance with the License.
+! You may obtain a copy of the License at
+!     http://www.apache.org/licenses/LICENSE-2.0
+! Unless required by applicable law or agreed to in writing, software
+! distributed under the License is distributed on an "AS IS" BASIS,
+! WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+! See the License for the specific language governing permissions and
+! limitations under the License.
+!**********************************************************************************************************************************
+
+
+!
+!
+!
+!
+!
+module BEMT
+    
+    USE nwtc_library 
+   
+    USE bemt_types 
+   
+   !USE AeroDyn_Types
+    USE airfoilinfo 
+    USE kgen_utils_mod, ONLY: kgen_dp, kgen_array_sumcheck 
+    USE tprof_mod, ONLY: tstart, tstop, tnull, tprnt 
+   
+
+    IMPLICIT NONE 
+         
+   
+    PRIVATE 
+   
+   ! ..... Public Subroutines ...................................................................................................
+      
+   
+
+
+                                                 !   continuous states, and updating discrete states
+    PUBLIC bemt_calcoutput 
+
+   
+   ! routines for linearization
+   
+   contains
+!----------------------------------------------------------------------------------------------------------------------------------   
+
+
+    
+
+ 
+
+!----------------------------------------------------------------------------------------------------------------------------------   
+
+ 
+
+
+!----------------------------------------------------------------------------------------------------------------------------------   
+
+   
+
+
+!----------------------------------------------------------------------------------------------------------------------------------
+
+
+!----------------------------------------------------------------------------------------------------------------------------------
+
+
+!----------------------------------------------------------------------------------------------------------------------------------
+
+
+!----------------------------------------------------------------------------------------------------------------------------------
+
+
+!----------------------------------------------------------------------------------------------------------------------------------
+
+
+!----------------------------------------------------------------------------------------------------------------------------------
+!> This subroutine reinitializes BEMT and UA, assuming that we will start the simulation over again, with only the inputs being different.
+!! This allows us to bypass reading input files and allocating arrays.
+
+!----------------------------------------------------------------------------------------------------------------------------------
+
+!----------------------------------------------------------------------------------------------------------------------------------
+
+
+!..................................................................................................................................
+
+
+!..................................................................................................................................
+
+
+!..................................................................................................................................
+
+!..................................................................................................................................
+
+
+!..................................................................................................................................
+
+
+!----------------------------------------------------------------------------------------------------------------------------------
+
+
+!----------------------------------------------------------------------------------------------------------------------------------
+   SUBROUTINE bemt_calcoutput(kgen_unit, kgen_measure, kgen_isverified, kgen_filepath, u, p, afinfo, y) 
+! Routine for computing outputs, used in both loose and tight coupling.
+!..................................................................................................................................
+       USE kgen_utils_mod, ONLY: kgen_dp, kgen_array_sumcheck 
+       USE kgen_utils_mod, ONLY: kgen_perturb_real 
+       USE nwtc_num, ONLY: kr_externs_out_nwtc_num 
+       USE kgen_utils_mod, ONLY: check_t, kgen_init_check, kgen_init_verify, kgen_tolerance, kgen_minvalue, kgen_verboselevel, &
+       &CHECK_IDENTICAL, CHECK_IN_TOL, CHECK_OUT_TOL 
+
+   
+       TYPE(bemt_inputtype), INTENT(INOUT) :: u 
+       TYPE(bemt_parametertype), INTENT(INOUT) :: p 
+       TYPE(afi_parametertype), INTENT(INOUT) :: afinfo(:) 
+       TYPE(bemt_outputtype), INTENT(INOUT) :: y 
+                                                                 !   nectivity information does not have to be recalculated)
+      ! Local variables:
+
+       INTEGER(KIND=intki) :: i 
+       INTEGER(KIND=intki) :: j 
+   
+       CHARACTER(LEN=errmsglen) :: errmsg2 
+       INTEGER(KIND=intki) :: errstat2 
+   
+       TYPE(afi_outputtype) :: afi_interp 
+         ! Initialize some output values
+       INTEGER, INTENT(IN) :: kgen_unit 
+       REAL(KIND=kgen_dp), INTENT(OUT) :: kgen_measure 
+       LOGICAL, INTENT(OUT) :: kgen_isverified 
+       CHARACTER(LEN=*), INTENT(IN) :: kgen_filepath 
+       LOGICAL :: kgen_istrue 
+       REAL(KIND=8) :: kgen_array_sum 
+       INTEGER :: kgen_intvar, kgen_ierr 
+       INTEGER :: kgen_mpirank, kgen_openmptid, kgen_kernelinvoke 
+       LOGICAL :: kgen_evalstage, kgen_warmupstage, kgen_mainstage 
+       COMMON / state / kgen_mpirank, kgen_openmptid, kgen_kernelinvoke, kgen_evalstage, kgen_warmupstage, kgen_mainstage 
+       INTEGER, PARAMETER :: KGEN_MAXITER = 1 
+         
+       TYPE(check_t) :: check_status 
+       INTEGER*8 :: kgen_start_clock, kgen_stop_clock, kgen_rate_clock 
+       REAL(KIND=kgen_dp) :: gkgen_measure 
+       CHARACTER(LEN=errmsglen) :: kgenref_errmsg2 
+       INTEGER(KIND=intki) :: kgenref_errstat2 
+       TYPE(afi_outputtype) :: kgenref_afi_interp 
+         
+       !parent block preprocessing 
+       kgen_mpirank = 0 
+         
+       !local input variables 
+       READ (UNIT = kgen_unit) errmsglen 
+       READ (UNIT = kgen_unit) i 
+       READ (UNIT = kgen_unit) j 
+       READ (UNIT = kgen_unit) errmsg2 
+       READ (UNIT = kgen_unit) errstat2 
+       CALL kr_airfoilinfo_types_afi_outputtype(afi_interp, kgen_unit, "afi_interp", .FALSE.) 
+         
+       !extern output variables 
+       CALL kr_externs_out_nwtc_num(kgen_unit) 
+         
+       !local output variables 
+       READ (UNIT = kgen_unit) kgenref_errmsg2 
+       READ (UNIT = kgen_unit) kgenref_errstat2 
+       CALL kr_airfoilinfo_types_afi_outputtype(kgenref_afi_interp, kgen_unit, "kgenref_afi_interp", .FALSE.) 
+
+!!#ifdef DEBUG_BEMT_RESIDUAL
+!!   call WriteDEBUGValuesToFile(t, u, p, x, xd, z, OtherState, m, AFInfo)
+!!#endif
+
+
+   !...............................................................................................................................
+   ! if we haven't initialized z%phi, we want to get a better guess as to what the actual values of phi are:
+   !...............................................................................................................................
+   
+
+   !............................................
+   ! calculate inductions using BEMT, applying the DBEMT, and/or skewed wake corrections as applicable:
+   ! NOTE that we don't use the DBEMT inputs when calling its CalcOutput routine, so we'll skip calculating them here
+   !............................................
+   
+   !............................................
+   ! update phi if necessary (consistent with inductions) and calculate inputs to UA (EVEN if UA isn't used, because we use the inputs later):
+   !............................................
+   
+   !............................................
+   ! unsteady aero and related outputs (cl, cd, cm, AoA, Vrel, Re)
+   !............................................
+   
+
+      ! Now depending on the option for UA get the airfoil coefs, Cl, Cd, Cm for unsteady or steady implementation
+   
+
+       IF (kgen_evalstage) THEN 
+       END IF   
+       IF (kgen_warmupstage) THEN 
+       END IF   
+       IF (kgen_mainstage) THEN 
+       END IF   
+         
+       !Uncomment following call statement to turn on perturbation experiment. 
+       !Adjust perturbation value and/or kind parameter if required. 
+       !CALL kgen_perturb_real( your_variable, 1.0E-15_8 ) 
+         
+         
+       !call to kgen kernel 
+            call AFI_ComputeAirfoilCoefs( y%AOA(i,j), y%Re(i,j), u%UserProp(i,j),  AFInfo(p%AFindx(i,j)), AFI_interp, errStat2, errMsg2 )
+            IF (kgen_mainstage) THEN 
+                  
+                !verify init 
+                CALL kgen_init_verify(tolerance=1.D-14, minvalue=1.D-14, verboseLevel=1) 
+                CALL kgen_init_check(check_status, rank=kgen_mpirank) 
+                  
+                !extern verify variables 
+                  
+                !local verify variables 
+                CALL kv_bemt_calcoutput_character_errmsglen_("errmsg2", check_status, errmsg2, kgenref_errmsg2) 
+                CALL kv_bemt_calcoutput_integer__intki("errstat2", check_status, errstat2, kgenref_errstat2) 
+                CALL kv_airfoilinfo_types_afi_outputtype("afi_interp", check_status, afi_interp, kgenref_afi_interp) 
+                IF (check_status%rank == 0) THEN 
+                    WRITE (*, *) "" 
+                END IF   
+                IF (kgen_verboseLevel > 0) THEN 
+                    IF (check_status%rank == 0) THEN 
+                        WRITE (*, *) "Number of output variables: ", check_status%numTotal 
+                        WRITE (*, *) "Number of identical variables: ", check_status%numIdentical 
+                        WRITE (*, *) "Number of non-identical variables within tolerance: ", check_status%numInTol 
+                        WRITE (*, *) "Number of non-identical variables out of tolerance: ", check_status%numOutTol 
+                        WRITE (*, *) "Tolerance: ", kgen_tolerance 
+                    END IF   
+                END IF   
+                IF (check_status%rank == 0) THEN 
+                    WRITE (*, *) "" 
+                END IF   
+                IF (check_status%numOutTol > 0) THEN 
+                    IF (check_status%rank == 0) THEN 
+                        WRITE (*, *) "Verification FAILED with" // TRIM(ADJUSTL(kgen_filepath)) 
+                    END IF   
+                    check_status%Passed = .FALSE. 
+                    kgen_isverified = .FALSE. 
+                ELSE 
+                    IF (check_status%rank == 0) THEN 
+                        WRITE (*, *) "Verification PASSED with " // TRIM(ADJUSTL(kgen_filepath)) 
+                    END IF   
+                    check_status%Passed = .TRUE. 
+                    kgen_isverified = .TRUE. 
+                END IF   
+                IF (check_status%rank == 0) THEN 
+                    WRITE (*, *) "" 
+                END IF   
+                CALL SYSTEM_CLOCK(kgen_start_clock, kgen_rate_clock) 
+                DO kgen_intvar = 1, KGEN_MAXITER 
+            call AFI_ComputeAirfoilCoefs( y%AOA(i,j), y%Re(i,j), u%UserProp(i,j),  AFInfo(p%AFindx(i,j)), AFI_interp, errStat2, errMsg2 )
+                END DO   
+                CALL SYSTEM_CLOCK(kgen_stop_clock, kgen_rate_clock) 
+                kgen_measure = 1.0D6*(kgen_stop_clock - kgen_start_clock)/DBLE(kgen_rate_clock*KGEN_MAXITER) 
+                IF (check_status%rank==0) THEN 
+                    WRITE (*, *) "AFI_ComputeAirfoilCoefs : Time per call (usec): ", kgen_measure 
+                END IF   
+            END IF   
+            IF (kgen_warmupstage) THEN 
+            END IF   
+            IF (kgen_evalstage) THEN 
+            END IF   
+
+   !............................................
+   ! Compute Cx, Cy given Cl, Cd and phi
+   !............................................
+
+
+              
+            CONTAINS 
+              
+
+            !verify state subroutine for kv_bemt_calcoutput_character_errmsglen_ 
+            RECURSIVE SUBROUTINE kv_bemt_calcoutput_character_errmsglen_(varname, check_status, var, kgenref_var) 
+                CHARACTER(LEN=*), INTENT(IN) :: varname 
+                TYPE(check_t), INTENT(INOUT) :: check_status 
+                CHARACTER(LEN=errmsglen), INTENT(IN) :: var, kgenref_var 
+                INTEGER :: check_result 
+                LOGICAL :: is_print = .FALSE. 
+                  
+                character(LEN=errmsglen) :: diff 
+                  
+                check_status%numTotal = check_status%numTotal + 1 
+                  
+                IF (var == kgenref_var) THEN 
+                    check_status%numIdentical = check_status%numIdentical + 1 
+                    IF (kgen_verboseLevel > 1) THEN 
+                        IF (check_status%rank == 0) THEN 
+                            WRITE (*, *) trim(adjustl(varname)), " is IDENTICAL." 
+                        END IF   
+                    END IF   
+                    check_result = CHECK_IDENTICAL 
+                ELSE 
+                    check_status%numOutTol = check_status%numOutTol + 1 
+                    IF (kgen_verboseLevel > 1) THEN 
+                        IF (check_status%rank == 0) THEN 
+                            WRITE (*, *) trim(adjustl(varname)), " is NOT IDENTICAL." 
+                        END IF   
+                    END IF   
+                    check_result = CHECK_OUT_TOL 
+                END IF   
+                IF (check_result == CHECK_IDENTICAL) THEN 
+                    IF (kgen_verboseLevel > 2) THEN 
+                        IF (check_status%rank == 0) THEN 
+                            WRITE (*, *) "NOT IMPLEMENTED" 
+                            WRITE (*, *) "" 
+                        END IF   
+                    END IF   
+                ELSE IF (check_result == CHECK_OUT_TOL) THEN 
+                    IF (kgen_verboseLevel > 0) THEN 
+                        IF (check_status%rank == 0) THEN 
+                            WRITE (*, *) "NOT IMPLEMENTED" 
+                            WRITE (*, *) "" 
+                        END IF   
+                    END IF   
+                ELSE IF (check_result == CHECK_IN_TOL) THEN 
+                    IF (kgen_verboseLevel > 1) THEN 
+                        IF (check_status%rank == 0) THEN 
+                            WRITE (*, *) "NOT IMPLEMENTED" 
+                            WRITE (*, *) "" 
+                        END IF   
+                    END IF   
+                END IF   
+                  
+            END SUBROUTINE kv_bemt_calcoutput_character_errmsglen_ 
+              
+            !verify state subroutine for kv_bemt_calcoutput_integer__intki 
+            RECURSIVE SUBROUTINE kv_bemt_calcoutput_integer__intki(varname, check_status, var, kgenref_var) 
+                CHARACTER(LEN=*), INTENT(IN) :: varname 
+                TYPE(check_t), INTENT(INOUT) :: check_status 
+                INTEGER(KIND=intki), INTENT(IN) :: var, kgenref_var 
+                INTEGER :: check_result 
+                LOGICAL :: is_print = .FALSE. 
+                  
+                integer(KIND=intki) :: diff 
+                  
+                check_status%numTotal = check_status%numTotal + 1 
+                  
+                IF (var == kgenref_var) THEN 
+                    check_status%numIdentical = check_status%numIdentical + 1 
+                    IF (kgen_verboseLevel > 1) THEN 
+                        IF (check_status%rank == 0) THEN 
+                            WRITE (*, *) trim(adjustl(varname)), " is IDENTICAL." 
+                        END IF   
+                    END IF   
+                    check_result = CHECK_IDENTICAL 
+                ELSE 
+                    diff = ABS(var - kgenref_var) 
+                    IF (diff <= kgen_tolerance) THEN 
+                        check_status%numInTol = check_status%numInTol + 1 
+                        IF (kgen_verboseLevel > 1) THEN 
+                            IF (check_status%rank == 0) THEN 
+                                WRITE (*, *) trim(adjustl(varname)), " is NOT IDENTICAL(within tolerance)." 
+                            END IF   
+                        END IF   
+                        check_result = CHECK_IN_TOL 
+                    ELSE 
+                        check_status%numOutTol = check_status%numOutTol + 1 
+                        IF (kgen_verboseLevel > 0) THEN 
+                            IF (check_status%rank == 0) THEN 
+                                WRITE (*, *) trim(adjustl(varname)), " is NOT IDENTICAL(out of tolerance)." 
+                            END IF   
+                        END IF   
+                        check_result = CHECK_OUT_TOL 
+                    END IF   
+                END IF   
+                IF (check_result == CHECK_IDENTICAL) THEN 
+                    IF (kgen_verboseLevel > 2) THEN 
+                        IF (check_status%rank == 0) THEN 
+                            WRITE (*, *) "Difference is ", 0 
+                            WRITE (*, *) "" 
+                        END IF   
+                    END IF   
+                ELSE IF (check_result == CHECK_OUT_TOL) THEN 
+                    IF (kgen_verboseLevel > 0) THEN 
+                        IF (check_status%rank == 0) THEN 
+                            WRITE (*, *) "Difference is ", diff 
+                            WRITE (*, *) "" 
+                        END IF   
+                    END IF   
+                ELSE IF (check_result == CHECK_IN_TOL) THEN 
+                    IF (kgen_verboseLevel > 1) THEN 
+                        IF (check_status%rank == 0) THEN 
+                            WRITE (*, *) "Difference is ", diff 
+                            WRITE (*, *) "" 
+                        END IF   
+                    END IF   
+                END IF   
+                  
+            END SUBROUTINE kv_bemt_calcoutput_integer__intki 
+              
+   END SUBROUTINE bemt_calcoutput 
+!----------------------------------------------------------------------------------------------------------------------------------
+!> Routine used in linearization to get the states initialized properly at t=0 (before perturbing things)
+
+
+!----------------------------------------------------------------------------------------------------------------------------------
+!> Routine for computing inductions outputs, used in both loose and tight coupling.
+
+
+!----------------------------------------------------------------------------------------------------------------------------------
+
+!----------------------------------------------------------------------------------------------------------------------------------
+
+
+!----------------------------------------------------------------------------------------------------------------------------------
+
+
+!----------------------------------------------------------------------------------------------------------------------------------
+
+
+!----------------------------------------------------------------------------------------------------------------------------------
+
+!----------------------------------------------------------------------------------------------------------------------------------
+
+
+!----------------------------------------------------------------------------------------------------------------------------------
+!> This subroutine computes the BEMT inductions that are frozen when linearizing with the FrozenWake flag.
+!> It first calls BEMT_CalcOutput to compute y%tanInduction and y%axInduction at this operating point.
+!SUBROUTINE computeFrozenWake( t, u, p, x, xd, z, OtherState, AFInfo, y, m, errStat, errMsg )
+
+
+!----------------------------------------------------------------------------------------------------------------------------------
+!> This subroutine checks for BEMT inputs that are invalid when linearizing constraint state equations.
+
+
+!----------------------------------------------------------------------------------------------------------------------------------
+!> This gets the constraint-state perturbations for linearization about a given operating point. This returns two deltas (one plus 
+!! and one minus) such that z_op+dz_p and z_op-dz_m are in the same solution region (or that they are in adjacent regions that have 
+!! continuous solution regions [i.e, the pi/2 boundary is okay because it is continuous across the momentum/empirical regions]).
+
+!----------------------------------------------------------------------------------------------------------------------------------
+
+
+   
+
+
+      
+
+
+!----------------------------------------------------------------------------------------------------------------------------------
+
+!----------------------------------------------------------------------------------------------------------------------------------
+
+!----------------------------------------------------------------------------------------------------------------------------------
+
+
+!----------------------------------------------------------------------------------------------------------------------------------
+!----------------------------------------------------------------------------------------------------------------------------------
+end module BEMT
+    

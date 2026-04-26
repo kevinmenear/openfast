@@ -1,0 +1,314 @@
+!KGEN-generated Fortran source file 
+  
+!Generated at : 2026-04-26 16:01:23 
+!KGEN version : 0.8.1 
+  
+!**********************************************************************************************************************************
+! LICENSING
+! Copyright (C) 2015-2018  National Renewable Energy Laboratory
+!    This file is part of AeroDyn.
+! Licensed under the Apache License, Version 2.0 (the "License");
+! you may not use this file except in compliance with the License.
+! You may obtain a copy of the License at
+!     http://www.apache.org/licenses/LICENSE-2.0
+! Unless required by applicable law or agreed to in writing, software
+! distributed under the License is distributed on an "AS IS" BASIS,
+! WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+! See the License for the specific language governing permissions and
+! limitations under the License.
+!**********************************************************************************************************************************
+
+
+!
+!
+!
+!
+!
+MODULE AirfoilInfo
+   ! This module contains airfoil-related routines with non-system-specific logic and references.
+! Redo this routing to get rid of some of the phases.  For instance, AFI_Init should be calle directly.
+
+
+    USE airfoilinfo_types 
+    USE kgen_utils_mod
+    USE tprof_mod, ONLY: tstart, tstop, tnull, tprnt 
+
+    USE ISO_C_BINDING
+    IMPLICIT NONE 
+
+    PRIVATE 
+
+    PUBLIC afi_computeairfoilcoefs 
+    PUBLIC FindBoundingTables
+
+
+   integer, parameter                           :: MaxNumAFCoeffs = 7 !cl,cd,cm,cpMin, UA:f_st, FullySeparate, FullyAttached
+
+
+    ! Auto-generated interface for C++ implementation of AFI_ComputeAirfoilCoefs
+    INTERFACE
+        SUBROUTINE afi_computeairfoilcoefs_c(AOA, Re, UserProp, p, AFI_interp, errStat, errMsg) BIND(C, NAME='afi_computeairfoilcoefs_c')
+            USE ISO_C_BINDING
+            REAL(C_DOUBLE), VALUE :: AOA
+            REAL(C_DOUBLE), VALUE :: Re
+            REAL(C_DOUBLE), VALUE :: UserProp
+            TYPE(C_PTR), VALUE :: p
+            TYPE(C_PTR), VALUE :: AFI_interp
+            INTEGER(C_INT), INTENT(OUT) :: errStat
+            CHARACTER(KIND=C_CHAR), INTENT(OUT) :: errMsg(*)
+        END SUBROUTINE afi_computeairfoilcoefs_c
+    END INTERFACE
+
+CONTAINS
+
+
+   !=============================================================================
+   
+
+
+   !=============================================================================
+   !> This routine checks the init input values for AFI and makes sure they are valid
+   !! before using them.
+   
+
+
+   !=============================================================================
+  
+
+
+!----------------------------------------------------------------------------------------------------------------------------------  
+
+
+!----------------------------------------------------------------------------------------------------------------------------------
+
+!----------------------------------------------------------------------------------------------------------------------------------
+
+
+!----------------------------------------------------------------------------------------------------------------------------------
+
+
+!----------------------------------------------------------------------------------------------------------------------------------  
+
+!----------------------------------------------------------------------------------------------------------------------------------  
+
+
+!----------------------------------------------------------------------------------------------------------------------------------  
+
+
+!----------------------------------------------------------------------------------------------------------------------------------  
+
+
+!----------------------------------------------------------------------------------------------------------------------------------  
+
+!----------------------------------------------------------------------------------------------------------------------------------  
+
+!----------------------------------------------------------------------------------------------------------------------------------  
+subroutine FindBoundingTables(p, secondaryDepVal, lowerTable, upperTable, xVals)
+
+   TYPE (AFI_ParameterType), intent(in   ) :: p                          ! This structure stores all the module parameters that are set by AirfoilInfo during the initialization phase.
+   real(ReKi),               intent(in   ) :: secondaryDepVal            ! Interpolate secondary values (Re or UserProp) based on this value
+
+   integer(IntKi),           intent(  out) :: lowerTable                 ! index of the lower airfoil table p%secondVals(lowerTable) <= secondaryDepVal <= p%secondVals(upperTable)
+   integer(IntKi),           intent(  out) :: upperTable                 ! index of the upper airfoil table ( = lowerTable+1 )
+   real(ReKi),               intent(  out) :: xVals(2)                   ! this takes the place of time in the extrapInterp routines generated by the Registry
+   
+   integer(IntKi)                          :: iMid
+   ! compare algorithm with InterpBinReal
+
+   lowerTable  = 1
+   upperTable  = p%NumTabs
+
+   DO WHILE ( upperTable-lowerTable > 1 )
+
+      iMid = ( upperTable + lowerTable )/2
+
+      IF ( secondaryDepVal >= p%secondVals(iMid) ) THEN
+         lowerTable = iMid
+      ELSE
+         upperTable = iMid
+      END IF
+
+   END DO
+   
+   xVals(1) = p%secondVals(lowerTable)
+   xVals(2) = p%secondVals(upperTable)
+
+end subroutine FindBoundingTables
+!----------------------------------------------------------------------------------------------------------------------------------  
+
+!----------------------------------------------------------------------------------------------------------------------------------  
+subroutine AFI_ComputeAirfoilCoefs2D( AOA, secondaryDepVal, p, AFI_interp, errStat, errMsg )
+! This routine is calculates Cl, Cd, Cm, (and Cpmin) for a set of tables which are dependent on AOA as well as a 2nd user-defined varible, could be Re or Cntrl, etc.
+! If the requested yVar is not associated with a given table, then the two tables which contain yVar are found and, a cubic spline interpolation is performed at the requested AOA.
+! for each of those two tables. Then a linear intepolation is performed on the 2nd dimension to find the final Cl,Cd,Cm, and Cpmin values.
+! If the requested yVar corresponds to a table, then only a single cubic interpolation based on the requested AOA is performed.
+!..................................................................................................................................
+   real(ReKi),               intent(in   ) :: AOA
+   real(ReKi),               intent(in   ) :: secondaryDepVal           ! Unused in the current version!     
+   TYPE (AFI_ParameterType), intent(in   ) :: p                          ! This structure stores all the module parameters that are set by AirfoilInfo during the initialization phase.
+   type(AFI_OutputType),     intent(  out) :: AFI_interp                 ! contains    real(ReKi),               intent(  out) :: Cl, Cd, Cm, Cpmin
+   integer(IntKi),           intent(  out) :: errStat                    ! Error status of the operation
+   character(*),             intent(  out) :: errMsg                     ! Error message if ErrStat /= ErrID_None 
+   
+   
+   integer                                 :: lowerTable, upperTable
+   real(ReKi)                              :: xVals(2)
+   type(AFI_OutputType)                    :: AFI_lower
+   type(AFI_OutputType)                    :: AFI_upper
+      
+   ErrStat = ErrID_None
+   ErrMsg  = ''
+   
+   IF ( secondaryDepVal <= p%secondVals( 1 ) )  THEN
+   ! was call SetErrStat (ErrID_Fatal, "Specified Reynold's number, "//trim(num2lstr(secondaryDepVal))//" , is outside the range of Re specified in the airfoil input file tables.", ErrStat, ErrMsg, RoutineName )
+   ! or  call SetErrStat (ErrID_Fatal, "Specified User Property's value, "//trim(num2lstr(secondaryDepVal))//" , is outside the range of User Property values specified in the airfoil input file tables.", ErrStat, ErrMsg, RoutineName )
+      call AFI_ComputeAirfoilCoefs1D( AOA, p, AFI_interp, errStat, errMsg, 1 )
+      return
+   ELSE IF ( secondaryDepVal >= p%secondVals( p%NumTabs ) ) THEN
+   ! was call SetErrStat (ErrID_Fatal, "Specified Reynold's number, "//trim(num2lstr(secondaryDepVal))//" , is outside the range of Re specified in the airfoil input file tables.", ErrStat, ErrMsg, RoutineName )
+   ! or  call SetErrStat (ErrID_Fatal, "Specified User Property's value, "//trim(num2lstr(secondaryDepVal))//" , is outside the range of User Property values specified in the airfoil input file tables.", ErrStat, ErrMsg, RoutineName )
+      call AFI_ComputeAirfoilCoefs1D( AOA, p, AFI_interp, errStat, errMsg, p%NumTabs )
+      return
+   END IF
+   
+   call FindBoundingTables(p, secondaryDepVal, lowerTable, upperTable, xVals)
+!fixme ERROR HANDLING!   
+   
+   call AFI_ComputeAirfoilCoefs1D( AOA, p, AFI_lower, errStat, errMsg, lowerTable )
+      if (ErrStat >= AbortErrLev) return
+   call AFI_ComputeAirfoilCoefs1D( AOA, p, AFI_upper, errStat, errMsg, upperTable )
+      if (ErrStat >= AbortErrLev) return
+       ! linearly interpolate these values
+
+   call AFI_Output_ExtrapInterp1(AFI_lower, AFI_upper, xVals, AFI_interp, secondaryDepVal, ErrStat, ErrMsg )
+   
+   
+end subroutine AFI_ComputeAirfoilCoefs2D  
+!----------------------------------------------------------------------------------------------------------------------------------  
+         
+subroutine AFI_ComputeAirfoilCoefs1D( AOA, p, AFI_interp, errStat, errMsg, TableNum )
+! If the requested yVar is not associated with a given table, then the two tables which contain yVar are found and, a cubic spline interpolation is performed at the requested AOA.
+! for each of those two tables. Then a linear intepolation is performed on the 2nd dimension to find the final Cl,Cd,Cm, and Cpmin values.
+! If the requested yVar corresponds to a table, then only a single cubic interpolation based on the requested AOA is performed.
+!..................................................................................................................................
+   real(ReKi),               intent(in   ) :: AOA 
+   TYPE (AFI_ParameterType), intent(in   ) :: p                          ! This structure stores all the module parameters that are set by AirfoilInfo during the initialization phase.
+   type(AFI_OutputType)                    :: AFI_interp                 !  Cl, Cd, Cm, Cpmin
+   integer(IntKi),           intent(  out) :: errStat                    ! Error status of the operation
+   character(*),             intent(  out) :: errMsg                     ! Error message if ErrStat /= ErrID_None
+   integer(IntKi), optional, intent(in   ) :: TableNum
+   
+   
+   real                                    :: IntAFCoefs(MaxNumAFCoeffs)                ! The interpolated airfoil coefficients.
+   real(reki)                              :: Alpha
+   integer                                 :: s1
+   integer                                 :: iTab
+
+      
+   ErrStat = ErrID_None
+   ErrMsg  = ''
+
+   if (present(TableNum)) then
+      iTab = TableNum
+   else
+      iTab = 1
+   end if
+   
+   IntAFCoefs = 0.0_ReKi ! initialize in case we only don't have MaxNumAFCoeffs columns in the airfoil data (e.g., so cm is zero if not in the file)
+ 
+   s1 = size(p%Table(iTab)%Coefs,2)
+   
+   if (p%Table(iTab)%ConstData) then
+      IntAFCoefs(1:s1) = p%Table(iTab)%Coefs(1,:)   ! all the rows are constant, so we can just return the values at any alpha (e.g., row 1)
+   else
+      Alpha = AOA
+      call MPi2Pi ( Alpha ) ! change AOA into range of -pi to pi
+         ! Spline interpolation of lower table based on requested AOA
+   
+   
+       CALL CubicSplineInterpM( Alpha, p%Table(iTab)%Alpha, p%Table(iTab)%Coefs, p%Table(iTab)%SplineCoefs, IntAFCoefs(1:s1) )
+   end if
+  
+   AFI_interp%Cl    = IntAFCoefs(p%ColCl)
+   AFI_interp%Cd    = IntAFCoefs(p%ColCd)
+     
+   if ( p%ColCm > 0 ) then
+      AFI_interp%Cm = IntAFCoefs(p%ColCm)
+   else
+      AFI_interp%Cm    = 0.0_Reki  !Set these to zero unless there is data to be read in
+   end if
+   
+   if ( p%ColCpmin > 0 ) then
+      AFI_interp%Cpmin = IntAFCoefs(p%ColCpmin)
+   else
+      AFI_interp%Cpmin = 0.0_Reki
+   end if
+
+   if ( p%ColUAf > 0 ) then
+      AFI_interp%f_st          = IntAFCoefs(p%ColUAf)   ! separation function
+      AFI_interp%fullySeparate = IntAFCoefs(p%ColUAf+1) ! fully separated cn or cl
+      AFI_interp%fullyAttached = IntAFCoefs(p%ColUAf+2) ! fully attached cn or cl
+   else
+      AFI_interp%f_st          = 0.0_ReKi
+      AFI_interp%fullySeparate = 0.0_ReKi
+      AFI_interp%fullyAttached = 0.0_ReKi
+   end if
+      ! needed if using UnsteadyAero:
+   
+   if (p%Table(iTab)%InclUAdata) then
+      AFI_interp%Cd0 = p%Table(iTab)%UA_BL%Cd0
+      AFI_interp%Cm0 = p%Table(iTab)%UA_BL%Cm0
+   else
+      AFI_interp%Cd0 = 0.0_ReKi
+      AFI_interp%Cm0 = 0.0_ReKi
+   end if
+   
+   
+end subroutine AFI_ComputeAirfoilCoefs1D
+!----------------------------------------------------------------------------------------------------------------------------------  
+!> This routine calculates Cl, Cd, Cm, (and Cpmin) for a set of tables which are dependent on AOA as well as a 2nd user-defined varible, could be Re or Cntrl, etc.
+
+    SUBROUTINE AFI_ComputeAirfoilCoefs(AOA, Re, UserProp, p, AFI_interp, errStat, errMsg)
+        USE ISO_C_BINDING
+        USE vit_afi_parametertype_view, ONLY: afi_parametertype_view_t, vit_populate_afi_parametertype, vit_original_afi_parametertype, vit_copy_scalars_to_afi_parametertype
+        IMPLICIT NONE
+        REAL(8), INTENT(IN) :: AOA
+        REAL(8), INTENT(IN) :: Re
+        REAL(8), INTENT(IN) :: UserProp
+        TYPE(AFI_PARAMETERTYPE), INTENT(IN), TARGET :: p
+        TYPE(AFI_OUTPUTTYPE), INTENT(OUT), TARGET :: AFI_interp
+        INTEGER(4), INTENT(OUT) :: errStat
+        CHARACTER(*), INTENT(OUT) :: errMsg
+        CHARACTER(KIND=C_CHAR) :: errMsg_c(LEN(errMsg))
+        INTEGER :: vit_i_errMsg
+        TYPE(afi_parametertype_view_t), TARGET :: p_view
+        ! Populate view structs from Fortran types
+        CALL vit_populate_afi_parametertype(p, p_view)
+        ! Stash original Fortran pointers for callee bridges
+        vit_original_afi_parametertype => p
+        ! Convert CHARACTER args to C_CHAR arrays
+        DO vit_i_errMsg = 1, LEN(errMsg)
+            errMsg_c(vit_i_errMsg) = errMsg(vit_i_errMsg:vit_i_errMsg)
+        END DO
+        CALL afi_computeairfoilcoefs_c(AOA, Re, UserProp, C_LOC(p_view), C_LOC(AFI_interp), errStat, errMsg_c)
+        ! Copy C_CHAR arrays back to CHARACTER args (INTENT OUT/INOUT)
+        DO vit_i_errMsg = 1, LEN(errMsg)
+            errMsg(vit_i_errMsg:vit_i_errMsg) = errMsg_c(vit_i_errMsg)
+        END DO
+        ! Copy modified scalars back from view to Fortran type
+    END SUBROUTINE AFI_ComputeAirfoilCoefs
+!----------------------------------------------------------------------------------------------------------------------------------  
+!> This routine calculates Cl, Cd, Cm, (and Cpmin) for a set of tables which are dependent on AOA as well as a 2nd user-defined varible, could be Re or Cntrl, etc.
+
+
+!=============================================================================
+
+
+!=============================================================================
+
+!=============================================================================
+
+
+!=============================================================================
+   
+END MODULE AirfoilInfo

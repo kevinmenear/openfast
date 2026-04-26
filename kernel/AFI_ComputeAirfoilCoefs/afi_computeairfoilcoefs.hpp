@@ -1,0 +1,189 @@
+// VIT Translation Scaffold
+// Function: AFI_ComputeAirfoilCoefs (+ AFI_ComputeAirfoilCoefs1D, AFI_ComputeAirfoilCoefs2D)
+// Source: AirfoilInfo.f90
+// Module: AirfoilInfo
+// Fortran: SUBROUTINE AFI_ComputeAirfoilCoefs(AOA, Re, UserProp, p, AFI_interp, errStat, errMsg)
+// Source MD5: 1000ce2a3d2b
+// VIT: 0.1.0
+// Status: unverified
+// Generated: 2026-04-26T20:07:21Z
+
+#include <cmath>
+#include <cstring>
+#include <algorithm>
+#include "vit_types.h"
+#include "vit_nwtc.h"
+#include "vit_aerodyn_constants.h"
+
+// Error constants (from NWTC_Base.f90)
+static constexpr int ErrID_None  = 0;
+static constexpr int ErrID_Fatal = 4;
+static constexpr int AbortErrLev = ErrID_Fatal;
+
+// Maximum number of airfoil coefficient columns (from AirfoilInfo.f90:44)
+static constexpr int MaxNumAFCoeffs = 7;
+
+// Forward declarations
+static void AFI_ComputeAirfoilCoefs1D(double AOA, afi_parametertype_view_t* p,
+                                       afi_outputtype_t* AFI_interp, int* errStat, char* errMsg,
+                                       int iTab);
+static void AFI_ComputeAirfoilCoefs2D(double AOA, double secondaryDepVal,
+                                       afi_parametertype_view_t* p,
+                                       afi_outputtype_t* AFI_interp, int* errStat, char* errMsg);
+
+// Linear interpolation on AFI_OutputType fields (from AFI_Output_ExtrapInterp1 in AirfoilInfo_Types.f90)
+static void AFI_Output_ExtrapInterp1(const afi_outputtype_t& y1, const afi_outputtype_t& y2,
+                                      const double tin[2], afi_outputtype_t* y_out, double tin_out) {
+    double t1 = tin[1] - tin[0];
+    double t_out = tin_out - tin[0];
+
+    // Lagrange polynomial weights: a1 = -(t_out - t1)/t1, a2 = t_out/t1
+    double a1 = -(t_out - t1) / t1;
+    double a2 = t_out / t1;
+
+    y_out->Cl            = a1 * y1.Cl            + a2 * y2.Cl;
+    y_out->Cd            = a1 * y1.Cd            + a2 * y2.Cd;
+    y_out->Cm            = a1 * y1.Cm            + a2 * y2.Cm;
+    y_out->Cpmin         = a1 * y1.Cpmin         + a2 * y2.Cpmin;
+    y_out->Cd0           = a1 * y1.Cd0           + a2 * y2.Cd0;
+    y_out->Cm0           = a1 * y1.Cm0           + a2 * y2.Cm0;
+    y_out->f_st          = a1 * y1.f_st          + a2 * y2.f_st;
+    y_out->FullySeparate = a1 * y1.FullySeparate + a2 * y2.FullySeparate;
+    y_out->FullyAttached = a1 * y1.FullyAttached + a2 * y2.FullyAttached;
+}
+
+// --- AFI_ComputeAirfoilCoefs1D (AirfoilInfo.f90:1708-1786) ---
+// Single-table cubic spline lookup.
+// iTab: 1-based table index (Fortran convention).
+
+static void AFI_ComputeAirfoilCoefs1D(double AOA, afi_parametertype_view_t* p,
+                                       afi_outputtype_t* AFI_interp, int* errStat, char* errMsg,
+                                       int iTab) {
+    *errStat = ErrID_None;
+    std::memset(errMsg, ' ', ErrMsgLen);
+
+    // Access the table view (0-based indexing into the Table array)
+    afi_table_type_view_t* tab = &p->Table[iTab - 1];
+
+    double IntAFCoefs[MaxNumAFCoeffs] = {};  // zero-initialized
+
+    int s1 = tab->n_Coefs_cols;  // number of coefficient columns
+
+    if (tab->ConstData) {
+        // All rows are constant — return first row
+        // Fortran: Coefs(1,:) = first row, all columns
+        // C++ column-major: Coefs[col * n_rows + 0]
+        for (int c = 0; c < s1; c++) {
+            IntAFCoefs[c] = tab->Coefs[c * tab->n_Coefs_rows];
+        }
+    } else {
+        double Alpha = MPi2Pi(AOA);
+
+        // Cubic spline interpolation across all columns
+        CubicSplineInterpM(Alpha,
+                           tab->Alpha,          // XAry: alpha knots (0-based)
+                           tab->Coefs,           // YAry: coefficient table [n_rows x n_cols] column-major
+                           tab->SplineCoefs,     // Coef: spline coefficients [n_rows x n_cols x 4]
+                           IntAFCoefs,           // Res: output [n_cols]
+                           tab->n_Alpha,         // NumPts
+                           s1);                  // nCols
+    }
+
+    // Extract aerodynamic coefficients (Fortran 1-based column indices → 0-based)
+    AFI_interp->Cl = IntAFCoefs[p->ColCl - 1];
+    AFI_interp->Cd = IntAFCoefs[p->ColCd - 1];
+
+    if (p->ColCm > 0) {
+        AFI_interp->Cm = IntAFCoefs[p->ColCm - 1];
+    } else {
+        AFI_interp->Cm = 0.0;
+    }
+
+    if (p->ColCpmin > 0) {
+        AFI_interp->Cpmin = IntAFCoefs[p->ColCpmin - 1];
+    } else {
+        AFI_interp->Cpmin = 0.0;
+    }
+
+    if (p->ColUAf > 0) {
+        AFI_interp->f_st          = IntAFCoefs[p->ColUAf - 1];
+        AFI_interp->FullySeparate = IntAFCoefs[p->ColUAf];      // ColUAf+1 in Fortran = ColUAf in 0-based
+        AFI_interp->FullyAttached = IntAFCoefs[p->ColUAf + 1];  // ColUAf+2 in Fortran
+    } else {
+        AFI_interp->f_st          = 0.0;
+        AFI_interp->FullySeparate = 0.0;
+        AFI_interp->FullyAttached = 0.0;
+    }
+
+    // UA baseline values from the table
+    if (tab->InclUAdata) {
+        AFI_interp->Cd0 = tab->UA_BL.Cd0;
+        AFI_interp->Cm0 = tab->UA_BL.Cm0;
+    } else {
+        AFI_interp->Cd0 = 0.0;
+        AFI_interp->Cm0 = 0.0;
+    }
+}
+
+// FindBoundingTables is already translated — declare the _c entry point
+extern "C" {
+    void findboundingtables_c(afi_parametertype_view_t* p, double secondaryDepVal,
+                              int* lowerTable, int* upperTable, double* xVals);
+}
+
+// --- AFI_ComputeAirfoilCoefs2D (AirfoilInfo.f90:1659-1705) ---
+// Two-table interpolation on a secondary variable (Re or UserProp).
+
+static void AFI_ComputeAirfoilCoefs2D(double AOA, double secondaryDepVal,
+                                       afi_parametertype_view_t* p,
+                                       afi_outputtype_t* AFI_interp, int* errStat, char* errMsg) {
+    *errStat = ErrID_None;
+    std::memset(errMsg, ' ', ErrMsgLen);
+
+    // Boundary clamp: if below first table, use first table only
+    if (secondaryDepVal <= p->secondVals[0]) {
+        AFI_ComputeAirfoilCoefs1D(AOA, p, AFI_interp, errStat, errMsg, 1);
+        return;
+    }
+    // If above last table, use last table only
+    if (secondaryDepVal >= p->secondVals[p->NumTabs - 1]) {
+        AFI_ComputeAirfoilCoefs1D(AOA, p, AFI_interp, errStat, errMsg, p->NumTabs);
+        return;
+    }
+
+    // Find bounding tables for interpolation
+    int lowerTable, upperTable;
+    double xVals[2];
+    findboundingtables_c(p, secondaryDepVal, &lowerTable, &upperTable, xVals);
+
+    // Interpolate lower and upper tables
+    afi_outputtype_t AFI_lower = {}, AFI_upper = {};
+
+    AFI_ComputeAirfoilCoefs1D(AOA, p, &AFI_lower, errStat, errMsg, lowerTable);
+    if (*errStat >= AbortErrLev) return;
+
+    AFI_ComputeAirfoilCoefs1D(AOA, p, &AFI_upper, errStat, errMsg, upperTable);
+    if (*errStat >= AbortErrLev) return;
+
+    // Linear interpolation between tables
+    AFI_Output_ExtrapInterp1(AFI_lower, AFI_upper, xVals, AFI_interp, secondaryDepVal);
+}
+
+// --- AFI_ComputeAirfoilCoefs (AirfoilInfo.f90:1790-1821) ---
+// Public dispatcher: routes to 1D or 2D based on AFTabMod.
+
+void AFI_ComputeAirfoilCoefs(double AOA, double Re, double UserProp,
+                              afi_parametertype_view_t* p, afi_outputtype_t* AFI_interp,
+                              int* errStat, char* errMsg) {
+    if (p->AFTabMod == AFITable_1) {
+        AFI_ComputeAirfoilCoefs1D(AOA, p, AFI_interp, errStat, errMsg, 1);
+    } else if (p->AFTabMod == AFITable_2Re) {
+        double ReInterp = std::log(Re);  // AFI_USE_LINEAR_RE is not defined (default: use log)
+        AFI_ComputeAirfoilCoefs2D(AOA, ReInterp, p, AFI_interp, errStat, errMsg);
+    } else {  // AFITable_2User
+        AFI_ComputeAirfoilCoefs2D(AOA, UserProp, p, AFI_interp, errStat, errMsg);
+    }
+
+    // Clamp separation function to [0, 1]
+    AFI_interp->f_st = std::min(std::max(AFI_interp->f_st, 0.0), 1.0);
+}
