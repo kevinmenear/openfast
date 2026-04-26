@@ -75,6 +75,10 @@ static void AFI_ComputeAirfoilCoefs1D(double AOA, afi_parametertype_view_t* p,
     double IntAFCoefs[MaxNumAFCoeffs] = {};  // zero-initialized
 
     int s1 = tab->n_Coefs_cols;  // number of coefficient columns
+    if (s1 > MaxNumAFCoeffs) {
+        *errStat = ErrID_Fatal;
+        return;
+    }
 
     if (tab->ConstData) {
         // All rows are constant — return first row
