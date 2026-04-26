@@ -42,6 +42,7 @@ void fZeros(const double* x, const double* f, int n,
 }
 
 // ---- InterpExtrapStp (NWTC_Num.f90:3268) ----
+// Extrapolates at boundaries using linear slope from nearest interval.
 
 double InterpExtrapStp(double XVal, const double* XAry,
                        const double* YAry, int& Ind, int AryLen) {
@@ -72,6 +73,90 @@ double InterpExtrapStp(double XVal, const double* XAry,
             Ind++;
         } else {
             return GetLinearVal();
+        }
+    }
+}
+
+// ---- InterpStp (NWTC_Num.f90:3455, InterpStpReal8) ----
+// Clamps at boundaries instead of extrapolating.
+
+double InterpStp(double XVal, const double* XAry,
+                 const double* YAry, int& Ind, int AryLen) {
+    auto GetLinearVal = [&]() -> double {
+        return (YAry[Ind] - YAry[Ind-1]) * (XVal - XAry[Ind-1])
+             / (XAry[Ind] - XAry[Ind-1]) + YAry[Ind-1];
+    };
+
+    if (XVal <= XAry[0]) {
+        Ind = 1;
+        return YAry[0];
+    } else if (XVal >= XAry[AryLen-1]) {
+        Ind = std::max(AryLen - 1, 1);
+        return YAry[AryLen-1];
+    }
+
+    Ind = std::max(std::min(Ind, AryLen - 1), 1);
+
+    while (true) {
+        if (XVal < XAry[Ind-1]) {
+            Ind--;
+        } else if (XVal >= XAry[Ind]) {
+            Ind++;
+        } else {
+            return GetLinearVal();
+        }
+    }
+}
+
+// ---- kernelSmoothing (NWTC_Num.f90:4157) ----
+
+void kernelSmoothing(const double* x, const double* f, int n,
+                     int kernelType, double radius, double* fNew) {
+    double RadiusFix = std::max(std::abs(radius), std::numeric_limits<double>::epsilon());
+
+    if (kernelType != kernelType_GAUSSIAN) {
+        // Non-Gaussian kernels: K(u) = w * (1 - |u|^Exp1)^Exp2 for |u| <= 1
+        double w;
+        int Exp1, Exp2;
+        switch (kernelType) {
+            case kernelType_EPANECHINIKOV: w = 3.0/4.0;   Exp1 = 2; Exp2 = 1; break;
+            case kernelType_QUARTIC:
+            case kernelType_BIWEIGHT:      w = 15.0/16.0;  Exp1 = 2; Exp2 = 2; break;
+            case kernelType_TRIWEIGHT:     w = 35.0/32.0;  Exp1 = 2; Exp2 = 3; break;
+            case kernelType_TRICUBE:       w = 70.0/81.0;  Exp1 = 3; Exp2 = 3; break;
+            default:                       w = 35.0/32.0;  Exp1 = 2; Exp2 = 3; break;
+        }
+
+        for (int j = 0; j < n; j++) {
+            double k_sum = 0.0;
+            fNew[j] = 0.0;
+            for (int i = 0; i < n; i++) {
+                double u = (x[i] - x[j]) / RadiusFix;
+                u = std::min(1.0, std::max(-1.0, u));
+                double k = w * std::pow(1.0 - std::pow(std::abs(u), Exp1), Exp2);
+                k_sum += k;
+                fNew[j] += k * f[i];
+            }
+            if (k_sum > 0.0) {
+                fNew[j] /= k_sum;
+            }
+        }
+    } else {
+        // Gaussian kernel: K(u) = (1/sqrt(2*pi)) * exp(-0.5*u^2)
+        double w = 1.0 / std::sqrt(TwoPi);
+
+        for (int j = 0; j < n; j++) {
+            double k_sum = 0.0;
+            fNew[j] = 0.0;
+            for (int i = 0; i < n; i++) {
+                double u = (x[i] - x[j]) / RadiusFix;
+                double k = w * std::exp(-0.5 * u * u);
+                k_sum += k;
+                fNew[j] += k * f[i];
+            }
+            if (k_sum > 0.0) {
+                fNew[j] /= k_sum;
+            }
         }
     }
 }

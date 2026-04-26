@@ -54,6 +54,10 @@ translations:
   ComputeUA360_updateCnSeparated:
     status: integrated
     cpp_file: translations/AirfoilInfo/computeua360_updatecnseparated.cpp
+    cases_passed: 20
+    cases_total: 20
+    cases_skipped: 0
+    kernel_dir: kernel/ComputeUA360_updateCnSeparated
   ComputeUA360_updateSeparationF:
     status: integrated
     cpp_file: translations/AirfoilInfo/computeua360_updateseparationf.cpp
@@ -64,6 +68,10 @@ translations:
     status: integrated
     cpp_file: translations/AirfoilInfo/computeua360_attachedflow.cpp
     verification: simulation
+    cases_passed: 20
+    cases_total: 20
+    cases_skipped: 0
+    kernel_dir: kernel/ComputeUA360_AttachedFlow
 types:
   AFI_ParameterType:
     strategy: view

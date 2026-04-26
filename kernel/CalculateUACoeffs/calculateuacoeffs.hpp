@@ -1,0 +1,399 @@
+// VIT Translation Scaffold
+// Function: CalculateUACoeffs
+// Source: AirfoilInfo.f90
+// Module: AirfoilInfo
+// Fortran: SUBROUTINE CalculateUACoeffs(CalcDefaults, p, ColCl, ColCd, ColCm, ColUAf, UAMod)
+// Source MD5: cc47e0b0b54f
+// VIT: 0.1.0
+// Status: unverified
+// Generated: 2026-04-26T01:24:47Z
+
+#include "vit_types.h"
+#include "vit_nwtc.h"
+#include <vector>
+#include <cstdio>
+
+// 2D column-major access: Coefs(Row, Col) in Fortran = Coefs[(Col-1)*nrows + (Row-1)] in C
+#define COEFS(row1, col1) p->Coefs[((col1)-1) * p->n_Coefs_rows + ((row1)-1)]
+
+// UA model constants (from AirfoilInfo_Types.f90)
+static constexpr int UA_HGM     = 4;
+static constexpr int UA_Oye     = 6;
+static constexpr int UA_HGMV360 = 8;
+
+void CalculateUACoeffs(afi_ua_bl_default_type_t* CalcDefaults, afi_table_type_view_t* p, int ColCl, int ColCd, int ColCm, int ColUAf, int UAMod) {
+    int N = p->NumAlf;
+
+    static constexpr double CnSlopeThreshold = 0.90;
+    static constexpr double fAtCriticalCn    = 0.7;
+
+    double LimitAlphaRange;
+    if (UAMod == UA_HGMV360) {
+        LimitAlphaRange = TwoPi;
+    } else {
+        LimitAlphaRange = 20.0 * D2R;
+    }
+
+    int col_fs = ColUAf + 1;
+    int col_fa = col_fs + 1;
+    bool UA_f_cn = (UAMod != UA_HGM) && (UAMod != UA_Oye);
+
+    if (!p->InclUAdata) return;
+
+    // DEBUG: dump first 40 bytes of CalcDefaults as int32
+    int32_t* raw = (int32_t*)CalcDefaults;
+    fprintf(stderr, "DEBUG CalcDefaults raw: ");
+    for (int i = 0; i < 10; i++) fprintf(stderr, "[%d]=%d ", i, raw[i]);
+    fprintf(stderr, "(sizeof=%zu)\n", sizeof(*CalcDefaults));
+
+    // --- Default parameter assignments ---
+    fprintf(stderr, "DEBUG before: T_f0=%f b1=%f\n", p->UA_BL.T_f0, p->UA_BL.b1);
+    if (CalcDefaults->eta_e)          p->UA_BL.eta_e          = 1.00;
+    if (CalcDefaults->k0)             p->UA_BL.k0             = 0.00;
+    if (CalcDefaults->k1)             p->UA_BL.k1             = 0.00;
+    if (CalcDefaults->k2)             p->UA_BL.k2             = 0.00;
+    if (CalcDefaults->k3)             p->UA_BL.k3             = 0.00;
+    if (CalcDefaults->k1_hat)         p->UA_BL.k1_hat         = 0.00;
+    if (CalcDefaults->S1)             p->UA_BL.S1             = 0.00;
+    if (CalcDefaults->S2)             p->UA_BL.S2             = 0.00;
+    if (CalcDefaults->S3)             p->UA_BL.S3             = 0.00;
+    if (CalcDefaults->S4)             p->UA_BL.S4             = 0.00;
+
+    if (CalcDefaults->T_f0)           p->UA_BL.T_f0           = 3.00;
+    fprintf(stderr, "DEBUG after defaults: T_f0=%f (flag=%d) b1=%f (flag=%d)\n",
+            p->UA_BL.T_f0, CalcDefaults->T_f0, p->UA_BL.b1, CalcDefaults->b1);
+    if (CalcDefaults->T_V0)           p->UA_BL.T_V0           = 6.00;
+    if (CalcDefaults->T_p)            p->UA_BL.T_p            = 1.70;
+    if (CalcDefaults->T_VL)           p->UA_BL.T_VL           = 11.00;
+    if (CalcDefaults->b1)             p->UA_BL.b1             = 0.14;
+    if (CalcDefaults->b2)             p->UA_BL.b2             = 0.53;
+    if (CalcDefaults->b5)             p->UA_BL.b5             = 5.00;
+    if (CalcDefaults->A1)             p->UA_BL.A1             = 0.30;
+    if (CalcDefaults->A2)             p->UA_BL.A2             = 0.70;
+    if (CalcDefaults->A5)             p->UA_BL.A5             = 1.00;
+    if (CalcDefaults->x_cp_bar)       p->UA_BL.x_cp_bar       = 0.20;
+    if (CalcDefaults->filtCutOff)     p->UA_BL.filtCutOff     = 0.50;
+
+    if (UAMod == UA_HGMV360) {
+        if (CalcDefaults->St_sh)          p->UA_BL.St_sh          = 0.14;
+        if (CalcDefaults->UACutout)       p->UA_BL.UACutout       = TwoPi * 2;
+        if (CalcDefaults->UACutout_delta) p->UA_BL.UACutout_delta = D2R;
+    } else {
+        if (CalcDefaults->St_sh)          p->UA_BL.St_sh          = 0.19;
+        if (CalcDefaults->UACutout)       p->UA_BL.UACutout       = 45.00 * D2R;
+        if (CalcDefaults->UACutout_delta) p->UA_BL.UACutout_delta = 5.00 * D2R;
+    }
+
+    p->UA_BL.UACutout_blend = std::max(0.0, std::abs(p->UA_BL.UACutout) - std::abs(p->UA_BL.UACutout_delta));
+
+    // --- Calculate based on airfoil polar ---
+    // iCdMin = minloc(Coefs(:,ColCd), DIM=1, MASK=abs(alpha) <= LimitAlphaRange)
+    int iCdMin = 1;
+    {
+        double minCd = 1e30;
+        for (int i = 0; i < N; i++) {
+            if (std::abs(p->Alpha[i]) <= LimitAlphaRange) {
+                if (COEFS(i+1, ColCd) < minCd) {
+                    minCd = COEFS(i+1, ColCd);
+                    iCdMin = i + 1; // 1-based
+                }
+            }
+        }
+    }
+
+    // Check for circular/constant polar
+    double maxCd = -1e30, minCd2 = 1e30, maxCl = -1e30;
+    for (int i = 0; i < N; i++) {
+        if (std::abs(p->Alpha[i]) <= LimitAlphaRange) {
+            if (COEFS(i+1, ColCd) > maxCd) maxCd = COEFS(i+1, ColCd);
+            if (COEFS(i+1, ColCd) < minCd2) minCd2 = COEFS(i+1, ColCd);
+            if (COEFS(i+1, ColCl) > maxCl) maxCl = COEFS(i+1, ColCl);
+        }
+    }
+
+    int iLower = 1, iUpper = N;
+    int iGuess = 1, iHighLimit = 1, iLowLimit = 1, iHigh, iLow, iHigh2 = 1, iLow2 = 1, nRoots;
+    std::vector<double> cn(N);
+    std::vector<double> roots(N);
+
+    if ((maxCd == minCd2) || maxCl < 0.01) {
+        // --- Circular/constant polar ---
+        if (CalcDefaults->Cd0)        p->UA_BL.Cd0 = COEFS(iCdMin, ColCd);
+        if (CalcDefaults->alpha0)     p->UA_BL.alpha0 = 0;
+        if (CalcDefaults->C_nalpha)   p->UA_BL.C_nalpha = 0;
+        if (CalcDefaults->C_lalpha)   p->UA_BL.C_lalpha = 0;
+        if (CalcDefaults->Cm0)        p->UA_BL.Cm0 = 0;
+        if (CalcDefaults->alpha1)     p->UA_BL.alpha1 = 10 * D2R;
+        if (CalcDefaults->alpha2)     p->UA_BL.alpha2 = -10 * D2R;
+        if (CalcDefaults->Cn1)        p->UA_BL.Cn1 = 0;
+        if (CalcDefaults->Cn2)        p->UA_BL.Cn2 = 0;
+        if (CalcDefaults->alphaLower) p->UA_BL.alphaLower = -5 * D2R;
+        if (CalcDefaults->alphaUpper) p->UA_BL.alphaUpper = 5 * D2R;
+
+        if (!UA_f_cn) {
+            computeuaseparationfunction_oncl_c(p, ColCl, ColUAf, col_fs, col_fa);
+        } else {
+            if (UAMod == UA_HGMV360) {
+                p->UA_BL.Cd0 = 0.0;
+            }
+            calculate_cn_c(p->Alpha, N, &COEFS(1, ColCl), N, &COEFS(1, ColCd), N, p->UA_BL.Cd0, cn.data());
+            computeua360_attachedflow_c(p, ColUAf, cn.data(), N, &iLower, &iUpper);
+            computeua360_updateseparationf_c(p, ColUAf, cn.data(), N, iLower, iUpper);
+            computeua360_updatecnseparated_c(p, ColUAf, cn.data(), N, iLower);
+        }
+    } else {
+        // --- Normal airfoil polar ---
+        double alphaAtCdMin = p->Alpha[iCdMin - 1];
+
+        if (UAMod == UA_HGMV360) {
+            p->UA_BL.Cd0 = 0.0;
+        } else {
+            if (CalcDefaults->Cd0) p->UA_BL.Cd0 = COEFS(iCdMin, ColCd);
+        }
+        calculate_cn_c(p->Alpha, N, &COEFS(1, ColCl), N, &COEFS(1, ColCd), N, p->UA_BL.Cd0, cn.data());
+
+        // Compute raw slopes and midpoint alpha
+        int Nm1 = N - 1;
+        std::vector<double> CnSlope_raw(Nm1), ClSlope_raw(Nm1);
+        std::vector<double> CnSlope_(Nm1), ClSlope_(Nm1);
+        std::vector<double> alpha_(Nm1);
+
+        for (int Row = 0; Row < Nm1; Row++) {
+            double da = p->Alpha[Row+1] - p->Alpha[Row];
+            CnSlope_raw[Row] = (cn[Row+1] - cn[Row]) / da;
+            ClSlope_raw[Row] = (COEFS(Row+2, ColCl) - COEFS(Row+1, ColCl)) / da;
+            alpha_[Row] = 0.5 * (p->Alpha[Row+1] + p->Alpha[Row]);
+        }
+
+        // Smooth slopes
+        kernelSmoothing(alpha_.data(), CnSlope_raw.data(), Nm1, kernelType_TRIWEIGHT, 2.0 * D2R, CnSlope_.data());
+        kernelSmoothing(alpha_.data(), ClSlope_raw.data(), Nm1, kernelType_TRIWEIGHT, 2.0 * D2R, ClSlope_.data());
+
+        iGuess = iCdMin;
+        double CnSlopeAtCdMin = InterpStp(alphaAtCdMin, alpha_.data(), CnSlope_.data(), iGuess, Nm1);
+
+        // Find bounding indices for LimitAlphaRange
+        // iHighLimit = min(maxloc(alpha_, DIM=1, MASK=alpha_ < LimitAlphaRange) + 1, size(alpha_))
+        iHighLimit = 1;
+        for (int i = 0; i < Nm1; i++) {
+            if (alpha_[i] < LimitAlphaRange) iHighLimit = i + 1;
+        }
+        iHighLimit = std::min(iHighLimit + 1, Nm1);
+
+        // iLowLimit = max(minloc(alpha_, DIM=1, MASK=alpha_ > -LimitAlphaRange) - 1, 1)
+        iLowLimit = Nm1;
+        for (int i = 0; i < Nm1; i++) {
+            if (alpha_[i] > -LimitAlphaRange) { iLowLimit = i + 1; break; }
+        }
+        iLowLimit = std::max(iLowLimit - 1, 1);
+
+        if (iHighLimit - iLowLimit < 3) iHighLimit = std::min(iLowLimit + 2, Nm1);
+        if (iHighLimit - iLowLimit < 3) iLowLimit = std::max(iHighLimit - 2, 1);
+
+        // --- alphaUpper ---
+        if (CalcDefaults->alphaUpper) {
+            iHigh = iHighLimit;
+            if (iHigh < iCdMin) iHigh = Nm1;
+
+            double maxCnSlope_local = CnSlopeAtCdMin;
+            for (int Row = iCdMin; Row <= iHigh; Row++) {
+                iHigh2 = Row;
+                if (CnSlope_[Row-1] > maxCnSlope_local) {
+                    maxCnSlope_local = CnSlope_[Row-1];
+                } else if (CnSlope_[Row-1] < CnSlopeThreshold * maxCnSlope_local) {
+                    break;
+                }
+            }
+
+            if (iHigh2 == iCdMin) {
+                p->UA_BL.alphaUpper = alphaAtCdMin;
+            } else {
+                iHigh2 = std::min(std::max(1, iHigh2 - 1), Nm1);
+                p->UA_BL.alphaUpper = alpha_[iHigh2-1];
+            }
+        } else {
+            iHigh2 = iHighLimit;
+        }
+
+        // --- alphaLower ---
+        if (CalcDefaults->alphaLower) {
+            double maxCnSlope_local = CnSlopeAtCdMin;
+            iLow = iLowLimit;
+            iHigh = std::max(1, std::min(iHigh2, std::min(iCdMin, Nm1)));
+            if (iHigh < iLow) iLow = 1;
+
+            for (int Row = iHigh; Row >= iLow; Row--) {
+                iLow2 = Row;
+                if (CnSlope_[Row-1] > maxCnSlope_local) {
+                    maxCnSlope_local = CnSlope_[Row-1];
+                } else if (CnSlope_[Row-1] < CnSlopeThreshold * maxCnSlope_local) {
+                    break;
+                }
+            }
+
+            if (iLow2 == iCdMin) {
+                p->UA_BL.alphaLower = alphaAtCdMin;
+            } else {
+                iLow2 = std::min(std::max(1, iLow2 + 1), Nm1);
+                p->UA_BL.alphaLower = alpha_[iLow2-1];
+            }
+        }
+
+        // --- C_nalpha, C_lalpha, alpha0 ---
+        if (CalcDefaults->C_nalpha || CalcDefaults->C_lalpha || CalcDefaults->alpha0) {
+            double alphaMargin = 0.2 * (p->UA_BL.alphaUpper - p->UA_BL.alphaLower);
+
+            iLow2 = iLowLimit;
+            while (iLow2 < iHighLimit - 1 && p->Alpha[iLow2-1] < p->UA_BL.alphaLower + alphaMargin) {
+                iLow2++;
+            }
+
+            iHigh2 = iHighLimit;
+            while (iHigh2 > iLow2 + 1 && p->Alpha[iHigh2-1] > p->UA_BL.alphaUpper - alphaMargin) {
+                iHigh2--;
+            }
+
+            int slice_len = iHigh2 - iLow2 + 1;
+            double Default_Cn_alpha, Default_Cl_alpha, Default_alpha0;
+            int ErrStat2 = 0;
+            char ErrMsg2[1025] = {0};
+            calculate_c_alpha_c(
+                &p->Alpha[iLow2-1], slice_len,
+                &cn[iLow2-1], slice_len,
+                &COEFS(iLow2, ColCl), slice_len,
+                &Default_Cn_alpha, &Default_Cl_alpha, &Default_alpha0,
+                &ErrStat2, ErrMsg2);
+
+            if (CalcDefaults->C_nalpha) p->UA_BL.C_nalpha = Default_Cn_alpha;
+            if (CalcDefaults->C_lalpha) p->UA_BL.C_lalpha = Default_Cl_alpha;
+            if (CalcDefaults->alpha0)   p->UA_BL.alpha0   = Default_alpha0;
+        }
+
+        // --- Cm0 ---
+        if (CalcDefaults->Cm0) {
+            if (ColCm > 0) {
+                iGuess = N / 2;
+                p->UA_BL.Cm0 = InterpStp(p->UA_BL.alpha0, p->Alpha, &COEFS(1, ColCm), iGuess, N);
+            } else {
+                p->UA_BL.Cm0 = 0.0;
+            }
+        }
+
+        // --- Separation functions ---
+        if (!UA_f_cn) {
+            computeuaseparationfunction_oncl_c(p, ColCl, ColUAf, col_fs, col_fa);
+            compute_iloweriupper_c(p, &iLower, &iUpper);
+        } else {
+            computeua360_attachedflow_c(p, ColUAf, cn.data(), N, &iLower, &iUpper);
+            computeua360_updateseparationf_c(p, ColUAf, cn.data(), N, iLower, iUpper);
+            computeua360_updatecnseparated_c(p, ColUAf, cn.data(), N, iLower);
+        }
+
+        // --- alpha1 ---
+        if (CalcDefaults->alpha1) {
+            // iGuess = max(1, minloc(alpha, DIM=1, MASK=alpha >= alphaUpper AND Coefs(:,ColUAf) <= fAtCriticalCn))
+            iGuess = 1;
+            {
+                double minAlpha = 1e30;
+                for (int i = 0; i < N; i++) {
+                    if (p->Alpha[i] >= p->UA_BL.alphaUpper && COEFS(i+1, ColUAf) <= fAtCriticalCn) {
+                        if (p->Alpha[i] < minAlpha) {
+                            minAlpha = p->Alpha[i];
+                            iGuess = i + 1;
+                        }
+                    }
+                }
+            }
+            iGuess = std::max(1, iGuess);
+
+            // fZeros(p%alpha(iUpper:), fAtCriticalCn - p%Coefs(iUpper:,ColUAf), roots, nRoots)
+            int slice_n = N - iUpper + 1;
+            std::vector<double> fSlice(slice_n);
+            for (int i = 0; i < slice_n; i++) {
+                fSlice[i] = fAtCriticalCn - COEFS(iUpper + i, ColUAf);
+            }
+            fZeros(&p->Alpha[iUpper-1], fSlice.data(), slice_n, roots.data(), N, nRoots);
+
+            if (nRoots == 1) {
+                p->UA_BL.alpha1 = roots[0];
+            } else if (nRoots > 1) {
+                int imin = 0;
+                double minDist = 1e30;
+                for (int k = 0; k < nRoots; k++) {
+                    double dist = std::abs(roots[k] - p->Alpha[iGuess-1]);
+                    if (dist < minDist) { minDist = dist; imin = k; }
+                }
+                p->UA_BL.alpha1 = roots[imin];
+            } else {
+                p->UA_BL.alpha1 = p->Alpha[iGuess-1];
+            }
+        }
+
+        // --- alpha2 ---
+        if (CalcDefaults->alpha2) {
+            // iGuess = maxloc(alpha, DIM=1, MASK=alpha <= alphaLower AND Coefs(:,ColUAf) <= fAtCriticalCn)
+            iGuess = 1;
+            {
+                double maxAlpha = -1e30;
+                for (int i = 0; i < N; i++) {
+                    if (p->Alpha[i] <= p->UA_BL.alphaLower && COEFS(i+1, ColUAf) <= fAtCriticalCn) {
+                        if (p->Alpha[i] > maxAlpha) {
+                            maxAlpha = p->Alpha[i];
+                            iGuess = i + 1;
+                        }
+                    }
+                }
+            }
+
+            // fZeros(p%alpha(:iLower), fAtCriticalCn - p%Coefs(:iLower,ColUAf), roots, nRoots)
+            int slice_n = iLower;
+            std::vector<double> fSlice(slice_n);
+            for (int i = 0; i < slice_n; i++) {
+                fSlice[i] = fAtCriticalCn - COEFS(i+1, ColUAf);
+            }
+            fZeros(p->Alpha, fSlice.data(), slice_n, roots.data(), N, nRoots);
+
+            if (nRoots == 1) {
+                p->UA_BL.alpha2 = roots[0];
+            } else if (nRoots > 1) {
+                int imin = 0;
+                double minDist = 1e30;
+                for (int k = 0; k < nRoots; k++) {
+                    double dist = std::abs(roots[k] - p->Alpha[iGuess-1]);
+                    if (dist < minDist) { minDist = dist; imin = k; }
+                }
+                p->UA_BL.alpha2 = roots[imin];
+            } else {
+                p->UA_BL.alpha2 = p->Alpha[iGuess-1];
+            }
+        }
+
+        // --- Cn1 ---
+        if (CalcDefaults->Cn1) {
+            iGuess = iHighLimit;
+            p->UA_BL.Cn1 = InterpStp(p->UA_BL.alpha1, p->Alpha, cn.data(), iGuess, N);
+        }
+
+        // --- Cn2 ---
+        if (CalcDefaults->Cn2) {
+            iGuess = iLowLimit;
+            p->UA_BL.Cn2 = InterpStp(p->UA_BL.alpha2, p->Alpha, cn.data(), iGuess, N);
+        }
+
+    } // end normal vs circular polar
+
+    // --- c_alphaLower / c_alphaUpper ---
+    if (UA_f_cn) {
+        iGuess = iLowLimit;
+        p->UA_BL.c_alphaLower = InterpStp(p->UA_BL.alphaLower, p->Alpha, cn.data(), iGuess, N);
+        iGuess = iHighLimit;
+        p->UA_BL.c_alphaUpper = InterpStp(p->UA_BL.alphaUpper, p->Alpha, cn.data(), iGuess, N);
+    } else {
+        iGuess = iLowLimit;
+        p->UA_BL.c_alphaLower = InterpStp(p->UA_BL.alphaLower, p->Alpha, &COEFS(1, ColCl), iGuess, N);
+        iGuess = iHighLimit;
+        p->UA_BL.c_alphaUpper = InterpStp(p->UA_BL.alphaUpper, p->Alpha, &COEFS(1, ColCl), iGuess, N);
+    }
+}
+
+#undef COEFS

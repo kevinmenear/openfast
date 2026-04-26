@@ -50,4 +50,32 @@ void fZeros(const double* x, const double* f, int n,
 double InterpExtrapStp(double XVal, const double* XAry,
                        const double* YAry, int& Ind, int AryLen);
 
+// ---- InterpStp (NWTC_Num.f90:3455, InterpStpReal8) ----
+// Like InterpExtrapStp but clamps at boundaries instead of extrapolating.
+// At XVal <= XAry[0]: returns YAry[0] directly.
+// At XVal >= XAry[AryLen-1]: returns YAry[AryLen-1] directly.
+// Ind: 1-based tracking index (same convention as InterpExtrapStp).
+
+double InterpStp(double XVal, const double* XAry,
+                 const double* YAry, int& Ind, int AryLen);
+
+// ---- kernelSmoothing (NWTC_Num.f90:4157) ----
+// Weighted kernel density smoothing.
+// x[0..n-1]: independent axis (0-based)
+// f[0..n-1]: function values to smooth (0-based)
+// kernelType: kernel function selector (use kernelType_TRIWEIGHT etc.)
+// radius: window width in units of x
+// fNew[0..n-1]: smoothed output (0-based)
+
+void kernelSmoothing(const double* x, const double* f, int n,
+                     int kernelType, double radius, double* fNew);
+
+// Kernel type constants (from NWTC_Num.f90:77-82)
+static constexpr int kernelType_EPANECHINIKOV = 1;
+static constexpr int kernelType_QUARTIC       = 2;
+static constexpr int kernelType_BIWEIGHT      = 3;
+static constexpr int kernelType_TRIWEIGHT     = 4;
+static constexpr int kernelType_TRICUBE       = 5;
+static constexpr int kernelType_GAUSSIAN      = 6;
+
 #endif // VIT_NWTC_H
