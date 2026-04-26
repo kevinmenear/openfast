@@ -87,6 +87,8 @@ translations:
   AFI_ValidateInitInput:
     status: integrated
     cpp_file: translations/AirfoilInfo/afi_validateinitinput.cpp
+  # Internal helpers — registered so VIT skips unnecessary callee bridges.
+  # Verified transitively via AFI_ComputeAirfoilCoefs kernel (20/20).
   AFI_ComputeAirfoilCoefs1D:
     status: translated
     cpp_file: translations/AirfoilInfo/afi_computeairfoilcoefs.cpp
@@ -96,6 +98,7 @@ translations:
   AFI_Output_ExtrapInterp1:
     status: translated
     cpp_file: translations/AirfoilInfo/afi_computeairfoilcoefs.cpp
+  # NWTC utilities — C++ implementations in vit_nwtc.cpp, verified transitively.
   CubicSplineInterpM:
     status: translated
     cpp_file: modules/aerodyn/src/vit_nwtc.cpp

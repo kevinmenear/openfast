@@ -20,7 +20,8 @@ static constexpr int ErrID_None  = 0;
 static constexpr int ErrID_Fatal = 4;
 static constexpr int AbortErrLev = ErrID_Fatal;
 
-// Maximum number of airfoil coefficient columns (from AirfoilInfo.f90:44)
+// Maximum number of airfoil coefficient columns (AirfoilInfo.f90:44).
+// Must be >= actual column count in any airfoil table: cl, cd, cm, cpmin, f_st, fullySep, fullyAtt.
 static constexpr int MaxNumAFCoeffs = 7;
 
 // Forward declarations
@@ -36,6 +37,12 @@ static void AFI_Output_ExtrapInterp1(const afi_outputtype_t& y1, const afi_outpu
                                       const double tin[2], afi_outputtype_t* y_out, double tin_out) {
     double t1 = tin[1] - tin[0];
     double t_out = tin_out - tin[0];
+
+    if (EqualRealNos(0.0, t1)) {
+        // t(1) == t(2) — division by zero. Copy y1 and return.
+        *y_out = y1;
+        return;
+    }
 
     // Lagrange polynomial weights: a1 = -(t_out - t1)/t1, a2 = t_out/t1
     double a1 = -(t_out - t1) / t1;
