@@ -65,6 +65,11 @@ integrate ComputeUA360_AttachedFlow \
     translations/AirfoilInfo/computeua360_attachedflow.cpp \
     "--reverse-copy"
 
+# --- Orchestrator (calls most of the above + NWTC utilities) ---
+integrate CalculateUACoeffs \
+    translations/AirfoilInfo/calculateuacoeffs.cpp \
+    "--reverse-copy"
+
 echo ""
 echo "===================="
 echo "Summary: $passed/$total passed, $failed failed"

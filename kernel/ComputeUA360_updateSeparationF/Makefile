@@ -3,7 +3,7 @@ FC_FLAGS_SET_0 ?= -O2 -ffree-form -ffree-line-length-none -cpp -fdefault-real-8 
 # Makefile for KGEN-generated kernel
 
 
-ALL_OBJS := vit_bridge_computeua360_cnoffset.o vit_afi_table_type_view.o computeua360_updateseparationf.o AirfoilInfo.o AirfoilInfo_Types.o NWTC_Library.o NWTC_Library_Types.o SingPrec.o NWTC_Num.o NWTC_IO.o kernel_driver.o kgen_utils.o tprof_mod.o
+ALL_OBJS := vit_bridge_computeua360_cnoffset.o vit_afi_table_type_view.o vit_nwtc.o computeua360_updateseparationf.o AirfoilInfo.o AirfoilInfo_Types.o NWTC_Library.o NWTC_Library_Types.o SingPrec.o NWTC_Num.o NWTC_IO.o kernel_driver.o kgen_utils.o tprof_mod.o
 
 # VIT: C++ compilation support
 CXX ?= g++
@@ -12,12 +12,15 @@ CXXFLAGS ?= -O2 -fPIC -ffp-contract=off
 computeua360_updateseparationf.o: computeua360_updateseparationf.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
+vit_nwtc.o: vit_nwtc.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
 # VIT: view populator module
 vit_afi_table_type_view.o: vit_afi_table_type_view.f90 AirfoilInfo_Types.o
 	$(FC_0) $(FC_FLAGS_SET_0) -c $< -o $@
 
 # VIT: callee bridge for kernel verification
-vit_bridge_computeua360_cnoffset.o: vit_bridge_computeua360_cnoffset.f90 vit_afi_table_type_view.o computeua360_updateseparationf.o AirfoilInfo.o AirfoilInfo_Types.o NWTC_Library.o NWTC_Library_Types.o SingPrec.o NWTC_Num.o NWTC_IO.o kernel_driver.o kgen_utils.o tprof_mod.o
+vit_bridge_computeua360_cnoffset.o: vit_bridge_computeua360_cnoffset.f90 vit_afi_table_type_view.o vit_nwtc.o computeua360_updateseparationf.o AirfoilInfo.o AirfoilInfo_Types.o NWTC_Library.o NWTC_Library_Types.o SingPrec.o NWTC_Num.o NWTC_IO.o kernel_driver.o kgen_utils.o tprof_mod.o
 	$(FC_0) $(FC_FLAGS_SET_0) -c $< -o $@
 
 build: ${ALL_OBJS}

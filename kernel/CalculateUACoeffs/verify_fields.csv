@@ -63,7 +63,6 @@ CalculateUACoeffs.0.0.1,alphabreakupper,scalar,IDENTICAL,3.1089640750908152,3.10
 CalculateUACoeffs.0.0.1,cnbreakupper,scalar,IN_TOL,0.20501140501893658,0.20501140501893633,2.4980018054066022E-016
 CalculateUACoeffs.0.0.1,alphabreaklower,scalar,IDENTICAL,-3.3084178269175109,-3.3084178269175109,
 CalculateUACoeffs.0.0.1,cnbreaklower,scalar,IDENTICAL,1.0481934779204047,1.0481934779204047,
-CalculateUACoeffs.0.0.1,numtabs,scalar,IN_TOL,1,1,1
 CalculateUACoeffs.0.0.1,bl_file,scalar,IDENTICAL,././../BAR_Baseline/Airfoils/AF01_BL.txt,././../BAR_Baseline/Airfoils/AF01_BL.txt,
 CalculateUACoeffs.0.0.1,filename,scalar,IDENTICAL,././../BAR_Baseline/Airfoils/BAR0_AeroDyn_Polar_01.dat,././../BAR_Baseline/Airfoils/BAR0_AeroDyn_Polar_01.dat,
 CalculateUACoeffs.0.0.1,itable,scalar,IDENTICAL,1,1,
@@ -131,7 +130,6 @@ CalculateUACoeffs.0.0.2,alphabreakupper,scalar,IN_TOL,2.8833609728366252,2.88336
 CalculateUACoeffs.0.0.2,cnbreakupper,scalar,IN_TOL,1.6225175023565943,1.6225175023565925,1.7763568394002505E-015
 CalculateUACoeffs.0.0.2,alphabreaklower,scalar,IN_TOL,-5.5265426896888066,-5.5265426896888057,8.8817841970012523E-016
 CalculateUACoeffs.0.0.2,cnbreaklower,scalar,IN_TOL,14.985083025174745,14.985083025174740,5.3290705182007514E-015
-CalculateUACoeffs.0.0.2,numtabs,scalar,IN_TOL,1,1,1
 CalculateUACoeffs.0.0.2,bl_file,scalar,IDENTICAL,././../BAR_Baseline/Airfoils/AF02_BL.txt,././../BAR_Baseline/Airfoils/AF02_BL.txt,
 CalculateUACoeffs.0.0.2,filename,scalar,IDENTICAL,././../BAR_Baseline/Airfoils/BAR0_AeroDyn_Polar_02.dat,././../BAR_Baseline/Airfoils/BAR0_AeroDyn_Polar_02.dat,
 CalculateUACoeffs.0.0.2,itable,scalar,IDENTICAL,1,1,
@@ -199,7 +197,6 @@ CalculateUACoeffs.0.0.3,alphabreakupper,scalar,IDENTICAL,2.6890365092090471,2.68
 CalculateUACoeffs.0.0.3,cnbreakupper,scalar,IDENTICAL,2.8434941170469470,2.8434941170469470,
 CalculateUACoeffs.0.0.3,alphabreaklower,scalar,IDENTICAL,-16.829703041494156,-16.829703041494156,
 CalculateUACoeffs.0.0.3,cnbreaklower,scalar,IDENTICAL,86.004934072332958,86.004934072332958,
-CalculateUACoeffs.0.0.3,numtabs,scalar,IN_TOL,1,1,1
 CalculateUACoeffs.0.0.3,bl_file,scalar,IDENTICAL,././../BAR_Baseline/Airfoils/AF03_BL.txt,././../BAR_Baseline/Airfoils/AF03_BL.txt,
 CalculateUACoeffs.0.0.3,filename,scalar,IDENTICAL,././../BAR_Baseline/Airfoils/BAR0_AeroDyn_Polar_03.dat,././../BAR_Baseline/Airfoils/BAR0_AeroDyn_Polar_03.dat,
 CalculateUACoeffs.0.0.3,itable,scalar,IDENTICAL,1,1,
@@ -267,7 +264,6 @@ CalculateUACoeffs.0.0.4,alphabreakupper,scalar,IDENTICAL,2.6146554834635172,2.61
 CalculateUACoeffs.0.0.4,cnbreakupper,scalar,IDENTICAL,3.3108438851442079,3.3108438851442079,
 CalculateUACoeffs.0.0.4,alphabreaklower,scalar,IDENTICAL,-124.31056015743457,-124.31056015743457,
 CalculateUACoeffs.0.0.4,cnbreaklower,scalar,IDENTICAL,761.32707630627817,761.32707630627817,
-CalculateUACoeffs.0.0.4,numtabs,scalar,IN_TOL,1,1,1
 CalculateUACoeffs.0.0.4,bl_file,scalar,IDENTICAL,././../BAR_Baseline/Airfoils/AF04_BL.txt,././../BAR_Baseline/Airfoils/AF04_BL.txt,
 CalculateUACoeffs.0.0.4,filename,scalar,IDENTICAL,././../BAR_Baseline/Airfoils/BAR0_AeroDyn_Polar_04.dat,././../BAR_Baseline/Airfoils/BAR0_AeroDyn_Polar_04.dat,
 CalculateUACoeffs.0.0.4,itable,scalar,IDENTICAL,1,1,
@@ -335,7 +331,6 @@ CalculateUACoeffs.0.0.5,alphabreakupper,scalar,IN_TOL,2.6048327075968061,2.60483
 CalculateUACoeffs.0.0.5,cnbreakupper,scalar,IN_TOL,3.3725622061456439,3.3725622061456417,2.2204460492503131E-015
 CalculateUACoeffs.0.0.5,alphabreaklower,scalar,IDENTICAL,-670.05050851182807,-670.05050851182807,
 CalculateUACoeffs.0.0.5,cnbreaklower,scalar,IDENTICAL,4190.3123013475497,4190.3123013475497,
-CalculateUACoeffs.0.0.5,numtabs,scalar,IN_TOL,1,1,1
 CalculateUACoeffs.0.0.5,bl_file,scalar,IDENTICAL,././../BAR_Baseline/Airfoils/AF05_BL.txt,././../BAR_Baseline/Airfoils/AF05_BL.txt,
 CalculateUACoeffs.0.0.5,filename,scalar,IDENTICAL,././../BAR_Baseline/Airfoils/BAR0_AeroDyn_Polar_05.dat,././../BAR_Baseline/Airfoils/BAR0_AeroDyn_Polar_05.dat,
 CalculateUACoeffs.0.0.5,itable,scalar,IDENTICAL,1,1,
@@ -403,7 +398,6 @@ CalculateUACoeffs.0.0.6,alphabreakupper,scalar,IDENTICAL,1.8706535858293161,1.87
 CalculateUACoeffs.0.0.6,cnbreakupper,scalar,IN_TOL,7.9855456768731479,7.9855456768731514,3.5527136788005009E-015
 CalculateUACoeffs.0.0.6,alphabreaklower,scalar,IDENTICAL,-3.1409968788034810,-3.1409968788034810,
 CalculateUACoeffs.0.0.6,cnbreaklower,scalar,IN_TOL,-3.7433633837440704E-003,-3.7433633837440587E-003,1.1709383462843448E-017
-CalculateUACoeffs.0.0.6,numtabs,scalar,IN_TOL,1,1,1
 CalculateUACoeffs.0.0.6,bl_file,scalar,IDENTICAL,././../BAR_Baseline/Airfoils/AF06_BL.txt,././../BAR_Baseline/Airfoils/AF06_BL.txt,
 CalculateUACoeffs.0.0.6,filename,scalar,IDENTICAL,././../BAR_Baseline/Airfoils/BAR0_AeroDyn_Polar_06.dat,././../BAR_Baseline/Airfoils/BAR0_AeroDyn_Polar_06.dat,
 CalculateUACoeffs.0.0.6,itable,scalar,IDENTICAL,1,1,
@@ -471,8 +465,6 @@ CalculateUACoeffs.0.0.7,alphabreakupper,scalar,IN_TOL,1.4492336132276660,1.44923
 CalculateUACoeffs.0.0.7,cnbreakupper,scalar,OUT_TOL,10.633405456875863,10.633405456875876,1.2434497875801753E-014
 CalculateUACoeffs.0.0.7,alphabreaklower,scalar,IDENTICAL,-1.4132103382949639,-1.4132103382949639,
 CalculateUACoeffs.0.0.7,cnbreaklower,scalar,IDENTICAL,-10.859746368649505,-10.859746368649505,
-CalculateUACoeffs.0.0.7,incluadata,scalar,OUT_TOL,T,T,
-CalculateUACoeffs.0.0.7,numtabs,scalar,OUT_TOL,1,1,1
 CalculateUACoeffs.0.0.7,bl_file,scalar,IDENTICAL,././../BAR_Baseline/Airfoils/AF07_BL.txt,././../BAR_Baseline/Airfoils/AF07_BL.txt,
 CalculateUACoeffs.0.0.7,filename,scalar,IDENTICAL,././../BAR_Baseline/Airfoils/BAR0_AeroDyn_Polar_07.dat,././../BAR_Baseline/Airfoils/BAR0_AeroDyn_Polar_07.dat,
 CalculateUACoeffs.0.0.7,itable,scalar,IDENTICAL,1,1,
@@ -540,7 +532,6 @@ CalculateUACoeffs.0.0.8,alphabreakupper,scalar,IDENTICAL,1.4063677751481167,1.40
 CalculateUACoeffs.0.0.8,cnbreakupper,scalar,IDENTICAL,10.902739460877225,10.902739460877225,
 CalculateUACoeffs.0.0.8,alphabreaklower,scalar,IDENTICAL,-1.3818467704946880,-1.3818467704946880,
 CalculateUACoeffs.0.0.8,cnbreaklower,scalar,IDENTICAL,-11.056809477032928,-11.056809477032928,
-CalculateUACoeffs.0.0.8,numtabs,scalar,OUT_TOL,1,1,1
 CalculateUACoeffs.0.0.8,bl_file,scalar,IDENTICAL,././../BAR_Baseline/Airfoils/AF08_BL.txt,././../BAR_Baseline/Airfoils/AF08_BL.txt,
 CalculateUACoeffs.0.0.8,filename,scalar,IDENTICAL,././../BAR_Baseline/Airfoils/BAR0_AeroDyn_Polar_08.dat,././../BAR_Baseline/Airfoils/BAR0_AeroDyn_Polar_08.dat,
 CalculateUACoeffs.0.0.8,itable,scalar,IDENTICAL,1,1,
@@ -608,8 +599,6 @@ CalculateUACoeffs.0.0.9,alphabreakupper,scalar,IN_TOL,1.4174125194911673,1.41741
 CalculateUACoeffs.0.0.9,cnbreakupper,scalar,OUT_TOL,10.833343285499415,10.833343285499428,1.2434497875801753E-014
 CalculateUACoeffs.0.0.9,alphabreaklower,scalar,IN_TOL,-1.3789116782568915,-1.3789116782568904,1.1102230246251565E-015
 CalculateUACoeffs.0.0.9,cnbreaklower,scalar,IN_TOL,-11.075251205456672,-11.075251205456675,3.5527136788005009E-015
-CalculateUACoeffs.0.0.9,incluadata,scalar,OUT_TOL,T,T,
-CalculateUACoeffs.0.0.9,numtabs,scalar,OUT_TOL,1,1,1
 CalculateUACoeffs.0.0.9,bl_file,scalar,IDENTICAL,././../BAR_Baseline/Airfoils/AF09_BL.txt,././../BAR_Baseline/Airfoils/AF09_BL.txt,
 CalculateUACoeffs.0.0.9,filename,scalar,IDENTICAL,././../BAR_Baseline/Airfoils/BAR0_AeroDyn_Polar_09.dat,././../BAR_Baseline/Airfoils/BAR0_AeroDyn_Polar_09.dat,
 CalculateUACoeffs.0.0.9,itable,scalar,IDENTICAL,1,1,
@@ -677,7 +666,6 @@ CalculateUACoeffs.0.0.10,alphabreakupper,scalar,IDENTICAL,1.4230645326283031,1.4
 CalculateUACoeffs.0.0.10,cnbreakupper,scalar,IDENTICAL,10.797830639600178,10.797830639600178,
 CalculateUACoeffs.0.0.10,alphabreaklower,scalar,IN_TOL,-1.3655764965477906,-1.3655764965477917,1.1102230246251565E-015
 CalculateUACoeffs.0.0.10,cnbreaklower,scalar,IN_TOL,-11.159038623239862,-11.159038623239857,5.3290705182007514E-015
-CalculateUACoeffs.0.0.10,numtabs,scalar,IN_TOL,1,1,1
 CalculateUACoeffs.0.0.10,bl_file,scalar,IDENTICAL,././../BAR_Baseline/Airfoils/AF10_BL.txt,././../BAR_Baseline/Airfoils/AF10_BL.txt,
 CalculateUACoeffs.0.0.10,filename,scalar,IDENTICAL,././../BAR_Baseline/Airfoils/BAR0_AeroDyn_Polar_10.dat,././../BAR_Baseline/Airfoils/BAR0_AeroDyn_Polar_10.dat,
 CalculateUACoeffs.0.0.10,itable,scalar,IDENTICAL,1,1,
@@ -745,8 +733,6 @@ CalculateUACoeffs.0.0.11,alphabreakupper,scalar,IN_TOL,1.4248395654371795,1.4248
 CalculateUACoeffs.0.0.11,cnbreakupper,scalar,OUT_TOL,10.786677779535683,10.786677779535671,1.2434497875801753E-014
 CalculateUACoeffs.0.0.11,alphabreaklower,scalar,IN_TOL,-1.3057172223399753,-1.3057172223399738,1.5543122344752192E-015
 CalculateUACoeffs.0.0.11,cnbreaklower,scalar,OUT_TOL,-11.535145535440840,-11.535145535440851,1.0658141036401503E-014
-CalculateUACoeffs.0.0.11,incluadata,scalar,OUT_TOL,T,T,
-CalculateUACoeffs.0.0.11,numtabs,scalar,OUT_TOL,1,1,1
 CalculateUACoeffs.0.0.11,bl_file,scalar,IDENTICAL,././../BAR_Baseline/Airfoils/AF11_BL.txt,././../BAR_Baseline/Airfoils/AF11_BL.txt,
 CalculateUACoeffs.0.0.11,filename,scalar,IDENTICAL,././../BAR_Baseline/Airfoils/BAR0_AeroDyn_Polar_11.dat,././../BAR_Baseline/Airfoils/BAR0_AeroDyn_Polar_11.dat,
 CalculateUACoeffs.0.0.11,itable,scalar,IDENTICAL,1,1,
@@ -814,7 +800,6 @@ CalculateUACoeffs.0.0.12,alphabreakupper,scalar,IDENTICAL,1.4305122710283669,1.4
 CalculateUACoeffs.0.0.12,cnbreakupper,scalar,IDENTICAL,10.751035119113178,10.751035119113178,
 CalculateUACoeffs.0.0.12,alphabreaklower,scalar,IN_TOL,-1.2966354249879593,-1.2966354249879586,6.6613381477509392E-016
 CalculateUACoeffs.0.0.12,cnbreaklower,scalar,IN_TOL,-11.592208151125810,-11.592208151125817,7.1054273576010019E-015
-CalculateUACoeffs.0.0.12,numtabs,scalar,IN_TOL,1,1,1
 CalculateUACoeffs.0.0.12,bl_file,scalar,IDENTICAL,././../BAR_Baseline/Airfoils/AF12_BL.txt,././../BAR_Baseline/Airfoils/AF12_BL.txt,
 CalculateUACoeffs.0.0.12,filename,scalar,IDENTICAL,././../BAR_Baseline/Airfoils/BAR0_AeroDyn_Polar_12.dat,././../BAR_Baseline/Airfoils/BAR0_AeroDyn_Polar_12.dat,
 CalculateUACoeffs.0.0.12,itable,scalar,IDENTICAL,1,1,
@@ -882,7 +867,6 @@ CalculateUACoeffs.0.0.13,alphabreakupper,scalar,IDENTICAL,1.4378449758232457,1.4
 CalculateUACoeffs.0.0.13,cnbreakupper,scalar,IDENTICAL,10.704962376084113,10.704962376084113,
 CalculateUACoeffs.0.0.13,alphabreaklower,scalar,IN_TOL,-1.2890986445285202,-1.2890986445285193,8.8817841970012523E-016
 CalculateUACoeffs.0.0.13,cnbreaklower,scalar,IN_TOL,-11.639563139371997,-11.639563139371999,1.7763568394002505E-015
-CalculateUACoeffs.0.0.13,numtabs,scalar,IN_TOL,1,1,1
 CalculateUACoeffs.0.0.13,bl_file,scalar,IDENTICAL,././../BAR_Baseline/Airfoils/AF13_BL.txt,././../BAR_Baseline/Airfoils/AF13_BL.txt,
 CalculateUACoeffs.0.0.13,filename,scalar,IDENTICAL,././../BAR_Baseline/Airfoils/BAR0_AeroDyn_Polar_13.dat,././../BAR_Baseline/Airfoils/BAR0_AeroDyn_Polar_13.dat,
 CalculateUACoeffs.0.0.13,itable,scalar,IDENTICAL,1,1,
@@ -950,8 +934,6 @@ CalculateUACoeffs.0.0.14,alphabreakupper,scalar,IN_TOL,1.4449496765400875,1.4449
 CalculateUACoeffs.0.0.14,cnbreakupper,scalar,OUT_TOL,10.660322224928141,10.660322224928155,1.4210854715202004E-014
 CalculateUACoeffs.0.0.14,alphabreaklower,scalar,IN_TOL,-1.2918510342646159,-1.2918510342646152,6.6613381477509392E-016
 CalculateUACoeffs.0.0.14,cnbreaklower,scalar,IN_TOL,-11.622269364622527,-11.622269364622534,7.1054273576010019E-015
-CalculateUACoeffs.0.0.14,incluadata,scalar,OUT_TOL,T,T,
-CalculateUACoeffs.0.0.14,numtabs,scalar,OUT_TOL,1,1,1
 CalculateUACoeffs.0.0.14,bl_file,scalar,IDENTICAL,././../BAR_Baseline/Airfoils/AF14_BL.txt,././../BAR_Baseline/Airfoils/AF14_BL.txt,
 CalculateUACoeffs.0.0.14,filename,scalar,IDENTICAL,././../BAR_Baseline/Airfoils/BAR0_AeroDyn_Polar_14.dat,././../BAR_Baseline/Airfoils/BAR0_AeroDyn_Polar_14.dat,
 CalculateUACoeffs.0.0.14,itable,scalar,IDENTICAL,1,1,
@@ -1019,7 +1001,6 @@ CalculateUACoeffs.0.0.15,alphabreakupper,scalar,IDENTICAL,1.4505248846029353,1.4
 CalculateUACoeffs.0.0.15,cnbreakupper,scalar,IDENTICAL,10.625292159543188,10.625292159543188,
 CalculateUACoeffs.0.0.15,alphabreaklower,scalar,IN_TOL,-1.3005020048794165,-1.3005020048794158,6.6613381477509392E-016
 CalculateUACoeffs.0.0.15,cnbreaklower,scalar,IN_TOL,-11.567913713162771,-11.567913713162778,7.1054273576010019E-015
-CalculateUACoeffs.0.0.15,numtabs,scalar,IN_TOL,1,1,1
 CalculateUACoeffs.0.0.15,bl_file,scalar,IDENTICAL,././../BAR_Baseline/Airfoils/AF15_BL.txt,././../BAR_Baseline/Airfoils/AF15_BL.txt,
 CalculateUACoeffs.0.0.15,filename,scalar,IDENTICAL,././../BAR_Baseline/Airfoils/BAR0_AeroDyn_Polar_15.dat,././../BAR_Baseline/Airfoils/BAR0_AeroDyn_Polar_15.dat,
 CalculateUACoeffs.0.0.15,itable,scalar,IDENTICAL,1,1,
@@ -1087,7 +1068,6 @@ CalculateUACoeffs.0.0.16,alphabreakupper,scalar,IDENTICAL,1.4553826942064885,1.4
 CalculateUACoeffs.0.0.16,cnbreakupper,scalar,IDENTICAL,10.594769641617065,10.594769641617065,
 CalculateUACoeffs.0.0.16,alphabreaklower,scalar,IN_TOL,-1.3106800118309279,-1.3106800118309272,6.6613381477509392E-016
 CalculateUACoeffs.0.0.16,cnbreaklower,scalar,IN_TOL,-11.503963409428664,-11.503963409428668,3.5527136788005009E-015
-CalculateUACoeffs.0.0.16,numtabs,scalar,IN_TOL,1,1,1
 CalculateUACoeffs.0.0.16,bl_file,scalar,IDENTICAL,././../BAR_Baseline/Airfoils/AF16_BL.txt,././../BAR_Baseline/Airfoils/AF16_BL.txt,
 CalculateUACoeffs.0.0.16,filename,scalar,IDENTICAL,././../BAR_Baseline/Airfoils/BAR0_AeroDyn_Polar_16.dat,././../BAR_Baseline/Airfoils/BAR0_AeroDyn_Polar_16.dat,
 CalculateUACoeffs.0.0.16,itable,scalar,IDENTICAL,1,1,
@@ -1155,7 +1135,6 @@ CalculateUACoeffs.0.0.17,alphabreakupper,scalar,IDENTICAL,1.4498603685096774,1.4
 CalculateUACoeffs.0.0.17,cnbreakupper,scalar,IDENTICAL,10.629467437296732,10.629467437296732,
 CalculateUACoeffs.0.0.17,alphabreaklower,scalar,IN_TOL,-1.3222404095227931,-1.3222404095227922,8.8817841970012523E-016
 CalculateUACoeffs.0.0.17,cnbreaklower,scalar,IN_TOL,-11.431327288505983,-11.431327288505988,5.3290705182007514E-015
-CalculateUACoeffs.0.0.17,numtabs,scalar,IN_TOL,1,1,1
 CalculateUACoeffs.0.0.17,bl_file,scalar,IDENTICAL,././../BAR_Baseline/Airfoils/AF17_BL.txt,././../BAR_Baseline/Airfoils/AF17_BL.txt,
 CalculateUACoeffs.0.0.17,filename,scalar,IDENTICAL,././../BAR_Baseline/Airfoils/BAR0_AeroDyn_Polar_17.dat,././../BAR_Baseline/Airfoils/BAR0_AeroDyn_Polar_17.dat,
 CalculateUACoeffs.0.0.17,itable,scalar,IDENTICAL,1,1,
@@ -1223,7 +1202,6 @@ CalculateUACoeffs.0.0.18,alphabreakupper,scalar,IDENTICAL,1.4538545283551014,1.4
 CalculateUACoeffs.0.0.18,cnbreakupper,scalar,IDENTICAL,10.604371390841436,10.604371390841436,
 CalculateUACoeffs.0.0.18,alphabreaklower,scalar,IN_TOL,-1.3343477459332569,-1.3343477459332560,8.8817841970012523E-016
 CalculateUACoeffs.0.0.18,cnbreaklower,scalar,IN_TOL,-11.355254650262678,-11.355254650262681,3.5527136788005009E-015
-CalculateUACoeffs.0.0.18,numtabs,scalar,IN_TOL,1,1,1
 CalculateUACoeffs.0.0.18,bl_file,scalar,IDENTICAL,././../BAR_Baseline/Airfoils/AF18_BL.txt,././../BAR_Baseline/Airfoils/AF18_BL.txt,
 CalculateUACoeffs.0.0.18,filename,scalar,IDENTICAL,././../BAR_Baseline/Airfoils/BAR0_AeroDyn_Polar_18.dat,././../BAR_Baseline/Airfoils/BAR0_AeroDyn_Polar_18.dat,
 CalculateUACoeffs.0.0.18,itable,scalar,IDENTICAL,1,1,
@@ -1291,7 +1269,6 @@ CalculateUACoeffs.0.0.19,alphabreakupper,scalar,IDENTICAL,1.4572684414774921,1.4
 CalculateUACoeffs.0.0.19,cnbreakupper,scalar,IDENTICAL,10.582921142070843,10.582921142070843,
 CalculateUACoeffs.0.0.19,alphabreaklower,scalar,IN_TOL,-1.3468530200327655,-1.3468530200327649,6.6613381477509392E-016
 CalculateUACoeffs.0.0.19,cnbreaklower,scalar,IN_TOL,-11.276681695778390,-11.276681695778395,5.3290705182007514E-015
-CalculateUACoeffs.0.0.19,numtabs,scalar,IN_TOL,1,1,1
 CalculateUACoeffs.0.0.19,bl_file,scalar,IDENTICAL,././../BAR_Baseline/Airfoils/AF19_BL.txt,././../BAR_Baseline/Airfoils/AF19_BL.txt,
 CalculateUACoeffs.0.0.19,filename,scalar,IDENTICAL,././../BAR_Baseline/Airfoils/BAR0_AeroDyn_Polar_19.dat,././../BAR_Baseline/Airfoils/BAR0_AeroDyn_Polar_19.dat,
 CalculateUACoeffs.0.0.19,itable,scalar,IDENTICAL,1,1,
@@ -1359,7 +1336,6 @@ CalculateUACoeffs.0.0.20,alphabreakupper,scalar,IDENTICAL,1.4601947546437533,1.4
 CalculateUACoeffs.0.0.20,cnbreakupper,scalar,IDENTICAL,10.564534574180385,10.564534574180385,
 CalculateUACoeffs.0.0.20,alphabreaklower,scalar,IN_TOL,-1.3602879876594365,-1.3602879876594356,8.8817841970012523E-016
 CalculateUACoeffs.0.0.20,cnbreaklower,scalar,IN_TOL,-11.192267304584060,-11.192267304584064,3.5527136788005009E-015
-CalculateUACoeffs.0.0.20,numtabs,scalar,IN_TOL,1,1,1
 CalculateUACoeffs.0.0.20,bl_file,scalar,IDENTICAL,././../BAR_Baseline/Airfoils/AF20_BL.txt,././../BAR_Baseline/Airfoils/AF20_BL.txt,
 CalculateUACoeffs.0.0.20,filename,scalar,IDENTICAL,././../BAR_Baseline/Airfoils/BAR0_AeroDyn_Polar_20.dat,././../BAR_Baseline/Airfoils/BAR0_AeroDyn_Polar_20.dat,
 CalculateUACoeffs.0.0.20,itable,scalar,IDENTICAL,1,1,

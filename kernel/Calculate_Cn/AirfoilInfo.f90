@@ -232,7 +232,6 @@ SUBROUTINE calculateuacoeffs(kgen_unit, kgen_measure, kgen_isverified, kgen_file
                         END IF   
                     END IF   
                     check_result = CHECK_IDENTICAL 
-                    WRITE(*, *) "[VIT_ARRAY] ", trim(adjustl(varname)), " | IDENTICAL | size=", SIZE(var)
                 ELSE 
                     ALLOCATE (buf1(SIZE(var,dim=1))) 
                     ALLOCATE (buf2(SIZE(var,dim=1))) 
@@ -254,7 +253,6 @@ SUBROUTINE calculateuacoeffs(kgen_unit, kgen_measure, kgen_isverified, kgen_file
                             END IF   
                         END IF   
                         check_result = CHECK_OUT_TOL 
-                        WRITE(*, *) "[VIT_ARRAY] ", trim(adjustl(varname)), " | OUT_TOL | n_diff=", n, " | rms=", rmsdiff
                     ELSE 
                         check_status%numInTol = check_status%numInTol + 1 
                         IF (kgen_verboseLevel > 1) THEN 
@@ -263,7 +261,6 @@ SUBROUTINE calculateuacoeffs(kgen_unit, kgen_measure, kgen_isverified, kgen_file
                             END IF   
                         END IF   
                         check_result = CHECK_IN_TOL 
-                        WRITE(*, *) "[VIT_ARRAY] ", trim(adjustl(varname)), " | IN_TOL | n_diff=", n, " | rms=", rmsdiff
                     END IF   
                 END IF   
                 IF (check_result == CHECK_IDENTICAL) THEN 

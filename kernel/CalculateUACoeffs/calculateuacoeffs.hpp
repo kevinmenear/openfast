@@ -40,14 +40,7 @@ void CalculateUACoeffs(afi_ua_bl_default_type_t* CalcDefaults, afi_table_type_vi
 
     if (!p->InclUAdata) return;
 
-    // DEBUG: dump first 40 bytes of CalcDefaults as int32
-    int32_t* raw = (int32_t*)CalcDefaults;
-    fprintf(stderr, "DEBUG CalcDefaults raw: ");
-    for (int i = 0; i < 10; i++) fprintf(stderr, "[%d]=%d ", i, raw[i]);
-    fprintf(stderr, "(sizeof=%zu)\n", sizeof(*CalcDefaults));
-
     // --- Default parameter assignments ---
-    fprintf(stderr, "DEBUG before: T_f0=%f b1=%f\n", p->UA_BL.T_f0, p->UA_BL.b1);
     if (CalcDefaults->eta_e)          p->UA_BL.eta_e          = 1.00;
     if (CalcDefaults->k0)             p->UA_BL.k0             = 0.00;
     if (CalcDefaults->k1)             p->UA_BL.k1             = 0.00;
@@ -60,8 +53,6 @@ void CalculateUACoeffs(afi_ua_bl_default_type_t* CalcDefaults, afi_table_type_vi
     if (CalcDefaults->S4)             p->UA_BL.S4             = 0.00;
 
     if (CalcDefaults->T_f0)           p->UA_BL.T_f0           = 3.00;
-    fprintf(stderr, "DEBUG after defaults: T_f0=%f (flag=%d) b1=%f (flag=%d)\n",
-            p->UA_BL.T_f0, CalcDefaults->T_f0, p->UA_BL.b1, CalcDefaults->b1);
     if (CalcDefaults->T_V0)           p->UA_BL.T_V0           = 6.00;
     if (CalcDefaults->T_p)            p->UA_BL.T_p            = 1.70;
     if (CalcDefaults->T_VL)           p->UA_BL.T_VL           = 11.00;
@@ -165,12 +156,16 @@ void CalculateUACoeffs(afi_ua_bl_default_type_t* CalcDefaults, afi_table_type_vi
             alpha_[Row] = 0.5 * (p->Alpha[Row+1] + p->Alpha[Row]);
         }
 
-        // Smooth slopes
-        kernelSmoothing(alpha_.data(), CnSlope_raw.data(), Nm1, kernelType_TRIWEIGHT, 2.0 * D2R, CnSlope_.data());
-        kernelSmoothing(alpha_.data(), ClSlope_raw.data(), Nm1, kernelType_TRIWEIGHT, 2.0 * D2R, ClSlope_.data());
+        // Use Fortran bridge for smoothing (C++ has 1-ULP diffs from Fortran's
+        // whole-array vectorization of u = (x - x(j)) / radius)
+        kernelsmoothing_c(alpha_.data(), Nm1, CnSlope_raw.data(), Nm1, kernelType_TRIWEIGHT, 2.0 * D2R, CnSlope_.data(), Nm1);
+        kernelsmoothing_c(alpha_.data(), Nm1, ClSlope_raw.data(), Nm1, kernelType_TRIWEIGHT, 2.0 * D2R, ClSlope_.data(), Nm1);
 
         iGuess = iCdMin;
         double CnSlopeAtCdMin = InterpStp(alphaAtCdMin, alpha_.data(), CnSlope_.data(), iGuess, Nm1);
+
+        // DEBUG: check D2R constant
+        fprintf(stderr, "DEBUG D2R=%.20e Pi=%.20e TwoPi=%.20e\n", D2R, Pi, TwoPi);
 
         // Find bounding indices for LimitAlphaRange
         // iHighLimit = min(maxloc(alpha_, DIM=1, MASK=alpha_ < LimitAlphaRange) + 1, size(alpha_))

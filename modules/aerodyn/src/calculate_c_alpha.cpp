@@ -37,7 +37,7 @@ void Calculate_C_alpha(double* alpha, int n_alpha, double* Cn, int n_Cn,
     // Early return if not enough data
     if (n_Cn < 2 || n_Cl < 2) {
         const char* msg = "Calculate_C_alpha: Not enough data points to compute Cn and Cl slopes.";
-        std::memset(ErrMsg, ' ', 8196);
+        std::memset(ErrMsg, ' ', 1024);
         std::memcpy(ErrMsg, msg, std::strlen(msg));
         *ErrStat = ErrID_Fatal;
         *Default_Cn_alpha = std::numeric_limits<double>::epsilon();
@@ -94,7 +94,7 @@ void Calculate_C_alpha(double* alpha, int n_alpha, double* Cn, int n_Cn,
             std::snprintf(buf, sizeof(buf),
                 "LAPACK_DGELS: Diagonal element %d of triangular factor is zero.", info);
         }
-        std::memset(ErrMsg, ' ', 8196);
+        std::memset(ErrMsg, ' ', 1024);
         std::memcpy(ErrMsg, buf, std::strlen(buf));
         *ErrStat = ErrID_Fatal;
         *Default_Cn_alpha = 0.0;
@@ -106,7 +106,7 @@ void Calculate_C_alpha(double* alpha, int n_alpha, double* Cn, int n_Cn,
     // Success
     *ErrStat = ErrID_None;
     // Fortran blank-fills CHARACTER buffers on assignment; match that behavior
-    std::memset(ErrMsg, ' ', 8196);
+    std::memset(ErrMsg, ' ', 1024);
 
     // B(1,1) = Cn_alpha, B(1,2) = Cl_alpha (0-indexed: B[0], B[LDB])
     *Default_Cn_alpha = B[0];

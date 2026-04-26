@@ -24,6 +24,7 @@ void computeua360_updatecnseparated_c(afi_table_type_view_t* p, int ColUAf, doub
 void computeua360_updateseparationf_c(afi_table_type_view_t* p, int ColUAf, double* cn_cl, int n_cn_cl, int iLower, int iUpper);
 void computeuaseparationfunction_oncl_c(afi_table_type_view_t* p, int ColCl, int ColUAf, int col_fs, int col_fa);
 void computeua360_attachedflow_c(afi_table_type_view_t* p, int ColUAf, double* cn_cl, int n_cn_cl, int* iLower, int* iUpper);
+void calculateuacoeffs_c(afi_ua_bl_default_type_t* CalcDefaults, afi_table_type_view_t* p, int ColCl, int ColCd, int ColCm, int ColUAf, int UAMod);
 
 #ifdef __cplusplus
 }

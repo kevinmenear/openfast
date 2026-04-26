@@ -4,16 +4,15 @@
 // Source: modules/nwtc-library/src/NWTC_Num.f90
 //         modules/nwtc-library/src/SysGnuLinux.f90
 //
-// These are header-only inline implementations. Verification of every
-// AeroDyn function that calls them provides transitive verification
-// against the Fortran originals via KGen kernel comparison.
+// Declarations only — implementations are in vit_nwtc.cpp (compiled once,
+// linked into all translation units). Verification of every AeroDyn function
+// that calls these provides transitive verification against the Fortran
+// originals via KGen kernel comparison.
 
 #ifndef VIT_NWTC_H
 #define VIT_NWTC_H
 
 #include <cmath>
-#include <algorithm>
-#include <limits>
 
 // ---- Constants (from NWTC_Library precision/system modules) ----
 
@@ -27,12 +26,7 @@ static constexpr double R2D   = 180.0 / M_PI;
 // Returns true if two doubles are approximately equal,
 // ignoring the last 2 significant digits of machine precision.
 
-static inline bool EqualRealNos(double a, double b) {
-    static constexpr double Eps = std::numeric_limits<double>::epsilon();
-    static constexpr double Tol = 100.0 * Eps / 2.0;
-    double Fraction = std::max(std::abs(a + b), 1.0);
-    return std::abs(a - b) <= Fraction * Tol;
-}
+bool EqualRealNos(double a, double b);
 
 // ---- fZeros (NWTC_Num.f90:7205, fZero_R8) ----
 // Finds zero-crossings in tabulated data via linear interpolation.
@@ -42,29 +36,9 @@ static inline bool EqualRealNos(double a, double b) {
 // nZeros: output count of zeros found
 // has_period/period: if true, also checks periodic wraparound
 
-static inline void fZeros(const double* x, const double* f, int n,
-                           double* roots, int roots_size, int& nZeros,
-                           bool has_period = false, double period = 0.0) {
-    nZeros = 0;
-
-    for (int j = 1; j < n; j++) {
-        if ((f[j-1] < 0.0 && f[j] >= 0.0) || (f[j-1] >= 0.0 && f[j] < 0.0)) {
-            nZeros++;
-            double df = f[j] - f[j-1];
-            double dx = x[j] - x[j-1];
-            roots[std::min(nZeros, roots_size) - 1] = x[j] - f[j] * dx / df;
-        }
-    }
-
-    if (has_period) {
-        if ((f[n-1] < 0.0 && f[0] >= 0.0) || (f[n-1] >= 0.0 && f[0] < 0.0)) {
-            nZeros++;
-            double df = f[0] - f[n-1];
-            double dx = x[0] - x[n-1] + period;
-            roots[std::min(nZeros, roots_size) - 1] = x[0] - f[0] * dx / df;
-        }
-    }
-}
+void fZeros(const double* x, const double* f, int n,
+            double* roots, int roots_size, int& nZeros,
+            bool has_period = false, double period = 0.0);
 
 // ---- InterpExtrapStp (NWTC_Num.f90:3268) ----
 // Linear interpolation/extrapolation with stepping index search.
@@ -73,39 +47,35 @@ static inline void fZeros(const double* x, const double* f, int n,
 //      Caller initializes to 1; function updates it for efficient
 //      sequential lookups.
 
-static inline double InterpExtrapStp(double XVal, const double* XAry,
-                                      const double* YAry, int& Ind, int AryLen) {
-    // GetLinearVal: linear interpolation using the interval [Ind-1, Ind] (0-based)
-    // Fortran Ind is 1-based, so XAry(Ind) = XAry[Ind-1], XAry(Ind+1) = XAry[Ind]
-    auto GetLinearVal = [&]() -> double {
-        return (YAry[Ind] - YAry[Ind-1]) * (XVal - XAry[Ind-1])
-             / (XAry[Ind] - XAry[Ind-1]) + YAry[Ind-1];
-    };
+double InterpExtrapStp(double XVal, const double* XAry,
+                       const double* YAry, int& Ind, int AryLen);
 
-    if (AryLen < 2) {
-        Ind = 1;
-        return YAry[0];
-    }
+// ---- InterpStp (NWTC_Num.f90:3455, InterpStpReal8) ----
+// Like InterpExtrapStp but clamps at boundaries instead of extrapolating.
+// At XVal <= XAry[0]: returns YAry[0] directly.
+// At XVal >= XAry[AryLen-1]: returns YAry[AryLen-1] directly.
+// Ind: 1-based tracking index (same convention as InterpExtrapStp).
 
-    if (XVal <= XAry[0]) {
-        Ind = 1;
-        return GetLinearVal();
-    } else if (XVal >= XAry[AryLen-1]) {
-        Ind = std::max(AryLen - 1, 1);
-        return GetLinearVal();
-    }
+double InterpStp(double XVal, const double* XAry,
+                 const double* YAry, int& Ind, int AryLen);
 
-    Ind = std::max(std::min(Ind, AryLen - 1), 1);
+// ---- kernelSmoothing (NWTC_Num.f90:4157) ----
+// Weighted kernel density smoothing.
+// x[0..n-1]: independent axis (0-based)
+// f[0..n-1]: function values to smooth (0-based)
+// kernelType: kernel function selector (use kernelType_TRIWEIGHT etc.)
+// radius: window width in units of x
+// fNew[0..n-1]: smoothed output (0-based)
 
-    while (true) {
-        if (XVal < XAry[Ind-1]) {
-            Ind--;
-        } else if (XVal >= XAry[Ind]) {
-            Ind++;
-        } else {
-            return GetLinearVal();
-        }
-    }
-}
+void kernelSmoothing(const double* x, const double* f, int n,
+                     int kernelType, double radius, double* fNew);
+
+// Kernel type constants (from NWTC_Num.f90:77-82)
+static constexpr int kernelType_EPANECHINIKOV = 1;
+static constexpr int kernelType_QUARTIC       = 2;
+static constexpr int kernelType_BIWEIGHT      = 3;
+static constexpr int kernelType_TRIWEIGHT     = 4;
+static constexpr int kernelType_TRICUBE       = 5;
+static constexpr int kernelType_GAUSSIAN      = 6;
 
 #endif // VIT_NWTC_H

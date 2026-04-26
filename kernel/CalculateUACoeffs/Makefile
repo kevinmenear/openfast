@@ -1,5 +1,5 @@
 FC_0 ?= gfortran
-FC_FLAGS_SET_0 ?= -O2 -ffree-form -ffree-line-length-none -cpp -fdefault-real-8 -fdefault-double-8 -ffp-contract=off
+FC_FLAGS_SET_0 ?= -O2 -fno-tree-vectorize -ffree-form -ffree-line-length-none -cpp -fdefault-real-8 -fdefault-double-8 -ffp-contract=off
 # Makefile for KGEN-generated kernel
 
 

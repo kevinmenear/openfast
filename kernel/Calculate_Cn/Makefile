@@ -3,13 +3,16 @@ FC_FLAGS_SET_0 ?= -O2 -ffree-form -ffree-line-length-none -cpp -fdefault-real-8 
 # Makefile for KGEN-generated kernel
 
 
-ALL_OBJS := calculate_cn.o AirfoilInfo.o AirfoilInfo_Types.o NWTC_Library.o NWTC_Library_Types.o SingPrec.o kernel_driver.o kgen_utils.o tprof_mod.o
+ALL_OBJS := vit_nwtc.o calculate_cn.o AirfoilInfo.o AirfoilInfo_Types.o NWTC_Library.o NWTC_Library_Types.o SingPrec.o kernel_driver.o kgen_utils.o tprof_mod.o
 
 # VIT: C++ compilation support
 CXX ?= g++
 CXXFLAGS ?= -O2 -fPIC -ffp-contract=off
 
 calculate_cn.o: calculate_cn.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+vit_nwtc.o: vit_nwtc.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 build: ${ALL_OBJS}

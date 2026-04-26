@@ -133,16 +133,7 @@ void kernelSmoothing(const double* x, const double* f, int n,
             for (int i = 0; i < n; i++) {
                 double u = (x[i] - x[j]) / RadiusFix;
                 u = std::min(1.0, std::max(-1.0, u));
-                // Use explicit integer exponentiation to match gfortran's
-                // compilation of abs(u)**Exp1 and (...)^Exp2 (repeated
-                // multiplication, not pow() library call — avoids 1-ULP diffs)
-                double abs_u = std::abs(u);
-                double u_pow = (Exp1 == 2) ? abs_u * abs_u : abs_u * abs_u * abs_u;
-                double base = 1.0 - u_pow;
-                double k;
-                if      (Exp2 == 1) k = w * base;
-                else if (Exp2 == 2) k = w * base * base;
-                else                k = w * base * base * base;
+                double k = w * std::pow(1.0 - std::pow(std::abs(u), Exp1), Exp2);
                 k_sum += k;
                 fNew[j] += k * f[i];
             }
