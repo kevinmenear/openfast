@@ -28,6 +28,7 @@ MODULE AirfoilInfo
    USE                                          :: ISO_FORTRAN_ENV , ONLY : IOSTAT_EOR
    USE                                          :: NWTC_LAPACK
 
+   USE ISO_C_BINDING
    IMPLICIT NONE
 
    PRIVATE
@@ -42,6 +43,17 @@ MODULE AirfoilInfo
    TYPE(ProgDesc), PARAMETER                    :: AFI_Ver = ProgDesc( 'AirfoilInfo', '', '')    ! The name, version, and date of AirfoilInfo.
 
    integer, parameter                           :: MaxNumAFCoeffs = 7 !cl,cd,cm,cpMin, UA:f_st, FullySeparate, FullyAttached
+
+
+    ! Auto-generated interface for C++ implementation of AFI_ValidateInitInput
+    INTERFACE
+        SUBROUTINE afi_validateinitinput_c(InitInput, ErrStat, ErrMsg) BIND(C, NAME='afi_validateinitinput_c')
+            USE ISO_C_BINDING
+            TYPE(C_PTR), VALUE :: InitInput
+            INTEGER(C_INT), INTENT(OUT) :: ErrStat
+            CHARACTER(KIND=C_CHAR), INTENT(OUT) :: ErrMsg(*)
+        END SUBROUTINE afi_validateinitinput_c
+    END INTERFACE
 
 CONTAINS
 
@@ -329,27 +341,24 @@ CONTAINS
    !=============================================================================
    !> This routine checks the init input values for AFI and makes sure they are valid
    !! before using them.
-   SUBROUTINE AFI_ValidateInitInput(InitInput, ErrStat, ErrMsg)
-      TYPE (AFI_InitInputType), INTENT(IN   )   :: InitInput                  ! This structure stores values that are set by the calling routine during the initialization phase.
-
-      INTEGER(IntKi), INTENT(OUT)               :: ErrStat                    ! Error status
-      CHARACTER(*), INTENT(OUT)                 :: ErrMsg                     ! Error message
-      CHARACTER(*), PARAMETER                   :: RoutineName = 'AFI_Validate'
-
-      ErrStat = ErrID_None
-      ErrMsg  = ""
-      
-      if (InitInput%InCol_Alfa  < 0) call SetErrStat( ErrID_Fatal, 'InCol_Alfa must not be a negative number.', ErrStat, ErrMsg, RoutineName )
-      if (InitInput%InCol_Cl    < 0) call SetErrStat( ErrID_Fatal, 'InCol_Cl must not be a negative number.', ErrStat, ErrMsg, RoutineName )
-      if (InitInput%InCol_Cd    < 0) call SetErrStat( ErrID_Fatal, 'InCol_Cd must not be a negative number.', ErrStat, ErrMsg, RoutineName )
-      if (InitInput%InCol_Cm    < 0) call SetErrStat( ErrID_Fatal, 'InCol_Cm must not be a negative number.', ErrStat, ErrMsg, RoutineName )
-      if (InitInput%InCol_Cpmin < 0) call SetErrStat( ErrID_Fatal, 'InCol_Cpmin must not be a negative number.', ErrStat, ErrMsg, RoutineName )
-      if (InitInput%AFTabMod /= AFITable_1 .and. InitInput%AFTabMod /= AFITable_2Re .and. InitInput%AFTabMod /= AFITable_2User) then
-         call SetErrStat( ErrID_Fatal, 'AFTabMod must be 1, 2, or 3.', ErrStat, ErrMsg, RoutineName )
-      end if
-      
-   
-   END SUBROUTINE AFI_ValidateInitInput
+    SUBROUTINE AFI_ValidateInitInput(InitInput, ErrStat, ErrMsg)
+        USE ISO_C_BINDING
+        IMPLICIT NONE
+        TYPE(AFI_INITINPUTTYPE), INTENT(IN), TARGET :: InitInput
+        INTEGER(4), INTENT(OUT) :: ErrStat
+        CHARACTER(*), INTENT(OUT) :: ErrMsg
+        CHARACTER(KIND=C_CHAR) :: ErrMsg_c(LEN(ErrMsg))
+        INTEGER :: vit_i_ErrMsg
+        ! Convert CHARACTER args to C_CHAR arrays
+        DO vit_i_ErrMsg = 1, LEN(ErrMsg)
+            ErrMsg_c(vit_i_ErrMsg) = ErrMsg(vit_i_ErrMsg:vit_i_ErrMsg)
+        END DO
+        CALL afi_validateinitinput_c(C_LOC(InitInput), ErrStat, ErrMsg_c)
+        ! Copy C_CHAR arrays back to CHARACTER args (INTENT OUT/INOUT)
+        DO vit_i_ErrMsg = 1, LEN(ErrMsg)
+            ErrMsg(vit_i_ErrMsg:vit_i_ErrMsg) = ErrMsg_c(vit_i_ErrMsg)
+        END DO
+    END SUBROUTINE AFI_ValidateInitInput
   
    !=============================================================================
    SUBROUTINE ReadAFfile ( InitInp, NumCoefsIn, p, ErrStat, ErrMsg, UnEc )

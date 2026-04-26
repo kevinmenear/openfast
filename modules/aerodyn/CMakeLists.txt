@@ -51,6 +51,7 @@ add_library(basicaerolib STATIC
   src/computeuaseparationfunction_oncl.cpp
   src/computeua360_attachedflow.cpp
   src/calculateuacoeffs.cpp
+  src/afi_validateinitinput.cpp
 )
 target_link_libraries(basicaerolib ifwlib nwtclibs stdc++)
 

@@ -12,7 +12,8 @@ static constexpr int ErrID_None = 0;
 static constexpr int ErrID_Fatal = 4;
 
 // Fortran bridge: receives struct as void*, returns ErrStat only
-extern "C" void afi_validateinitinput_f90(void* InitInput_ptr, int* ErrStat, int* ErrMsg_stat);
+// CHARACTER args are handled locally in the bridge (not exposed to C++)
+extern "C" void afi_validateinitinput_f90(void* InitInput_ptr, int* ErrStat);
 
 struct TestResult { const char* name; bool passed; const char* detail; };
 
@@ -34,9 +35,8 @@ DualResult run_both(afi_initinputtype_t* input) {
     char msg_cpp[ErrMsgLen + 1] = {};
     r.err_cpp = 0;
     AFI_ValidateInitInput(input, &r.err_cpp, msg_cpp);
-    int msg_stat = 0;
     r.err_f90 = 0;
-    afi_validateinitinput_f90(input, &r.err_f90, &msg_stat);
+    afi_validateinitinput_f90(input, &r.err_f90);
     return r;
 }
 

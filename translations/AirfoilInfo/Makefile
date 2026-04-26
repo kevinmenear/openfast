@@ -8,15 +8,22 @@ FC_FLAGS = -fPIC -ffree-line-length-none -cpp -fdefault-real-8 -fdefault-double-
            -I. -I/workspace/openfast/build/ftnmods -J.
 CXX_FLAGS = -O2 -fPIC -ffp-contract=off -I. -I/workspace/openfast/modules/aerodyn/src
 
-# Production build libraries (link order matters)
-LIBS = /workspace/openfast/build/modules/aerodyn/libbasicaerolib.a \
+# Libraries derived from CMake target (link order preserved)
+LIBS = /workspace/openfast/build/modules/aerodyn/libaerodyn_driver_subs.a \
+       /workspace/openfast/build/modules/aerodyn/libadilib.a \
        /workspace/openfast/build/modules/aerodyn/libaerodynlib.a \
        /workspace/openfast/build/modules/aerodyn/libaeroacousticslib.a \
-       /workspace/openfast/build/modules/nwtc-library/libnwtclibs.a \
+       /workspace/openfast/build/modules/aerodyn/libbasicaerolib.a \
+       -lstdc++ \
        /workspace/openfast/build/modules/seastate/libseastlib.a \
        /workspace/openfast/build/modules/inflowwind/libifwlib.a \
        /workspace/openfast/build/modules/version/libversioninfolib.a \
-       -lopenblas -lstdc++ -lmvec -lm -ldl -lgfortran
+       /workspace/openfast/build/modules/nwtc-library/libnwtclibs.a \
+       /usr/lib/aarch64-linux-gnu/libopenblas.so \
+       -lm \
+       -ldl \
+       -ldl \
+       -lgfortran
 
 afi_validateinitinput.hpp: /workspace/openfast/translations/AirfoilInfo/afi_validateinitinput.cpp
 	cp $< $@

@@ -80,12 +80,15 @@ translations:
     cases_total: 20
     cases_skipped: 0
     kernel_dir: kernel/CalculateUACoeffs
-shared_files:
-- modules/aerodyn/src/vit_nwtc.h
-- modules/aerodyn/src/vit_nwtc.cpp
-- modules/aerodyn/src/vit_aerodyn_constants.h
+  AFI_ValidateInitInput:
+    status: integrated
+    cpp_file: translations/AirfoilInfo/afi_validateinitinput.cpp
 types:
   AFI_ParameterType:
     strategy: view
   AFI_Table_Type:
     strategy: view
+shared_files:
+- modules/aerodyn/src/vit_nwtc.h
+- modules/aerodyn/src/vit_nwtc.cpp
+- modules/aerodyn/src/vit_aerodyn_constants.h
