@@ -10,16 +10,11 @@
 
 #include "vit_types.h"
 #include "vit_nwtc.h"
+#include "vit_aerodyn_constants.h"
 #include <vector>
-#include <cstdio>
 
 // 2D column-major access: Coefs(Row, Col) in Fortran = Coefs[(Col-1)*nrows + (Row-1)] in C
 #define COEFS(row1, col1) p->Coefs[((col1)-1) * p->n_Coefs_rows + ((row1)-1)]
-
-// UA model constants (from AirfoilInfo_Types.f90)
-static constexpr int UA_HGM     = 4;
-static constexpr int UA_Oye     = 6;
-static constexpr int UA_HGMV360 = 8;
 
 void CalculateUACoeffs(afi_ua_bl_default_type_t* CalcDefaults, afi_table_type_view_t* p, int ColCl, int ColCd, int ColCm, int ColUAf, int UAMod) {
     int N = p->NumAlf;
@@ -156,16 +151,13 @@ void CalculateUACoeffs(afi_ua_bl_default_type_t* CalcDefaults, afi_table_type_vi
             alpha_[Row] = 0.5 * (p->Alpha[Row+1] + p->Alpha[Row]);
         }
 
-        // Use Fortran bridge for smoothing (C++ has 1-ULP diffs from Fortran's
-        // whole-array vectorization of u = (x - x(j)) / radius)
-        kernelsmoothing_c(alpha_.data(), Nm1, CnSlope_raw.data(), Nm1, kernelType_TRIWEIGHT, 2.0 * D2R, CnSlope_.data(), Nm1);
-        kernelsmoothing_c(alpha_.data(), Nm1, ClSlope_raw.data(), Nm1, kernelType_TRIWEIGHT, 2.0 * D2R, ClSlope_.data(), Nm1);
+        // Smooth slopes
+        kernelSmoothing(alpha_.data(), CnSlope_raw.data(), Nm1, kernelType_TRIWEIGHT, 2.0 * D2R, CnSlope_.data());
+        kernelSmoothing(alpha_.data(), ClSlope_raw.data(), Nm1, kernelType_TRIWEIGHT, 2.0 * D2R, ClSlope_.data());
 
         iGuess = iCdMin;
         double CnSlopeAtCdMin = InterpStp(alphaAtCdMin, alpha_.data(), CnSlope_.data(), iGuess, Nm1);
 
-        // DEBUG: check D2R constant
-        fprintf(stderr, "DEBUG D2R=%.20e Pi=%.20e TwoPi=%.20e\n", D2R, Pi, TwoPi);
 
         // Find bounding indices for LimitAlphaRange
         // iHighLimit = min(maxloc(alpha_, DIM=1, MASK=alpha_ < LimitAlphaRange) + 1, size(alpha_))
@@ -251,7 +243,7 @@ void CalculateUACoeffs(afi_ua_bl_default_type_t* CalcDefaults, afi_table_type_vi
             int slice_len = iHigh2 - iLow2 + 1;
             double Default_Cn_alpha, Default_Cl_alpha, Default_alpha0;
             int ErrStat2 = 0;
-            char ErrMsg2[1025] = {0};
+            char ErrMsg2[ErrMsgLen + 1] = {0};
             calculate_c_alpha_c(
                 &p->Alpha[iLow2-1], slice_len,
                 &cn[iLow2-1], slice_len,

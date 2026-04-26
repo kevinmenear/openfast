@@ -13,7 +13,7 @@ CalculateUACoeffs.0.0.1,x_coord,array,IDENTICAL,,,size=         201
 CalculateUACoeffs.0.0.1,y_coord,array,IDENTICAL,,,size=         201
 CalculateUACoeffs.0.0.1,numtabs,scalar,IDENTICAL,1,1,
 CalculateUACoeffs.0.0.1,alpha,array,IDENTICAL,,,size=         200
-CalculateUACoeffs.0.0.1,coefs,array,IN_TOL,,,n_diff=         183 rms=   9.6510086956103848E-017
+CalculateUACoeffs.0.0.1,coefs,array,IDENTICAL,,,size=        1200
 CalculateUACoeffs.0.0.1,userprop,scalar,IDENTICAL,0.0000000000000000,0.0000000000000000,
 CalculateUACoeffs.0.0.1,re,scalar,IDENTICAL,1627863.0000000000,1627863.0000000000,
 CalculateUACoeffs.0.0.1,numalf,scalar,IDENTICAL,200,200,
@@ -56,11 +56,11 @@ CalculateUACoeffs.0.0.1,uacutout_blend,scalar,IDENTICAL,0.69813170079773179,0.69
 CalculateUACoeffs.0.0.1,filtcutoff,scalar,IDENTICAL,0.50000000000000000,0.50000000000000000,
 CalculateUACoeffs.0.0.1,alphaupper,scalar,IDENTICAL,-6.8755394775534204E-002,-6.8755394775534204E-002,
 CalculateUACoeffs.0.0.1,alphalower,scalar,IDENTICAL,-6.8755394775534204E-002,-6.8755394775534204E-002,
-CalculateUACoeffs.0.0.1,c_alphalower,scalar,IN_TOL,5.5214479043066847E-003,5.5214479043066839E-003,8.6736173798840355E-019
-CalculateUACoeffs.0.0.1,c_alphaupper,scalar,IN_TOL,5.5214479043066847E-003,5.5214479043066839E-003,8.6736173798840355E-019
+CalculateUACoeffs.0.0.1,c_alphalower,scalar,IDENTICAL,5.5214479043066839E-003,5.5214479043066839E-003,
+CalculateUACoeffs.0.0.1,c_alphaupper,scalar,IDENTICAL,5.5214479043066839E-003,5.5214479043066839E-003,
 CalculateUACoeffs.0.0.1,alpha0reverseflow,scalar,IDENTICAL,3.1415926535897931,3.1415926535897931,
 CalculateUACoeffs.0.0.1,alphabreakupper,scalar,IDENTICAL,3.1089640750908152,3.1089640750908152,
-CalculateUACoeffs.0.0.1,cnbreakupper,scalar,IN_TOL,0.20501140501893658,0.20501140501893633,2.4980018054066022E-016
+CalculateUACoeffs.0.0.1,cnbreakupper,scalar,IDENTICAL,0.20501140501893633,0.20501140501893633,
 CalculateUACoeffs.0.0.1,alphabreaklower,scalar,IDENTICAL,-3.3084178269175109,-3.3084178269175109,
 CalculateUACoeffs.0.0.1,cnbreaklower,scalar,IDENTICAL,1.0481934779204047,1.0481934779204047,
 CalculateUACoeffs.0.0.1,bl_file,scalar,IDENTICAL,././../BAR_Baseline/Airfoils/AF01_BL.txt,././../BAR_Baseline/Airfoils/AF01_BL.txt,
@@ -80,7 +80,7 @@ CalculateUACoeffs.0.0.2,x_coord,array,IDENTICAL,,,size=         201
 CalculateUACoeffs.0.0.2,y_coord,array,IDENTICAL,,,size=         201
 CalculateUACoeffs.0.0.2,numtabs,scalar,IDENTICAL,1,1,
 CalculateUACoeffs.0.0.2,alpha,array,IDENTICAL,,,size=         200
-CalculateUACoeffs.0.0.2,coefs,array,IN_TOL,,,n_diff=         324 rms=   9.8936487305010789E-016
+CalculateUACoeffs.0.0.2,coefs,array,IDENTICAL,,,size=        1200
 CalculateUACoeffs.0.0.2,userprop,scalar,IDENTICAL,0.0000000000000000,0.0000000000000000,
 CalculateUACoeffs.0.0.2,re,scalar,IDENTICAL,2539713.0000000000,2539713.0000000000,
 CalculateUACoeffs.0.0.2,numalf,scalar,IDENTICAL,200,200,
@@ -123,13 +123,13 @@ CalculateUACoeffs.0.0.2,uacutout_blend,scalar,IDENTICAL,0.69813170079773179,0.69
 CalculateUACoeffs.0.0.2,filtcutoff,scalar,IDENTICAL,0.50000000000000000,0.50000000000000000,
 CalculateUACoeffs.0.0.2,alphaupper,scalar,IDENTICAL,-6.8755394775534204E-002,-6.8755394775534204E-002,
 CalculateUACoeffs.0.0.2,alphalower,scalar,IDENTICAL,-6.8755394775534204E-002,-6.8755394775534204E-002,
-CalculateUACoeffs.0.0.2,c_alphalower,scalar,IN_TOL,4.6954036863430235E-002,4.6954036863430228E-002,6.9388939039072284E-018
-CalculateUACoeffs.0.0.2,c_alphaupper,scalar,IN_TOL,4.6954036863430235E-002,4.6954036863430228E-002,6.9388939039072284E-018
+CalculateUACoeffs.0.0.2,c_alphalower,scalar,IDENTICAL,4.6954036863430228E-002,4.6954036863430228E-002,
+CalculateUACoeffs.0.0.2,c_alphaupper,scalar,IDENTICAL,4.6954036863430228E-002,4.6954036863430228E-002,
 CalculateUACoeffs.0.0.2,alpha0reverseflow,scalar,IDENTICAL,3.1415926535897931,3.1415926535897931,
-CalculateUACoeffs.0.0.2,alphabreakupper,scalar,IN_TOL,2.8833609728366252,2.8833609728366256,4.4408920985006262E-016
-CalculateUACoeffs.0.0.2,cnbreakupper,scalar,IN_TOL,1.6225175023565943,1.6225175023565925,1.7763568394002505E-015
-CalculateUACoeffs.0.0.2,alphabreaklower,scalar,IN_TOL,-5.5265426896888066,-5.5265426896888057,8.8817841970012523E-016
-CalculateUACoeffs.0.0.2,cnbreaklower,scalar,IN_TOL,14.985083025174745,14.985083025174740,5.3290705182007514E-015
+CalculateUACoeffs.0.0.2,alphabreakupper,scalar,IDENTICAL,2.8833609728366256,2.8833609728366256,
+CalculateUACoeffs.0.0.2,cnbreakupper,scalar,IDENTICAL,1.6225175023565925,1.6225175023565925,
+CalculateUACoeffs.0.0.2,alphabreaklower,scalar,IDENTICAL,-5.5265426896888057,-5.5265426896888057,
+CalculateUACoeffs.0.0.2,cnbreaklower,scalar,IDENTICAL,14.985083025174740,14.985083025174740,
 CalculateUACoeffs.0.0.2,bl_file,scalar,IDENTICAL,././../BAR_Baseline/Airfoils/AF02_BL.txt,././../BAR_Baseline/Airfoils/AF02_BL.txt,
 CalculateUACoeffs.0.0.2,filename,scalar,IDENTICAL,././../BAR_Baseline/Airfoils/BAR0_AeroDyn_Polar_02.dat,././../BAR_Baseline/Airfoils/BAR0_AeroDyn_Polar_02.dat,
 CalculateUACoeffs.0.0.2,itable,scalar,IDENTICAL,1,1,
@@ -147,7 +147,7 @@ CalculateUACoeffs.0.0.3,x_coord,array,IDENTICAL,,,size=         201
 CalculateUACoeffs.0.0.3,y_coord,array,IDENTICAL,,,size=         201
 CalculateUACoeffs.0.0.3,numtabs,scalar,IDENTICAL,1,1,
 CalculateUACoeffs.0.0.3,alpha,array,IDENTICAL,,,size=         200
-CalculateUACoeffs.0.0.3,coefs,array,IN_TOL,,,n_diff=         153 rms=   1.9532643828346055E-016
+CalculateUACoeffs.0.0.3,coefs,array,IDENTICAL,,,size=        1200
 CalculateUACoeffs.0.0.3,userprop,scalar,IDENTICAL,0.0000000000000000,0.0000000000000000,
 CalculateUACoeffs.0.0.3,re,scalar,IDENTICAL,3519385.0000000000,3519385.0000000000,
 CalculateUACoeffs.0.0.3,numalf,scalar,IDENTICAL,200,200,
@@ -190,8 +190,8 @@ CalculateUACoeffs.0.0.3,uacutout_blend,scalar,IDENTICAL,0.69813170079773179,0.69
 CalculateUACoeffs.0.0.3,filtcutoff,scalar,IDENTICAL,0.50000000000000000,0.50000000000000000,
 CalculateUACoeffs.0.0.3,alphaupper,scalar,IDENTICAL,-6.8755394775534204E-002,-6.8755394775534204E-002,
 CalculateUACoeffs.0.0.3,alphalower,scalar,IDENTICAL,-6.8755394775534204E-002,-6.8755394775534204E-002,
-CalculateUACoeffs.0.0.3,c_alphalower,scalar,IN_TOL,8.7936499396407977E-002,8.7936499396407963E-002,1.3877787807814457E-017
-CalculateUACoeffs.0.0.3,c_alphaupper,scalar,IN_TOL,8.7936499396407977E-002,8.7936499396407963E-002,1.3877787807814457E-017
+CalculateUACoeffs.0.0.3,c_alphalower,scalar,IDENTICAL,8.7936499396407963E-002,8.7936499396407963E-002,
+CalculateUACoeffs.0.0.3,c_alphaupper,scalar,IDENTICAL,8.7936499396407963E-002,8.7936499396407963E-002,
 CalculateUACoeffs.0.0.3,alpha0reverseflow,scalar,IDENTICAL,3.1415926535897931,3.1415926535897931,
 CalculateUACoeffs.0.0.3,alphabreakupper,scalar,IDENTICAL,2.6890365092090471,2.6890365092090471,
 CalculateUACoeffs.0.0.3,cnbreakupper,scalar,IDENTICAL,2.8434941170469470,2.8434941170469470,
@@ -214,7 +214,7 @@ CalculateUACoeffs.0.0.4,x_coord,array,IDENTICAL,,,size=         201
 CalculateUACoeffs.0.0.4,y_coord,array,IDENTICAL,,,size=         201
 CalculateUACoeffs.0.0.4,numtabs,scalar,IDENTICAL,1,1,
 CalculateUACoeffs.0.0.4,alpha,array,IDENTICAL,,,size=         200
-CalculateUACoeffs.0.0.4,coefs,array,IN_TOL,,,n_diff=         129 rms=   3.1676846794198984E-016
+CalculateUACoeffs.0.0.4,coefs,array,IDENTICAL,,,size=        1200
 CalculateUACoeffs.0.0.4,userprop,scalar,IDENTICAL,0.0000000000000000,0.0000000000000000,
 CalculateUACoeffs.0.0.4,re,scalar,IDENTICAL,4576834.0000000000,4576834.0000000000,
 CalculateUACoeffs.0.0.4,numalf,scalar,IDENTICAL,200,200,
@@ -257,8 +257,8 @@ CalculateUACoeffs.0.0.4,uacutout_blend,scalar,IDENTICAL,0.69813170079773179,0.69
 CalculateUACoeffs.0.0.4,filtcutoff,scalar,IDENTICAL,0.50000000000000000,0.50000000000000000,
 CalculateUACoeffs.0.0.4,alphaupper,scalar,IDENTICAL,-6.8755394775534204E-002,-6.8755394775534204E-002,
 CalculateUACoeffs.0.0.4,alphalower,scalar,IDENTICAL,-6.8755394775534204E-002,-6.8755394775534204E-002,
-CalculateUACoeffs.0.0.4,c_alphalower,scalar,IN_TOL,0.10511255960634748,0.10511255960634747,1.3877787807814457E-017
-CalculateUACoeffs.0.0.4,c_alphaupper,scalar,IN_TOL,0.10511255960634748,0.10511255960634747,1.3877787807814457E-017
+CalculateUACoeffs.0.0.4,c_alphalower,scalar,IDENTICAL,0.10511255960634747,0.10511255960634747,
+CalculateUACoeffs.0.0.4,c_alphaupper,scalar,IDENTICAL,0.10511255960634747,0.10511255960634747,
 CalculateUACoeffs.0.0.4,alpha0reverseflow,scalar,IDENTICAL,3.1415926535897931,3.1415926535897931,
 CalculateUACoeffs.0.0.4,alphabreakupper,scalar,IDENTICAL,2.6146554834635172,2.6146554834635172,
 CalculateUACoeffs.0.0.4,cnbreakupper,scalar,IDENTICAL,3.3108438851442079,3.3108438851442079,
@@ -281,7 +281,7 @@ CalculateUACoeffs.0.0.5,x_coord,array,IDENTICAL,,,size=         201
 CalculateUACoeffs.0.0.5,y_coord,array,IDENTICAL,,,size=         201
 CalculateUACoeffs.0.0.5,numtabs,scalar,IDENTICAL,1,1,
 CalculateUACoeffs.0.0.5,alpha,array,IDENTICAL,,,size=         200
-CalculateUACoeffs.0.0.5,coefs,array,IN_TOL,,,n_diff=         266 rms=   1.4157150484733125E-015
+CalculateUACoeffs.0.0.5,coefs,array,IDENTICAL,,,size=        1200
 CalculateUACoeffs.0.0.5,userprop,scalar,IDENTICAL,0.0000000000000000,0.0000000000000000,
 CalculateUACoeffs.0.0.5,re,scalar,IDENTICAL,5701684.0000000000,5701684.0000000000,
 CalculateUACoeffs.0.0.5,numalf,scalar,IDENTICAL,200,200,
@@ -324,11 +324,11 @@ CalculateUACoeffs.0.0.5,uacutout_blend,scalar,IDENTICAL,0.69813170079773179,0.69
 CalculateUACoeffs.0.0.5,filtcutoff,scalar,IDENTICAL,0.50000000000000000,0.50000000000000000,
 CalculateUACoeffs.0.0.5,alphaupper,scalar,IDENTICAL,-6.8755394775534204E-002,-6.8755394775534204E-002,
 CalculateUACoeffs.0.0.5,alphalower,scalar,IDENTICAL,-6.8755394775534204E-002,-6.8755394775534204E-002,
-CalculateUACoeffs.0.0.5,c_alphalower,scalar,IN_TOL,0.10731177348951107,0.10731177348951106,1.3877787807814457E-017
-CalculateUACoeffs.0.0.5,c_alphaupper,scalar,IN_TOL,0.10731177348951107,0.10731177348951106,1.3877787807814457E-017
+CalculateUACoeffs.0.0.5,c_alphalower,scalar,IDENTICAL,0.10731177348951106,0.10731177348951106,
+CalculateUACoeffs.0.0.5,c_alphaupper,scalar,IDENTICAL,0.10731177348951106,0.10731177348951106,
 CalculateUACoeffs.0.0.5,alpha0reverseflow,scalar,IDENTICAL,3.1415926535897931,3.1415926535897931,
-CalculateUACoeffs.0.0.5,alphabreakupper,scalar,IN_TOL,2.6048327075968061,2.6048327075968065,4.4408920985006262E-016
-CalculateUACoeffs.0.0.5,cnbreakupper,scalar,IN_TOL,3.3725622061456439,3.3725622061456417,2.2204460492503131E-015
+CalculateUACoeffs.0.0.5,alphabreakupper,scalar,IDENTICAL,2.6048327075968065,2.6048327075968065,
+CalculateUACoeffs.0.0.5,cnbreakupper,scalar,IDENTICAL,3.3725622061456417,3.3725622061456417,
 CalculateUACoeffs.0.0.5,alphabreaklower,scalar,IDENTICAL,-670.05050851182807,-670.05050851182807,
 CalculateUACoeffs.0.0.5,cnbreaklower,scalar,IDENTICAL,4190.3123013475497,4190.3123013475497,
 CalculateUACoeffs.0.0.5,bl_file,scalar,IDENTICAL,././../BAR_Baseline/Airfoils/AF05_BL.txt,././../BAR_Baseline/Airfoils/AF05_BL.txt,
@@ -348,7 +348,7 @@ CalculateUACoeffs.0.0.6,x_coord,array,IDENTICAL,,,size=         201
 CalculateUACoeffs.0.0.6,y_coord,array,IDENTICAL,,,size=         201
 CalculateUACoeffs.0.0.6,numtabs,scalar,IDENTICAL,1,1,
 CalculateUACoeffs.0.0.6,alpha,array,IDENTICAL,,,size=         200
-CalculateUACoeffs.0.0.6,coefs,array,IN_TOL,,,n_diff=         344 rms=   1.1372655239758361E-015
+CalculateUACoeffs.0.0.6,coefs,array,IDENTICAL,,,size=        1200
 CalculateUACoeffs.0.0.6,userprop,scalar,IDENTICAL,0.0000000000000000,0.0000000000000000,
 CalculateUACoeffs.0.0.6,re,scalar,IDENTICAL,6866556.0000000000,6866556.0000000000,
 CalculateUACoeffs.0.0.6,numalf,scalar,IDENTICAL,200,200,
@@ -391,13 +391,13 @@ CalculateUACoeffs.0.0.6,uacutout_blend,scalar,IDENTICAL,0.69813170079773179,0.69
 CalculateUACoeffs.0.0.6,filtcutoff,scalar,IDENTICAL,0.50000000000000000,0.50000000000000000,
 CalculateUACoeffs.0.0.6,alphaupper,scalar,IDENTICAL,-6.8755394775534204E-002,-6.8755394775534204E-002,
 CalculateUACoeffs.0.0.6,alphalower,scalar,IDENTICAL,-6.8755394775534204E-002,-6.8755394775534204E-002,
-CalculateUACoeffs.0.0.6,c_alphalower,scalar,IN_TOL,-8.3565200172594611E-002,-8.3565200172594598E-002,1.3877787807814457E-017
-CalculateUACoeffs.0.0.6,c_alphaupper,scalar,IN_TOL,-8.3565200172594611E-002,-8.3565200172594598E-002,1.3877787807814457E-017
+CalculateUACoeffs.0.0.6,c_alphalower,scalar,IDENTICAL,-8.3565200172594598E-002,-8.3565200172594598E-002,
+CalculateUACoeffs.0.0.6,c_alphaupper,scalar,IDENTICAL,-8.3565200172594598E-002,-8.3565200172594598E-002,
 CalculateUACoeffs.0.0.6,alpha0reverseflow,scalar,IDENTICAL,3.1415926535897931,3.1415926535897931,
 CalculateUACoeffs.0.0.6,alphabreakupper,scalar,IDENTICAL,1.8706535858293161,1.8706535858293161,
-CalculateUACoeffs.0.0.6,cnbreakupper,scalar,IN_TOL,7.9855456768731479,7.9855456768731514,3.5527136788005009E-015
+CalculateUACoeffs.0.0.6,cnbreakupper,scalar,IDENTICAL,7.9855456768731514,7.9855456768731514,
 CalculateUACoeffs.0.0.6,alphabreaklower,scalar,IDENTICAL,-3.1409968788034810,-3.1409968788034810,
-CalculateUACoeffs.0.0.6,cnbreaklower,scalar,IN_TOL,-3.7433633837440704E-003,-3.7433633837440587E-003,1.1709383462843448E-017
+CalculateUACoeffs.0.0.6,cnbreaklower,scalar,IDENTICAL,-3.7433633837440587E-003,-3.7433633837440587E-003,
 CalculateUACoeffs.0.0.6,bl_file,scalar,IDENTICAL,././../BAR_Baseline/Airfoils/AF06_BL.txt,././../BAR_Baseline/Airfoils/AF06_BL.txt,
 CalculateUACoeffs.0.0.6,filename,scalar,IDENTICAL,././../BAR_Baseline/Airfoils/BAR0_AeroDyn_Polar_06.dat,././../BAR_Baseline/Airfoils/BAR0_AeroDyn_Polar_06.dat,
 CalculateUACoeffs.0.0.6,itable,scalar,IDENTICAL,1,1,
@@ -415,7 +415,7 @@ CalculateUACoeffs.0.0.7,x_coord,array,IDENTICAL,,,size=         201
 CalculateUACoeffs.0.0.7,y_coord,array,IDENTICAL,,,size=         201
 CalculateUACoeffs.0.0.7,numtabs,scalar,IDENTICAL,1,1,
 CalculateUACoeffs.0.0.7,alpha,array,IDENTICAL,,,size=         200
-CalculateUACoeffs.0.0.7,coefs,array,IN_TOL,,,n_diff=         263 rms=   5.5565348070668167E-015
+CalculateUACoeffs.0.0.7,coefs,array,IDENTICAL,,,size=        1200
 CalculateUACoeffs.0.0.7,userprop,scalar,IDENTICAL,0.0000000000000000,0.0000000000000000,
 CalculateUACoeffs.0.0.7,re,scalar,IDENTICAL,8027659.0000000000,8027659.0000000000,
 CalculateUACoeffs.0.0.7,numalf,scalar,IDENTICAL,200,200,
@@ -461,8 +461,8 @@ CalculateUACoeffs.0.0.7,alphalower,scalar,IDENTICAL,-1.5866629563584863E-002,-1.
 CalculateUACoeffs.0.0.7,c_alphalower,scalar,IDENTICAL,5.8798801133021800E-002,5.8798801133021800E-002,
 CalculateUACoeffs.0.0.7,c_alphaupper,scalar,IDENTICAL,0.93983987878865372,0.93983987878865372,
 CalculateUACoeffs.0.0.7,alpha0reverseflow,scalar,IDENTICAL,3.1415926535897931,3.1415926535897931,
-CalculateUACoeffs.0.0.7,alphabreakupper,scalar,IN_TOL,1.4492336132276660,1.4492336132276638,2.2204460492503131E-015
-CalculateUACoeffs.0.0.7,cnbreakupper,scalar,OUT_TOL,10.633405456875863,10.633405456875876,1.2434497875801753E-014
+CalculateUACoeffs.0.0.7,alphabreakupper,scalar,IDENTICAL,1.4492336132276638,1.4492336132276638,
+CalculateUACoeffs.0.0.7,cnbreakupper,scalar,IDENTICAL,10.633405456875876,10.633405456875876,
 CalculateUACoeffs.0.0.7,alphabreaklower,scalar,IDENTICAL,-1.4132103382949639,-1.4132103382949639,
 CalculateUACoeffs.0.0.7,cnbreaklower,scalar,IDENTICAL,-10.859746368649505,-10.859746368649505,
 CalculateUACoeffs.0.0.7,bl_file,scalar,IDENTICAL,././../BAR_Baseline/Airfoils/AF07_BL.txt,././../BAR_Baseline/Airfoils/AF07_BL.txt,
@@ -482,7 +482,7 @@ CalculateUACoeffs.0.0.8,x_coord,array,IDENTICAL,,,size=         201
 CalculateUACoeffs.0.0.8,y_coord,array,IDENTICAL,,,size=         201
 CalculateUACoeffs.0.0.8,numtabs,scalar,IDENTICAL,1,1,
 CalculateUACoeffs.0.0.8,alpha,array,IDENTICAL,,,size=         200
-CalculateUACoeffs.0.0.8,coefs,array,OUT_TOL,,,n_diff=         182 rms=   1.1012886476781960E-014
+CalculateUACoeffs.0.0.8,coefs,array,IDENTICAL,,,size=        1200
 CalculateUACoeffs.0.0.8,userprop,scalar,IDENTICAL,0.0000000000000000,0.0000000000000000,
 CalculateUACoeffs.0.0.8,re,scalar,IDENTICAL,9121546.0000000000,9121546.0000000000,
 CalculateUACoeffs.0.0.8,numalf,scalar,IDENTICAL,200,200,
@@ -526,7 +526,7 @@ CalculateUACoeffs.0.0.8,filtcutoff,scalar,IDENTICAL,0.50000000000000000,0.500000
 CalculateUACoeffs.0.0.8,alphaupper,scalar,IDENTICAL,6.8755394775534204E-002,6.8755394775534204E-002,
 CalculateUACoeffs.0.0.8,alphalower,scalar,IDENTICAL,-0.12164415998748357,-0.12164415998748357,
 CalculateUACoeffs.0.0.8,c_alphalower,scalar,IDENTICAL,-0.70151425056281203,-0.70151425056281203,
-CalculateUACoeffs.0.0.8,c_alphaupper,scalar,IN_TOL,0.82743497060102655,0.82743497060102644,1.1102230246251565E-016
+CalculateUACoeffs.0.0.8,c_alphaupper,scalar,IDENTICAL,0.82743497060102644,0.82743497060102644,
 CalculateUACoeffs.0.0.8,alpha0reverseflow,scalar,IDENTICAL,3.1415926535897931,3.1415926535897931,
 CalculateUACoeffs.0.0.8,alphabreakupper,scalar,IDENTICAL,1.4063677751481167,1.4063677751481167,
 CalculateUACoeffs.0.0.8,cnbreakupper,scalar,IDENTICAL,10.902739460877225,10.902739460877225,
@@ -549,7 +549,7 @@ CalculateUACoeffs.0.0.9,x_coord,array,IDENTICAL,,,size=         201
 CalculateUACoeffs.0.0.9,y_coord,array,IDENTICAL,,,size=         201
 CalculateUACoeffs.0.0.9,numtabs,scalar,IDENTICAL,1,1,
 CalculateUACoeffs.0.0.9,alpha,array,IDENTICAL,,,size=         200
-CalculateUACoeffs.0.0.9,coefs,array,IN_TOL,,,n_diff=         373 rms=   7.5197120804382395E-015
+CalculateUACoeffs.0.0.9,coefs,array,IDENTICAL,,,size=        1200
 CalculateUACoeffs.0.0.9,userprop,scalar,IDENTICAL,0.0000000000000000,0.0000000000000000,
 CalculateUACoeffs.0.0.9,re,scalar,IDENTICAL,10037697.000000000,10037697.000000000,
 CalculateUACoeffs.0.0.9,numalf,scalar,IDENTICAL,200,200,
@@ -595,10 +595,10 @@ CalculateUACoeffs.0.0.9,alphalower,scalar,IDENTICAL,-0.14279966607226330,-0.1427
 CalculateUACoeffs.0.0.9,c_alphalower,scalar,IDENTICAL,-0.79245972140033027,-0.79245972140033027,
 CalculateUACoeffs.0.0.9,c_alphaupper,scalar,IDENTICAL,1.1416344538407113,1.1416344538407113,
 CalculateUACoeffs.0.0.9,alpha0reverseflow,scalar,IDENTICAL,3.1415926535897931,3.1415926535897931,
-CalculateUACoeffs.0.0.9,alphabreakupper,scalar,IN_TOL,1.4174125194911673,1.4174125194911651,2.2204460492503131E-015
-CalculateUACoeffs.0.0.9,cnbreakupper,scalar,OUT_TOL,10.833343285499415,10.833343285499428,1.2434497875801753E-014
-CalculateUACoeffs.0.0.9,alphabreaklower,scalar,IN_TOL,-1.3789116782568915,-1.3789116782568904,1.1102230246251565E-015
-CalculateUACoeffs.0.0.9,cnbreaklower,scalar,IN_TOL,-11.075251205456672,-11.075251205456675,3.5527136788005009E-015
+CalculateUACoeffs.0.0.9,alphabreakupper,scalar,IDENTICAL,1.4174125194911651,1.4174125194911651,
+CalculateUACoeffs.0.0.9,cnbreakupper,scalar,IDENTICAL,10.833343285499428,10.833343285499428,
+CalculateUACoeffs.0.0.9,alphabreaklower,scalar,IDENTICAL,-1.3789116782568904,-1.3789116782568904,
+CalculateUACoeffs.0.0.9,cnbreaklower,scalar,IDENTICAL,-11.075251205456675,-11.075251205456675,
 CalculateUACoeffs.0.0.9,bl_file,scalar,IDENTICAL,././../BAR_Baseline/Airfoils/AF09_BL.txt,././../BAR_Baseline/Airfoils/AF09_BL.txt,
 CalculateUACoeffs.0.0.9,filename,scalar,IDENTICAL,././../BAR_Baseline/Airfoils/BAR0_AeroDyn_Polar_09.dat,././../BAR_Baseline/Airfoils/BAR0_AeroDyn_Polar_09.dat,
 CalculateUACoeffs.0.0.9,itable,scalar,IDENTICAL,1,1,
@@ -616,7 +616,7 @@ CalculateUACoeffs.0.0.10,x_coord,array,IDENTICAL,,,size=         201
 CalculateUACoeffs.0.0.10,y_coord,array,IDENTICAL,,,size=         201
 CalculateUACoeffs.0.0.10,numtabs,scalar,IDENTICAL,1,1,
 CalculateUACoeffs.0.0.10,alpha,array,IDENTICAL,,,size=         200
-CalculateUACoeffs.0.0.10,coefs,array,IN_TOL,,,n_diff=         285 rms=   3.1793583194519475E-015
+CalculateUACoeffs.0.0.10,coefs,array,IDENTICAL,,,size=        1200
 CalculateUACoeffs.0.0.10,userprop,scalar,IDENTICAL,0.0000000000000000,0.0000000000000000,
 CalculateUACoeffs.0.0.10,re,scalar,IDENTICAL,10741593.000000000,10741593.000000000,
 CalculateUACoeffs.0.0.10,numalf,scalar,IDENTICAL,200,200,
@@ -660,12 +660,12 @@ CalculateUACoeffs.0.0.10,filtcutoff,scalar,IDENTICAL,0.50000000000000000,0.50000
 CalculateUACoeffs.0.0.10,alphaupper,scalar,IDENTICAL,0.11106640694509382,0.11106640694509382,
 CalculateUACoeffs.0.0.10,alphalower,scalar,IDENTICAL,-0.17453292519943295,-0.17453292519943295,
 CalculateUACoeffs.0.0.10,c_alphalower,scalar,IDENTICAL,-1.0279785268754527,-1.0279785268754527,
-CalculateUACoeffs.0.0.10,c_alphaupper,scalar,IN_TOL,1.2487810615493979,1.2487810615493977,2.2204460492503131E-016
+CalculateUACoeffs.0.0.10,c_alphaupper,scalar,IDENTICAL,1.2487810615493977,1.2487810615493977,
 CalculateUACoeffs.0.0.10,alpha0reverseflow,scalar,IDENTICAL,3.1415926535897931,3.1415926535897931,
 CalculateUACoeffs.0.0.10,alphabreakupper,scalar,IDENTICAL,1.4230645326283031,1.4230645326283031,
 CalculateUACoeffs.0.0.10,cnbreakupper,scalar,IDENTICAL,10.797830639600178,10.797830639600178,
-CalculateUACoeffs.0.0.10,alphabreaklower,scalar,IN_TOL,-1.3655764965477906,-1.3655764965477917,1.1102230246251565E-015
-CalculateUACoeffs.0.0.10,cnbreaklower,scalar,IN_TOL,-11.159038623239862,-11.159038623239857,5.3290705182007514E-015
+CalculateUACoeffs.0.0.10,alphabreaklower,scalar,IDENTICAL,-1.3655764965477917,-1.3655764965477917,
+CalculateUACoeffs.0.0.10,cnbreaklower,scalar,IDENTICAL,-11.159038623239857,-11.159038623239857,
 CalculateUACoeffs.0.0.10,bl_file,scalar,IDENTICAL,././../BAR_Baseline/Airfoils/AF10_BL.txt,././../BAR_Baseline/Airfoils/AF10_BL.txt,
 CalculateUACoeffs.0.0.10,filename,scalar,IDENTICAL,././../BAR_Baseline/Airfoils/BAR0_AeroDyn_Polar_10.dat,././../BAR_Baseline/Airfoils/BAR0_AeroDyn_Polar_10.dat,
 CalculateUACoeffs.0.0.10,itable,scalar,IDENTICAL,1,1,
@@ -683,7 +683,7 @@ CalculateUACoeffs.0.0.11,x_coord,array,IDENTICAL,,,size=         201
 CalculateUACoeffs.0.0.11,y_coord,array,IDENTICAL,,,size=         201
 CalculateUACoeffs.0.0.11,numtabs,scalar,IDENTICAL,1,1,
 CalculateUACoeffs.0.0.11,alpha,array,IDENTICAL,,,size=         200
-CalculateUACoeffs.0.0.11,coefs,array,IN_TOL,,,n_diff=         371 rms=   7.5959682398584647E-015
+CalculateUACoeffs.0.0.11,coefs,array,IDENTICAL,,,size=        1200
 CalculateUACoeffs.0.0.11,userprop,scalar,IDENTICAL,0.0000000000000000,0.0000000000000000,
 CalculateUACoeffs.0.0.11,re,scalar,IDENTICAL,11275855.000000000,11275855.000000000,
 CalculateUACoeffs.0.0.11,numalf,scalar,IDENTICAL,200,200,
@@ -726,13 +726,13 @@ CalculateUACoeffs.0.0.11,uacutout_blend,scalar,IDENTICAL,0.69813170079773179,0.6
 CalculateUACoeffs.0.0.11,filtcutoff,scalar,IDENTICAL,0.50000000000000000,0.50000000000000000,
 CalculateUACoeffs.0.0.11,alphaupper,scalar,IDENTICAL,0.11106640694509382,0.11106640694509382,
 CalculateUACoeffs.0.0.11,alphalower,scalar,IDENTICAL,-0.17453292519943295,-0.17453292519943295,
-CalculateUACoeffs.0.0.11,c_alphalower,scalar,IN_TOL,-1.0256203412175515,-1.0256203412175517,2.2204460492503131E-016
-CalculateUACoeffs.0.0.11,c_alphaupper,scalar,IN_TOL,1.2462851124515066,1.2462851124515064,2.2204460492503131E-016
+CalculateUACoeffs.0.0.11,c_alphalower,scalar,IDENTICAL,-1.0256203412175517,-1.0256203412175517,
+CalculateUACoeffs.0.0.11,c_alphaupper,scalar,IDENTICAL,1.2462851124515064,1.2462851124515064,
 CalculateUACoeffs.0.0.11,alpha0reverseflow,scalar,IDENTICAL,3.1415926535897931,3.1415926535897931,
-CalculateUACoeffs.0.0.11,alphabreakupper,scalar,IN_TOL,1.4248395654371795,1.4248395654371817,2.2204460492503131E-015
-CalculateUACoeffs.0.0.11,cnbreakupper,scalar,OUT_TOL,10.786677779535683,10.786677779535671,1.2434497875801753E-014
-CalculateUACoeffs.0.0.11,alphabreaklower,scalar,IN_TOL,-1.3057172223399753,-1.3057172223399738,1.5543122344752192E-015
-CalculateUACoeffs.0.0.11,cnbreaklower,scalar,OUT_TOL,-11.535145535440840,-11.535145535440851,1.0658141036401503E-014
+CalculateUACoeffs.0.0.11,alphabreakupper,scalar,IDENTICAL,1.4248395654371817,1.4248395654371817,
+CalculateUACoeffs.0.0.11,cnbreakupper,scalar,IDENTICAL,10.786677779535671,10.786677779535671,
+CalculateUACoeffs.0.0.11,alphabreaklower,scalar,IDENTICAL,-1.3057172223399738,-1.3057172223399738,
+CalculateUACoeffs.0.0.11,cnbreaklower,scalar,IDENTICAL,-11.535145535440851,-11.535145535440851,
 CalculateUACoeffs.0.0.11,bl_file,scalar,IDENTICAL,././../BAR_Baseline/Airfoils/AF11_BL.txt,././../BAR_Baseline/Airfoils/AF11_BL.txt,
 CalculateUACoeffs.0.0.11,filename,scalar,IDENTICAL,././../BAR_Baseline/Airfoils/BAR0_AeroDyn_Polar_11.dat,././../BAR_Baseline/Airfoils/BAR0_AeroDyn_Polar_11.dat,
 CalculateUACoeffs.0.0.11,itable,scalar,IDENTICAL,1,1,
@@ -750,7 +750,7 @@ CalculateUACoeffs.0.0.12,x_coord,array,IDENTICAL,,,size=         201
 CalculateUACoeffs.0.0.12,y_coord,array,IDENTICAL,,,size=         201
 CalculateUACoeffs.0.0.12,numtabs,scalar,IDENTICAL,1,1,
 CalculateUACoeffs.0.0.12,alpha,array,IDENTICAL,,,size=         200
-CalculateUACoeffs.0.0.12,coefs,array,IN_TOL,,,n_diff=         241 rms=   8.7197734327576836E-015
+CalculateUACoeffs.0.0.12,coefs,array,IDENTICAL,,,size=        1200
 CalculateUACoeffs.0.0.12,userprop,scalar,IDENTICAL,0.0000000000000000,0.0000000000000000,
 CalculateUACoeffs.0.0.12,re,scalar,IDENTICAL,11717358.000000000,11717358.000000000,
 CalculateUACoeffs.0.0.12,numalf,scalar,IDENTICAL,200,200,
@@ -793,13 +793,13 @@ CalculateUACoeffs.0.0.12,uacutout_blend,scalar,IDENTICAL,0.69813170079773179,0.6
 CalculateUACoeffs.0.0.12,filtcutoff,scalar,IDENTICAL,0.50000000000000000,0.50000000000000000,
 CalculateUACoeffs.0.0.12,alphaupper,scalar,IDENTICAL,0.11106640694509382,0.11106640694509382,
 CalculateUACoeffs.0.0.12,alphalower,scalar,IDENTICAL,-0.16395517215704300,-0.16395517215704300,
-CalculateUACoeffs.0.0.12,c_alphalower,scalar,IN_TOL,-0.91929758181588150,-0.91929758181588161,1.1102230246251565E-016
+CalculateUACoeffs.0.0.12,c_alphalower,scalar,IDENTICAL,-0.91929758181588161,-0.91929758181588161,
 CalculateUACoeffs.0.0.12,c_alphaupper,scalar,IDENTICAL,1.2369727320467276,1.2369727320467276,
 CalculateUACoeffs.0.0.12,alpha0reverseflow,scalar,IDENTICAL,3.1415926535897931,3.1415926535897931,
 CalculateUACoeffs.0.0.12,alphabreakupper,scalar,IDENTICAL,1.4305122710283669,1.4305122710283669,
 CalculateUACoeffs.0.0.12,cnbreakupper,scalar,IDENTICAL,10.751035119113178,10.751035119113178,
-CalculateUACoeffs.0.0.12,alphabreaklower,scalar,IN_TOL,-1.2966354249879593,-1.2966354249879586,6.6613381477509392E-016
-CalculateUACoeffs.0.0.12,cnbreaklower,scalar,IN_TOL,-11.592208151125810,-11.592208151125817,7.1054273576010019E-015
+CalculateUACoeffs.0.0.12,alphabreaklower,scalar,IDENTICAL,-1.2966354249879586,-1.2966354249879586,
+CalculateUACoeffs.0.0.12,cnbreaklower,scalar,IDENTICAL,-11.592208151125817,-11.592208151125817,
 CalculateUACoeffs.0.0.12,bl_file,scalar,IDENTICAL,././../BAR_Baseline/Airfoils/AF12_BL.txt,././../BAR_Baseline/Airfoils/AF12_BL.txt,
 CalculateUACoeffs.0.0.12,filename,scalar,IDENTICAL,././../BAR_Baseline/Airfoils/BAR0_AeroDyn_Polar_12.dat,././../BAR_Baseline/Airfoils/BAR0_AeroDyn_Polar_12.dat,
 CalculateUACoeffs.0.0.12,itable,scalar,IDENTICAL,1,1,
@@ -817,7 +817,7 @@ CalculateUACoeffs.0.0.13,x_coord,array,IDENTICAL,,,size=         201
 CalculateUACoeffs.0.0.13,y_coord,array,IDENTICAL,,,size=         201
 CalculateUACoeffs.0.0.13,numtabs,scalar,IDENTICAL,1,1,
 CalculateUACoeffs.0.0.13,alpha,array,IDENTICAL,,,size=         200
-CalculateUACoeffs.0.0.13,coefs,array,IN_TOL,,,n_diff=         291 rms=   6.0965178690075691E-015
+CalculateUACoeffs.0.0.13,coefs,array,IDENTICAL,,,size=        1200
 CalculateUACoeffs.0.0.13,userprop,scalar,IDENTICAL,0.0000000000000000,0.0000000000000000,
 CalculateUACoeffs.0.0.13,re,scalar,IDENTICAL,12099162.000000000,12099162.000000000,
 CalculateUACoeffs.0.0.13,numalf,scalar,IDENTICAL,200,200,
@@ -860,13 +860,13 @@ CalculateUACoeffs.0.0.13,uacutout_blend,scalar,IDENTICAL,0.69813170079773179,0.6
 CalculateUACoeffs.0.0.13,filtcutoff,scalar,IDENTICAL,0.50000000000000000,0.50000000000000000,
 CalculateUACoeffs.0.0.13,alphaupper,scalar,IDENTICAL,0.11106640694509382,0.11106640694509382,
 CalculateUACoeffs.0.0.13,alphalower,scalar,IDENTICAL,-0.16395517215704300,-0.16395517215704300,
-CalculateUACoeffs.0.0.13,c_alphalower,scalar,IN_TOL,-0.91234246102835392,-0.91234246102835403,1.1102230246251565E-016
-CalculateUACoeffs.0.0.13,c_alphaupper,scalar,IN_TOL,1.2251050196069557,1.2251050196069555,2.2204460492503131E-016
+CalculateUACoeffs.0.0.13,c_alphalower,scalar,IDENTICAL,-0.91234246102835403,-0.91234246102835403,
+CalculateUACoeffs.0.0.13,c_alphaupper,scalar,IDENTICAL,1.2251050196069555,1.2251050196069555,
 CalculateUACoeffs.0.0.13,alpha0reverseflow,scalar,IDENTICAL,3.1415926535897931,3.1415926535897931,
 CalculateUACoeffs.0.0.13,alphabreakupper,scalar,IDENTICAL,1.4378449758232457,1.4378449758232457,
 CalculateUACoeffs.0.0.13,cnbreakupper,scalar,IDENTICAL,10.704962376084113,10.704962376084113,
-CalculateUACoeffs.0.0.13,alphabreaklower,scalar,IN_TOL,-1.2890986445285202,-1.2890986445285193,8.8817841970012523E-016
-CalculateUACoeffs.0.0.13,cnbreaklower,scalar,IN_TOL,-11.639563139371997,-11.639563139371999,1.7763568394002505E-015
+CalculateUACoeffs.0.0.13,alphabreaklower,scalar,IDENTICAL,-1.2890986445285193,-1.2890986445285193,
+CalculateUACoeffs.0.0.13,cnbreaklower,scalar,IDENTICAL,-11.639563139371999,-11.639563139371999,
 CalculateUACoeffs.0.0.13,bl_file,scalar,IDENTICAL,././../BAR_Baseline/Airfoils/AF13_BL.txt,././../BAR_Baseline/Airfoils/AF13_BL.txt,
 CalculateUACoeffs.0.0.13,filename,scalar,IDENTICAL,././../BAR_Baseline/Airfoils/BAR0_AeroDyn_Polar_13.dat,././../BAR_Baseline/Airfoils/BAR0_AeroDyn_Polar_13.dat,
 CalculateUACoeffs.0.0.13,itable,scalar,IDENTICAL,1,1,
@@ -884,7 +884,7 @@ CalculateUACoeffs.0.0.14,x_coord,array,IDENTICAL,,,size=         201
 CalculateUACoeffs.0.0.14,y_coord,array,IDENTICAL,,,size=         201
 CalculateUACoeffs.0.0.14,numtabs,scalar,IDENTICAL,1,1,
 CalculateUACoeffs.0.0.14,alpha,array,IDENTICAL,,,size=         200
-CalculateUACoeffs.0.0.14,coefs,array,IN_TOL,,,n_diff=         377 rms=   6.7274062386949354E-015
+CalculateUACoeffs.0.0.14,coefs,array,IDENTICAL,,,size=        1200
 CalculateUACoeffs.0.0.14,userprop,scalar,IDENTICAL,0.0000000000000000,0.0000000000000000,
 CalculateUACoeffs.0.0.14,re,scalar,IDENTICAL,12338595.000000000,12338595.000000000,
 CalculateUACoeffs.0.0.14,numalf,scalar,IDENTICAL,200,200,
@@ -927,13 +927,13 @@ CalculateUACoeffs.0.0.14,uacutout_blend,scalar,IDENTICAL,0.69813170079773179,0.6
 CalculateUACoeffs.0.0.14,filtcutoff,scalar,IDENTICAL,0.50000000000000000,0.50000000000000000,
 CalculateUACoeffs.0.0.14,alphaupper,scalar,IDENTICAL,0.11106640694509382,0.11106640694509382,
 CalculateUACoeffs.0.0.14,alphalower,scalar,IDENTICAL,-0.16395517215704300,-0.16395517215704300,
-CalculateUACoeffs.0.0.14,c_alphalower,scalar,IN_TOL,-0.90583509776653848,-0.90583509776653859,1.1102230246251565E-016
+CalculateUACoeffs.0.0.14,c_alphalower,scalar,IDENTICAL,-0.90583509776653859,-0.90583509776653859,
 CalculateUACoeffs.0.0.14,c_alphaupper,scalar,IDENTICAL,1.2137897885244837,1.2137897885244837,
 CalculateUACoeffs.0.0.14,alpha0reverseflow,scalar,IDENTICAL,3.1415926535897931,3.1415926535897931,
-CalculateUACoeffs.0.0.14,alphabreakupper,scalar,IN_TOL,1.4449496765400875,1.4449496765400853,2.2204460492503131E-015
-CalculateUACoeffs.0.0.14,cnbreakupper,scalar,OUT_TOL,10.660322224928141,10.660322224928155,1.4210854715202004E-014
-CalculateUACoeffs.0.0.14,alphabreaklower,scalar,IN_TOL,-1.2918510342646159,-1.2918510342646152,6.6613381477509392E-016
-CalculateUACoeffs.0.0.14,cnbreaklower,scalar,IN_TOL,-11.622269364622527,-11.622269364622534,7.1054273576010019E-015
+CalculateUACoeffs.0.0.14,alphabreakupper,scalar,IDENTICAL,1.4449496765400853,1.4449496765400853,
+CalculateUACoeffs.0.0.14,cnbreakupper,scalar,IDENTICAL,10.660322224928155,10.660322224928155,
+CalculateUACoeffs.0.0.14,alphabreaklower,scalar,IDENTICAL,-1.2918510342646152,-1.2918510342646152,
+CalculateUACoeffs.0.0.14,cnbreaklower,scalar,IDENTICAL,-11.622269364622534,-11.622269364622534,
 CalculateUACoeffs.0.0.14,bl_file,scalar,IDENTICAL,././../BAR_Baseline/Airfoils/AF14_BL.txt,././../BAR_Baseline/Airfoils/AF14_BL.txt,
 CalculateUACoeffs.0.0.14,filename,scalar,IDENTICAL,././../BAR_Baseline/Airfoils/BAR0_AeroDyn_Polar_14.dat,././../BAR_Baseline/Airfoils/BAR0_AeroDyn_Polar_14.dat,
 CalculateUACoeffs.0.0.14,itable,scalar,IDENTICAL,1,1,
@@ -951,7 +951,7 @@ CalculateUACoeffs.0.0.15,x_coord,array,IDENTICAL,,,size=         201
 CalculateUACoeffs.0.0.15,y_coord,array,IDENTICAL,,,size=         201
 CalculateUACoeffs.0.0.15,numtabs,scalar,IDENTICAL,1,1,
 CalculateUACoeffs.0.0.15,alpha,array,IDENTICAL,,,size=         200
-CalculateUACoeffs.0.0.15,coefs,array,IN_TOL,,,n_diff=         249 rms=   3.3326831217256614E-015
+CalculateUACoeffs.0.0.15,coefs,array,IDENTICAL,,,size=        1200
 CalculateUACoeffs.0.0.15,userprop,scalar,IDENTICAL,0.0000000000000000,0.0000000000000000,
 CalculateUACoeffs.0.0.15,re,scalar,IDENTICAL,12443681.000000000,12443681.000000000,
 CalculateUACoeffs.0.0.15,numalf,scalar,IDENTICAL,200,200,
@@ -994,13 +994,13 @@ CalculateUACoeffs.0.0.15,uacutout_blend,scalar,IDENTICAL,0.69813170079773179,0.6
 CalculateUACoeffs.0.0.15,filtcutoff,scalar,IDENTICAL,0.50000000000000000,0.50000000000000000,
 CalculateUACoeffs.0.0.15,alphaupper,scalar,IDENTICAL,0.11106640694509382,0.11106640694509382,
 CalculateUACoeffs.0.0.15,alphalower,scalar,IDENTICAL,-0.16395517215704300,-0.16395517215704300,
-CalculateUACoeffs.0.0.15,c_alphalower,scalar,IN_TOL,-0.90008684210849810,-0.90008684210849821,1.1102230246251565E-016
+CalculateUACoeffs.0.0.15,c_alphalower,scalar,IDENTICAL,-0.90008684210849821,-0.90008684210849821,
 CalculateUACoeffs.0.0.15,c_alphaupper,scalar,IDENTICAL,1.2050477061190841,1.2050477061190841,
 CalculateUACoeffs.0.0.15,alpha0reverseflow,scalar,IDENTICAL,3.1415926535897931,3.1415926535897931,
 CalculateUACoeffs.0.0.15,alphabreakupper,scalar,IDENTICAL,1.4505248846029353,1.4505248846029353,
 CalculateUACoeffs.0.0.15,cnbreakupper,scalar,IDENTICAL,10.625292159543188,10.625292159543188,
-CalculateUACoeffs.0.0.15,alphabreaklower,scalar,IN_TOL,-1.3005020048794165,-1.3005020048794158,6.6613381477509392E-016
-CalculateUACoeffs.0.0.15,cnbreaklower,scalar,IN_TOL,-11.567913713162771,-11.567913713162778,7.1054273576010019E-015
+CalculateUACoeffs.0.0.15,alphabreaklower,scalar,IDENTICAL,-1.3005020048794158,-1.3005020048794158,
+CalculateUACoeffs.0.0.15,cnbreaklower,scalar,IDENTICAL,-11.567913713162778,-11.567913713162778,
 CalculateUACoeffs.0.0.15,bl_file,scalar,IDENTICAL,././../BAR_Baseline/Airfoils/AF15_BL.txt,././../BAR_Baseline/Airfoils/AF15_BL.txt,
 CalculateUACoeffs.0.0.15,filename,scalar,IDENTICAL,././../BAR_Baseline/Airfoils/BAR0_AeroDyn_Polar_15.dat,././../BAR_Baseline/Airfoils/BAR0_AeroDyn_Polar_15.dat,
 CalculateUACoeffs.0.0.15,itable,scalar,IDENTICAL,1,1,
@@ -1018,7 +1018,7 @@ CalculateUACoeffs.0.0.16,x_coord,array,IDENTICAL,,,size=         201
 CalculateUACoeffs.0.0.16,y_coord,array,IDENTICAL,,,size=         201
 CalculateUACoeffs.0.0.16,numtabs,scalar,IDENTICAL,1,1,
 CalculateUACoeffs.0.0.16,alpha,array,IDENTICAL,,,size=         200
-CalculateUACoeffs.0.0.16,coefs,array,IN_TOL,,,n_diff=         219 rms=   2.6746280142966455E-015
+CalculateUACoeffs.0.0.16,coefs,array,IDENTICAL,,,size=        1200
 CalculateUACoeffs.0.0.16,userprop,scalar,IDENTICAL,0.0000000000000000,0.0000000000000000,
 CalculateUACoeffs.0.0.16,re,scalar,IDENTICAL,12446901.000000000,12446901.000000000,
 CalculateUACoeffs.0.0.16,numalf,scalar,IDENTICAL,200,200,
@@ -1061,13 +1061,13 @@ CalculateUACoeffs.0.0.16,uacutout_blend,scalar,IDENTICAL,0.69813170079773179,0.6
 CalculateUACoeffs.0.0.16,filtcutoff,scalar,IDENTICAL,0.50000000000000000,0.50000000000000000,
 CalculateUACoeffs.0.0.16,alphaupper,scalar,IDENTICAL,0.11106640694509382,0.11106640694509382,
 CalculateUACoeffs.0.0.16,alphalower,scalar,IDENTICAL,-0.16395517215704300,-0.16395517215704300,
-CalculateUACoeffs.0.0.16,c_alphalower,scalar,IN_TOL,-0.89583497506884058,-0.89583497506884069,1.1102230246251565E-016
+CalculateUACoeffs.0.0.16,c_alphalower,scalar,IDENTICAL,-0.89583497506884069,-0.89583497506884069,
 CalculateUACoeffs.0.0.16,c_alphaupper,scalar,IDENTICAL,1.1975954591886409,1.1975954591886409,
 CalculateUACoeffs.0.0.16,alpha0reverseflow,scalar,IDENTICAL,3.1415926535897931,3.1415926535897931,
 CalculateUACoeffs.0.0.16,alphabreakupper,scalar,IDENTICAL,1.4553826942064885,1.4553826942064885,
 CalculateUACoeffs.0.0.16,cnbreakupper,scalar,IDENTICAL,10.594769641617065,10.594769641617065,
-CalculateUACoeffs.0.0.16,alphabreaklower,scalar,IN_TOL,-1.3106800118309279,-1.3106800118309272,6.6613381477509392E-016
-CalculateUACoeffs.0.0.16,cnbreaklower,scalar,IN_TOL,-11.503963409428664,-11.503963409428668,3.5527136788005009E-015
+CalculateUACoeffs.0.0.16,alphabreaklower,scalar,IDENTICAL,-1.3106800118309272,-1.3106800118309272,
+CalculateUACoeffs.0.0.16,cnbreaklower,scalar,IDENTICAL,-11.503963409428668,-11.503963409428668,
 CalculateUACoeffs.0.0.16,bl_file,scalar,IDENTICAL,././../BAR_Baseline/Airfoils/AF16_BL.txt,././../BAR_Baseline/Airfoils/AF16_BL.txt,
 CalculateUACoeffs.0.0.16,filename,scalar,IDENTICAL,././../BAR_Baseline/Airfoils/BAR0_AeroDyn_Polar_16.dat,././../BAR_Baseline/Airfoils/BAR0_AeroDyn_Polar_16.dat,
 CalculateUACoeffs.0.0.16,itable,scalar,IDENTICAL,1,1,
@@ -1085,7 +1085,7 @@ CalculateUACoeffs.0.0.17,x_coord,array,IDENTICAL,,,size=         201
 CalculateUACoeffs.0.0.17,y_coord,array,IDENTICAL,,,size=         201
 CalculateUACoeffs.0.0.17,numtabs,scalar,IDENTICAL,1,1,
 CalculateUACoeffs.0.0.17,alpha,array,IDENTICAL,,,size=         200
-CalculateUACoeffs.0.0.17,coefs,array,IN_TOL,,,n_diff=         272 rms=   2.8932991271547906E-015
+CalculateUACoeffs.0.0.17,coefs,array,IDENTICAL,,,size=        1200
 CalculateUACoeffs.0.0.17,userprop,scalar,IDENTICAL,0.0000000000000000,0.0000000000000000,
 CalculateUACoeffs.0.0.17,re,scalar,IDENTICAL,12368920.000000000,12368920.000000000,
 CalculateUACoeffs.0.0.17,numalf,scalar,IDENTICAL,200,200,
@@ -1128,13 +1128,13 @@ CalculateUACoeffs.0.0.17,uacutout_blend,scalar,IDENTICAL,0.69813170079773179,0.6
 CalculateUACoeffs.0.0.17,filtcutoff,scalar,IDENTICAL,0.50000000000000000,0.50000000000000000,
 CalculateUACoeffs.0.0.17,alphaupper,scalar,IDENTICAL,0.10048865390270385,0.10048865390270385,
 CalculateUACoeffs.0.0.17,alphalower,scalar,IDENTICAL,-0.16395517215704300,-0.16395517215704300,
-CalculateUACoeffs.0.0.17,c_alphalower,scalar,IN_TOL,-0.89255561678142292,-0.89255561678142303,1.1102230246251565E-016
-CalculateUACoeffs.0.0.17,c_alphaupper,scalar,IN_TOL,1.1156154273359145,1.1156154273359142,2.2204460492503131E-016
+CalculateUACoeffs.0.0.17,c_alphalower,scalar,IDENTICAL,-0.89255561678142303,-0.89255561678142303,
+CalculateUACoeffs.0.0.17,c_alphaupper,scalar,IDENTICAL,1.1156154273359142,1.1156154273359142,
 CalculateUACoeffs.0.0.17,alpha0reverseflow,scalar,IDENTICAL,3.1415926535897931,3.1415926535897931,
 CalculateUACoeffs.0.0.17,alphabreakupper,scalar,IDENTICAL,1.4498603685096774,1.4498603685096774,
 CalculateUACoeffs.0.0.17,cnbreakupper,scalar,IDENTICAL,10.629467437296732,10.629467437296732,
-CalculateUACoeffs.0.0.17,alphabreaklower,scalar,IN_TOL,-1.3222404095227931,-1.3222404095227922,8.8817841970012523E-016
-CalculateUACoeffs.0.0.17,cnbreaklower,scalar,IN_TOL,-11.431327288505983,-11.431327288505988,5.3290705182007514E-015
+CalculateUACoeffs.0.0.17,alphabreaklower,scalar,IDENTICAL,-1.3222404095227922,-1.3222404095227922,
+CalculateUACoeffs.0.0.17,cnbreaklower,scalar,IDENTICAL,-11.431327288505988,-11.431327288505988,
 CalculateUACoeffs.0.0.17,bl_file,scalar,IDENTICAL,././../BAR_Baseline/Airfoils/AF17_BL.txt,././../BAR_Baseline/Airfoils/AF17_BL.txt,
 CalculateUACoeffs.0.0.17,filename,scalar,IDENTICAL,././../BAR_Baseline/Airfoils/BAR0_AeroDyn_Polar_17.dat,././../BAR_Baseline/Airfoils/BAR0_AeroDyn_Polar_17.dat,
 CalculateUACoeffs.0.0.17,itable,scalar,IDENTICAL,1,1,
@@ -1152,7 +1152,7 @@ CalculateUACoeffs.0.0.18,x_coord,array,IDENTICAL,,,size=         201
 CalculateUACoeffs.0.0.18,y_coord,array,IDENTICAL,,,size=         201
 CalculateUACoeffs.0.0.18,numtabs,scalar,IDENTICAL,1,1,
 CalculateUACoeffs.0.0.18,alpha,array,IDENTICAL,,,size=         200
-CalculateUACoeffs.0.0.18,coefs,array,IN_TOL,,,n_diff=         255 rms=   2.2871411008337129E-015
+CalculateUACoeffs.0.0.18,coefs,array,IDENTICAL,,,size=        1200
 CalculateUACoeffs.0.0.18,userprop,scalar,IDENTICAL,0.0000000000000000,0.0000000000000000,
 CalculateUACoeffs.0.0.18,re,scalar,IDENTICAL,12188034.000000000,12188034.000000000,
 CalculateUACoeffs.0.0.18,numalf,scalar,IDENTICAL,200,200,
@@ -1195,13 +1195,13 @@ CalculateUACoeffs.0.0.18,uacutout_blend,scalar,IDENTICAL,0.69813170079773179,0.6
 CalculateUACoeffs.0.0.18,filtcutoff,scalar,IDENTICAL,0.50000000000000000,0.50000000000000000,
 CalculateUACoeffs.0.0.18,alphaupper,scalar,IDENTICAL,0.10048865390270385,0.10048865390270385,
 CalculateUACoeffs.0.0.18,alphalower,scalar,IDENTICAL,-0.16395517215704300,-0.16395517215704300,
-CalculateUACoeffs.0.0.18,c_alphalower,scalar,IN_TOL,-0.88968626724069932,-0.88968626724069944,1.1102230246251565E-016
-CalculateUACoeffs.0.0.18,c_alphaupper,scalar,IN_TOL,1.1082047670772779,1.1082047670772777,2.2204460492503131E-016
+CalculateUACoeffs.0.0.18,c_alphalower,scalar,IDENTICAL,-0.88968626724069944,-0.88968626724069944,
+CalculateUACoeffs.0.0.18,c_alphaupper,scalar,IDENTICAL,1.1082047670772777,1.1082047670772777,
 CalculateUACoeffs.0.0.18,alpha0reverseflow,scalar,IDENTICAL,3.1415926535897931,3.1415926535897931,
 CalculateUACoeffs.0.0.18,alphabreakupper,scalar,IDENTICAL,1.4538545283551014,1.4538545283551014,
 CalculateUACoeffs.0.0.18,cnbreakupper,scalar,IDENTICAL,10.604371390841436,10.604371390841436,
-CalculateUACoeffs.0.0.18,alphabreaklower,scalar,IN_TOL,-1.3343477459332569,-1.3343477459332560,8.8817841970012523E-016
-CalculateUACoeffs.0.0.18,cnbreaklower,scalar,IN_TOL,-11.355254650262678,-11.355254650262681,3.5527136788005009E-015
+CalculateUACoeffs.0.0.18,alphabreaklower,scalar,IDENTICAL,-1.3343477459332560,-1.3343477459332560,
+CalculateUACoeffs.0.0.18,cnbreaklower,scalar,IDENTICAL,-11.355254650262681,-11.355254650262681,
 CalculateUACoeffs.0.0.18,bl_file,scalar,IDENTICAL,././../BAR_Baseline/Airfoils/AF18_BL.txt,././../BAR_Baseline/Airfoils/AF18_BL.txt,
 CalculateUACoeffs.0.0.18,filename,scalar,IDENTICAL,././../BAR_Baseline/Airfoils/BAR0_AeroDyn_Polar_18.dat,././../BAR_Baseline/Airfoils/BAR0_AeroDyn_Polar_18.dat,
 CalculateUACoeffs.0.0.18,itable,scalar,IDENTICAL,1,1,
@@ -1219,7 +1219,7 @@ CalculateUACoeffs.0.0.19,x_coord,array,IDENTICAL,,,size=         201
 CalculateUACoeffs.0.0.19,y_coord,array,IDENTICAL,,,size=         201
 CalculateUACoeffs.0.0.19,numtabs,scalar,IDENTICAL,1,1,
 CalculateUACoeffs.0.0.19,alpha,array,IDENTICAL,,,size=         200
-CalculateUACoeffs.0.0.19,coefs,array,IN_TOL,,,n_diff=         259 rms=   2.2009632029697651E-015
+CalculateUACoeffs.0.0.19,coefs,array,IDENTICAL,,,size=        1200
 CalculateUACoeffs.0.0.19,userprop,scalar,IDENTICAL,0.0000000000000000,0.0000000000000000,
 CalculateUACoeffs.0.0.19,re,scalar,IDENTICAL,11900697.000000000,11900697.000000000,
 CalculateUACoeffs.0.0.19,numalf,scalar,IDENTICAL,200,200,
@@ -1262,13 +1262,13 @@ CalculateUACoeffs.0.0.19,uacutout_blend,scalar,IDENTICAL,0.69813170079773179,0.6
 CalculateUACoeffs.0.0.19,filtcutoff,scalar,IDENTICAL,0.50000000000000000,0.50000000000000000,
 CalculateUACoeffs.0.0.19,alphaupper,scalar,IDENTICAL,0.10048865390270385,0.10048865390270385,
 CalculateUACoeffs.0.0.19,alphalower,scalar,IDENTICAL,-0.16395517215704300,-0.16395517215704300,
-CalculateUACoeffs.0.0.19,c_alphalower,scalar,IN_TOL,-0.88692887992960723,-0.88692887992960734,1.1102230246251565E-016
-CalculateUACoeffs.0.0.19,c_alphaupper,scalar,IN_TOL,1.1018122395419530,1.1018122395419527,2.2204460492503131E-016
+CalculateUACoeffs.0.0.19,c_alphalower,scalar,IDENTICAL,-0.88692887992960734,-0.88692887992960734,
+CalculateUACoeffs.0.0.19,c_alphaupper,scalar,IDENTICAL,1.1018122395419527,1.1018122395419527,
 CalculateUACoeffs.0.0.19,alpha0reverseflow,scalar,IDENTICAL,3.1415926535897931,3.1415926535897931,
 CalculateUACoeffs.0.0.19,alphabreakupper,scalar,IDENTICAL,1.4572684414774921,1.4572684414774921,
 CalculateUACoeffs.0.0.19,cnbreakupper,scalar,IDENTICAL,10.582921142070843,10.582921142070843,
-CalculateUACoeffs.0.0.19,alphabreaklower,scalar,IN_TOL,-1.3468530200327655,-1.3468530200327649,6.6613381477509392E-016
-CalculateUACoeffs.0.0.19,cnbreaklower,scalar,IN_TOL,-11.276681695778390,-11.276681695778395,5.3290705182007514E-015
+CalculateUACoeffs.0.0.19,alphabreaklower,scalar,IDENTICAL,-1.3468530200327649,-1.3468530200327649,
+CalculateUACoeffs.0.0.19,cnbreaklower,scalar,IDENTICAL,-11.276681695778395,-11.276681695778395,
 CalculateUACoeffs.0.0.19,bl_file,scalar,IDENTICAL,././../BAR_Baseline/Airfoils/AF19_BL.txt,././../BAR_Baseline/Airfoils/AF19_BL.txt,
 CalculateUACoeffs.0.0.19,filename,scalar,IDENTICAL,././../BAR_Baseline/Airfoils/BAR0_AeroDyn_Polar_19.dat,././../BAR_Baseline/Airfoils/BAR0_AeroDyn_Polar_19.dat,
 CalculateUACoeffs.0.0.19,itable,scalar,IDENTICAL,1,1,
@@ -1286,7 +1286,7 @@ CalculateUACoeffs.0.0.20,x_coord,array,IDENTICAL,,,size=         201
 CalculateUACoeffs.0.0.20,y_coord,array,IDENTICAL,,,size=         201
 CalculateUACoeffs.0.0.20,numtabs,scalar,IDENTICAL,1,1,
 CalculateUACoeffs.0.0.20,alpha,array,IDENTICAL,,,size=         200
-CalculateUACoeffs.0.0.20,coefs,array,IN_TOL,,,n_diff=         271 rms=   2.2581615359434012E-015
+CalculateUACoeffs.0.0.20,coefs,array,IDENTICAL,,,size=        1200
 CalculateUACoeffs.0.0.20,userprop,scalar,IDENTICAL,0.0000000000000000,0.0000000000000000,
 CalculateUACoeffs.0.0.20,re,scalar,IDENTICAL,11511673.000000000,11511673.000000000,
 CalculateUACoeffs.0.0.20,numalf,scalar,IDENTICAL,200,200,
@@ -1329,13 +1329,13 @@ CalculateUACoeffs.0.0.20,uacutout_blend,scalar,IDENTICAL,0.69813170079773179,0.6
 CalculateUACoeffs.0.0.20,filtcutoff,scalar,IDENTICAL,0.50000000000000000,0.50000000000000000,
 CalculateUACoeffs.0.0.20,alphaupper,scalar,IDENTICAL,0.10048865390270385,0.10048865390270385,
 CalculateUACoeffs.0.0.20,alphalower,scalar,IDENTICAL,-0.16395517215704300,-0.16395517215704300,
-CalculateUACoeffs.0.0.20,c_alphalower,scalar,IN_TOL,-0.88402652087025935,-0.88402652087025946,1.1102230246251565E-016
-CalculateUACoeffs.0.0.20,c_alphaupper,scalar,IN_TOL,1.0963062129719034,1.0963062129719032,2.2204460492503131E-016
+CalculateUACoeffs.0.0.20,c_alphalower,scalar,IDENTICAL,-0.88402652087025946,-0.88402652087025946,
+CalculateUACoeffs.0.0.20,c_alphaupper,scalar,IDENTICAL,1.0963062129719032,1.0963062129719032,
 CalculateUACoeffs.0.0.20,alpha0reverseflow,scalar,IDENTICAL,3.1415926535897931,3.1415926535897931,
 CalculateUACoeffs.0.0.20,alphabreakupper,scalar,IDENTICAL,1.4601947546437533,1.4601947546437533,
 CalculateUACoeffs.0.0.20,cnbreakupper,scalar,IDENTICAL,10.564534574180385,10.564534574180385,
-CalculateUACoeffs.0.0.20,alphabreaklower,scalar,IN_TOL,-1.3602879876594365,-1.3602879876594356,8.8817841970012523E-016
-CalculateUACoeffs.0.0.20,cnbreaklower,scalar,IN_TOL,-11.192267304584060,-11.192267304584064,3.5527136788005009E-015
+CalculateUACoeffs.0.0.20,alphabreaklower,scalar,IDENTICAL,-1.3602879876594356,-1.3602879876594356,
+CalculateUACoeffs.0.0.20,cnbreaklower,scalar,IDENTICAL,-11.192267304584064,-11.192267304584064,
 CalculateUACoeffs.0.0.20,bl_file,scalar,IDENTICAL,././../BAR_Baseline/Airfoils/AF20_BL.txt,././../BAR_Baseline/Airfoils/AF20_BL.txt,
 CalculateUACoeffs.0.0.20,filename,scalar,IDENTICAL,././../BAR_Baseline/Airfoils/BAR0_AeroDyn_Polar_20.dat,././../BAR_Baseline/Airfoils/BAR0_AeroDyn_Polar_20.dat,
 CalculateUACoeffs.0.0.20,itable,scalar,IDENTICAL,1,1,
