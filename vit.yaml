@@ -94,6 +94,13 @@ translations:
     cases_total: 20
     cases_skipped: 0
     kernel_dir: kernel/AFI_ComputeAirfoilCoefs
+  AFI_ComputeUACoefs:
+    status: integrated
+    cpp_file: translations/AirfoilInfo/afi_computeuacoefs.cpp
+    cases_passed: 20
+    cases_total: 20
+    cases_skipped: 0
+    kernel_dir: kernel/AFI_ComputeUACoefs
 types:
   AFI_ParameterType:
     strategy: view

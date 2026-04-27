@@ -1,5 +1,5 @@
 FC_0 ?= gfortran
-FC_FLAGS_SET_0 ?= -O2 -ffree-form -ffree-line-length-none -cpp -fdefault-real-8 -fdefault-double-8 -ffp-contract=off
+FC_FLAGS_SET_0 ?= -O2 -ffree-form -ffree-line-length-none -fvect-cost-model=unlimited -cpp -fdefault-real-8 -fdefault-double-8 -ffp-contract=off
 # Makefile for KGEN-generated kernel
 
 
@@ -28,7 +28,7 @@ vit_bridge_interpextrapstp.o: vit_bridge_interpextrapstp.f90 vit_bridge_compute_
 	$(FC_0) $(FC_FLAGS_SET_0) -c $< -o $@
 
 build: ${ALL_OBJS}
-	${FC_0} ${FC_FLAGS_SET_0} -o kernel.exe $^ -lstdc++
+	${FC_0} ${FC_FLAGS_SET_0} -o kernel.exe $^ -lstdc++ -lmvec -lm
 
 run: build
 	./kernel.exe

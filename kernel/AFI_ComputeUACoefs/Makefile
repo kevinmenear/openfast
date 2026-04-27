@@ -1,0 +1,85 @@
+FC_0 ?= gfortran
+FC_FLAGS_SET_0 ?= -O2 -ffree-form -ffree-line-length-none -fvect-cost-model=unlimited -cpp -fdefault-real-8 -fdefault-double-8 -ffp-contract=off
+# Makefile for KGEN-generated kernel
+
+
+ALL_OBJS := vit_bridge_findboundingtables.o vit_afi_table_type_view.o vit_afi_parametertype_view.o vit_nwtc.o afi_computeuacoefs.o UnsteadyAero.o UnsteadyAero_Types.o AirfoilInfo_Types.o NWTC_Library.o NWTC_Library_Types.o SingPrec.o SysIVF_reduced.o NWTC_Base_reduced.o NWTC_Num.o NWTC_IO.o ModMesh.o ModMesh_Types.o AirfoilInfo.o kernel_driver.o kgen_utils.o tprof_mod.o
+
+# VIT: C++ compilation support
+CXX ?= g++
+CXXFLAGS ?= -O2 -fPIC -ffp-contract=off
+
+afi_computeuacoefs.o: afi_computeuacoefs.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+vit_nwtc.o: vit_nwtc.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+# VIT: view populator module
+vit_afi_parametertype_view.o: vit_afi_parametertype_view.f90 AirfoilInfo_Types.o vit_afi_table_type_view.o
+	$(FC_0) $(FC_FLAGS_SET_0) -c $< -o $@
+
+# VIT: view populator module
+vit_afi_table_type_view.o: vit_afi_table_type_view.f90 AirfoilInfo_Types.o
+	$(FC_0) $(FC_FLAGS_SET_0) -c $< -o $@
+
+# VIT: callee bridge for kernel verification
+vit_bridge_findboundingtables.o: vit_bridge_findboundingtables.f90 vit_afi_table_type_view.o vit_afi_parametertype_view.o vit_nwtc.o afi_computeuacoefs.o UnsteadyAero.o UnsteadyAero_Types.o AirfoilInfo_Types.o NWTC_Library.o NWTC_Library_Types.o SingPrec.o SysIVF_reduced.o NWTC_Base_reduced.o NWTC_Num.o NWTC_IO.o ModMesh.o ModMesh_Types.o AirfoilInfo.o kernel_driver.o kgen_utils.o tprof_mod.o
+	$(FC_0) $(FC_FLAGS_SET_0) -c $< -o $@
+
+build: ${ALL_OBJS}
+	${FC_0} ${FC_FLAGS_SET_0} -o kernel.exe $^ -lstdc++ -lmvec -lm
+
+run: build
+	./kernel.exe
+
+UnsteadyAero.o: UnsteadyAero.f90 UnsteadyAero_Types.o AirfoilInfo_Types.o NWTC_Library.o NWTC_Library_Types.o SingPrec.o SysIVF_reduced.o NWTC_Base_reduced.o NWTC_Num.o NWTC_IO.o ModMesh.o ModMesh_Types.o AirfoilInfo.o kgen_utils.o tprof_mod.o
+	${FC_0} ${FC_FLAGS_SET_0} -c -o $@ $<
+
+UnsteadyAero_Types.o: UnsteadyAero_Types.f90 kgen_utils.o tprof_mod.o AirfoilInfo_Types.o
+	${FC_0} ${FC_FLAGS_SET_0} -c -o $@ $<
+
+AirfoilInfo_Types.o: AirfoilInfo_Types.f90 kgen_utils.o tprof_mod.o NWTC_Library.o
+	${FC_0} ${FC_FLAGS_SET_0} -c -o $@ $<
+
+NWTC_Library.o: NWTC_Library.f90 kgen_utils.o tprof_mod.o NWTC_Library_Types.o ModMesh.o NWTC_Num.o
+	${FC_0} ${FC_FLAGS_SET_0} -c -o $@ $<
+
+NWTC_Library_Types.o: NWTC_Library_Types.f90 kgen_utils.o tprof_mod.o SingPrec.o SysIVF_reduced.o
+	${FC_0} ${FC_FLAGS_SET_0} -c -o $@ $<
+
+SingPrec.o: SingPrec.f90 kgen_utils.o tprof_mod.o
+	${FC_0} ${FC_FLAGS_SET_0} -c -o $@ $<
+
+SysIVF_reduced.o: SysIVF_reduced.f90 kgen_utils.o tprof_mod.o NWTC_Base_reduced.o
+	${FC_0} ${FC_FLAGS_SET_0} -c -o $@ $<
+
+NWTC_Base_reduced.o: NWTC_Base_reduced.f90 kgen_utils.o tprof_mod.o SingPrec.o
+	${FC_0} ${FC_FLAGS_SET_0} -c -o $@ $<
+
+NWTC_Num.o: NWTC_Num.f90 kgen_utils.o tprof_mod.o NWTC_IO.o
+	${FC_0} ${FC_FLAGS_SET_0} -c -o $@ $<
+
+NWTC_IO.o: NWTC_IO.f90 kgen_utils.o tprof_mod.o NWTC_Library_Types.o
+	${FC_0} ${FC_FLAGS_SET_0} -c -o $@ $<
+
+ModMesh.o: ModMesh.f90 kgen_utils.o tprof_mod.o ModMesh_Types.o
+	${FC_0} ${FC_FLAGS_SET_0} -c -o $@ $<
+
+ModMesh_Types.o: ModMesh_Types.f90 kgen_utils.o tprof_mod.o
+	${FC_0} ${FC_FLAGS_SET_0} -c -o $@ $<
+
+AirfoilInfo.o: AirfoilInfo.f90 kgen_utils.o tprof_mod.o AirfoilInfo_Types.o vit_afi_parametertype_view.o vit_afi_table_type_view.o
+	${FC_0} ${FC_FLAGS_SET_0} -c -o $@ $<
+
+kernel_driver.o: kernel_driver.f90 UnsteadyAero.o UnsteadyAero_Types.o AirfoilInfo_Types.o NWTC_Library.o NWTC_Library_Types.o SingPrec.o SysIVF_reduced.o NWTC_Base_reduced.o NWTC_Num.o NWTC_IO.o ModMesh.o ModMesh_Types.o AirfoilInfo.o kgen_utils.o tprof_mod.o
+	${FC_0} ${FC_FLAGS_SET_0} -c -o $@ $<
+
+kgen_utils.o: kgen_utils.f90
+	${FC_0} ${FC_FLAGS_SET_0} -c -o $@ $<
+
+tprof_mod.o: tprof_mod.f90
+	${FC_0} ${FC_FLAGS_SET_0} -c -o $@ $<
+
+clean:
+	rm -f kernel.exe *.mod ${ALL_OBJS}

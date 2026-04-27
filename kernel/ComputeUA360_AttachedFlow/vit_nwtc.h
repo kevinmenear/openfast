@@ -22,6 +22,9 @@ static constexpr double PiBy2 = M_PI / 2.0;
 static constexpr double D2R   = M_PI / 180.0;
 static constexpr double R2D   = 180.0 / M_PI;
 
+// Error message length (from NWTC_Base.f90:37)
+static constexpr int ErrMsgLen = 8196;
+
 // ---- EqualRealNos (NWTC_Num.f90:1647, EqualRealNos8) ----
 // Returns true if two doubles are approximately equal,
 // ignoring the last 2 significant digits of machine precision.

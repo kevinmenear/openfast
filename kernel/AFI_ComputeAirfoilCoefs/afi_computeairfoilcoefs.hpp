@@ -20,7 +20,8 @@ static constexpr int ErrID_None  = 0;
 static constexpr int ErrID_Fatal = 4;
 static constexpr int AbortErrLev = ErrID_Fatal;
 
-// Maximum number of airfoil coefficient columns (from AirfoilInfo.f90:44)
+// Maximum number of airfoil coefficient columns (AirfoilInfo.f90:44).
+// Must be >= actual column count in any airfoil table: cl, cd, cm, cpmin, f_st, fullySep, fullyAtt.
 static constexpr int MaxNumAFCoeffs = 7;
 
 // Forward declarations
@@ -36,6 +37,12 @@ static void AFI_Output_ExtrapInterp1(const afi_outputtype_t& y1, const afi_outpu
                                       const double tin[2], afi_outputtype_t* y_out, double tin_out) {
     double t1 = tin[1] - tin[0];
     double t_out = tin_out - tin[0];
+
+    if (EqualRealNos(0.0, t1)) {
+        // t(1) == t(2) — division by zero. Copy y1 and return.
+        *y_out = y1;
+        return;
+    }
 
     // Lagrange polynomial weights: a1 = -(t_out - t1)/t1, a2 = t_out/t1
     double a1 = -(t_out - t1) / t1;
@@ -68,6 +75,10 @@ static void AFI_ComputeAirfoilCoefs1D(double AOA, afi_parametertype_view_t* p,
     double IntAFCoefs[MaxNumAFCoeffs] = {};  // zero-initialized
 
     int s1 = tab->n_Coefs_cols;  // number of coefficient columns
+    if (s1 > MaxNumAFCoeffs) {
+        *errStat = ErrID_Fatal;
+        return;
+    }
 
     if (tab->ConstData) {
         // All rows are constant — return first row
@@ -80,13 +91,15 @@ static void AFI_ComputeAirfoilCoefs1D(double AOA, afi_parametertype_view_t* p,
         double Alpha = MPi2Pi(AOA);
 
         // Cubic spline interpolation across all columns
+        // SplineCoefs has (NumAlf-1) rows, nCols cols, 4 coefficient orders
         CubicSplineInterpM(Alpha,
-                           tab->Alpha,          // XAry: alpha knots (0-based)
-                           tab->Coefs,           // YAry: coefficient table [n_rows x n_cols] column-major
-                           tab->SplineCoefs,     // Coef: spline coefficients [n_rows x n_cols x 4]
-                           IntAFCoefs,           // Res: output [n_cols]
-                           tab->n_Alpha,         // NumPts
-                           s1);                  // nCols
+                           tab->Alpha,              // XAry: alpha knots (0-based)
+                           tab->Coefs,               // YAry: [n_Alpha x n_cols] column-major
+                           tab->SplineCoefs,         // Coef: [n_SplineCoefs_dim1 x n_cols x 4]
+                           IntAFCoefs,               // Res: output [n_cols]
+                           tab->n_Alpha,             // NumPts (knot count)
+                           s1,                       // nCols
+                           tab->n_SplineCoefs_dim1); // nCoefRows (= NumAlf-1)
     }
 
     // Extract aerodynamic coefficients (Fortran 1-based column indices → 0-based)

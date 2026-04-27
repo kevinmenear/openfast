@@ -28,6 +28,7 @@ MODULE AirfoilInfo
    USE                                          :: ISO_FORTRAN_ENV , ONLY : IOSTAT_EOR
    USE                                          :: NWTC_LAPACK
 
+   USE ISO_C_BINDING
    IMPLICIT NONE
 
    PRIVATE
@@ -42,6 +43,20 @@ MODULE AirfoilInfo
    TYPE(ProgDesc), PARAMETER                    :: AFI_Ver = ProgDesc( 'AirfoilInfo', '', '')    ! The name, version, and date of AirfoilInfo.
 
    integer, parameter                           :: MaxNumAFCoeffs = 7 !cl,cd,cm,cpMin, UA:f_st, FullySeparate, FullyAttached
+
+
+    ! Auto-generated interface for C++ implementation of AFI_ComputeUACoefs
+    INTERFACE
+        SUBROUTINE afi_computeuacoefs_c(p, Re, UserProp, UA_BL, errMsg, errStat) BIND(C, NAME='afi_computeuacoefs_c')
+            USE ISO_C_BINDING
+            TYPE(C_PTR), VALUE :: p
+            REAL(C_DOUBLE), VALUE :: Re
+            REAL(C_DOUBLE), VALUE :: UserProp
+            TYPE(C_PTR), VALUE :: UA_BL
+            CHARACTER(KIND=C_CHAR), INTENT(OUT) :: errMsg(*)
+            INTEGER(C_INT), INTENT(OUT) :: errStat
+        END SUBROUTINE afi_computeuacoefs_c
+    END INTERFACE
 
 CONTAINS
 
@@ -1822,42 +1837,31 @@ end subroutine AFI_ComputeAirfoilCoefs
 
 !----------------------------------------------------------------------------------------------------------------------------------  
 !> This routine calculates Cl, Cd, Cm, (and Cpmin) for a set of tables which are dependent on AOA as well as a 2nd user-defined varible, could be Re or Cntrl, etc.
-subroutine AFI_ComputeUACoefs( p, Re, UserProp, UA_BL, errMsg, errStat )
-
-   type(AFI_ParameterType), intent(in   ) :: p                             !< This structure stores all the module parameters that are set by AirfoilInfo during the initialization phase.
-   real(ReKi),              intent(in   ) :: Re                            !< Reynold's number
-   real(ReKi),              intent(in   ) :: UserProp                      !< User property for interpolating airfoil tables
-   type(AFI_UA_BL_Type),    intent(  out) :: UA_BL                         !< airfoil constants (UA Beddoes-Leishman parameters )
-
-   integer(IntKi),          intent(  out) :: errStat                       !< Error status
-   character(*),            intent(  out) :: errMsg                        !< Error message
-
-   real(ReKi)                             :: ReInterp
-   
-
-      ! These coefs are stored in the p data structures based on Re
-   
-   if ( p%AFTabMod == AFITable_1 ) then 
-      call AFI_CopyUA_BL_Type( p%Table(1)%UA_BL, UA_BL, MESH_NEWCOPY, errStat, errMsg )  ! this doesn't have a mesh, so the control code is irrelevant
-      return
-   elseif ( p%AFTabMod == AFITable_2Re ) then
-#ifndef AFI_USE_LINEAR_RE
-      ReInterp = log( Re )
-#else
-      ReInterp =      Re
-#endif
-      call AFI_ComputeUACoefs2D( ReInterp, p, UA_BL, errStat, errMsg )
-   else !if ( p%AFTabMod == AFITable_2User ) then
-      call AFI_ComputeUACoefs2D( UserProp, p, UA_BL, errStat, errMsg )
-   end if
-   
-   call MPi2Pi( UA_BL%alpha0 )
-   call MPi2Pi( UA_BL%alpha1 )
-   call MPi2Pi( UA_BL%alpha2 )
-   
-   ! Cn1=1.9 Tp=1.7 Tf=3., Tv=6 Tvl=11, Cd0=0.012
-   
-end subroutine AFI_ComputeUACoefs
+    SUBROUTINE AFI_ComputeUACoefs(p, Re, UserProp, UA_BL, errMsg, errStat)
+        USE ISO_C_BINDING
+        USE vit_afi_parametertype_view, ONLY: afi_parametertype_view_t, vit_populate_afi_parametertype
+        IMPLICIT NONE
+        TYPE(AFI_PARAMETERTYPE), INTENT(IN), TARGET :: p
+        REAL(8), INTENT(IN) :: Re
+        REAL(8), INTENT(IN) :: UserProp
+        TYPE(AFI_UA_BL_TYPE), INTENT(OUT), TARGET :: UA_BL
+        INTEGER(4), INTENT(OUT) :: errStat
+        CHARACTER(*), INTENT(OUT) :: errMsg
+        CHARACTER(KIND=C_CHAR) :: errMsg_c(LEN(errMsg))
+        INTEGER :: vit_i_errMsg
+        TYPE(afi_parametertype_view_t), TARGET :: p_view
+        ! Populate view structs from Fortran types
+        CALL vit_populate_afi_parametertype(p, p_view)
+        ! Convert CHARACTER args to C_CHAR arrays
+        DO vit_i_errMsg = 1, LEN(errMsg)
+            errMsg_c(vit_i_errMsg) = errMsg(vit_i_errMsg:vit_i_errMsg)
+        END DO
+        CALL afi_computeuacoefs_c(C_LOC(p_view), Re, UserProp, C_LOC(UA_BL), errMsg_c, errStat)
+        ! Copy C_CHAR arrays back to CHARACTER args (INTENT OUT/INOUT)
+        DO vit_i_errMsg = 1, LEN(errMsg)
+            errMsg(vit_i_errMsg:vit_i_errMsg) = errMsg_c(vit_i_errMsg)
+        END DO
+    END SUBROUTINE AFI_ComputeUACoefs
 
 !=============================================================================
 subroutine AFI_WrHeader(delim, FileName, unOutFile, ErrStat, ErrMsg)

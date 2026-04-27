@@ -22,6 +22,9 @@ static constexpr double PiBy2 = M_PI / 2.0;
 static constexpr double D2R   = M_PI / 180.0;
 static constexpr double R2D   = 180.0 / M_PI;
 
+// Error message length (from NWTC_Base.f90:37)
+static constexpr int ErrMsgLen = 8196;
+
 // ---- EqualRealNos (NWTC_Num.f90:1647, EqualRealNos8) ----
 // Returns true if two doubles are approximately equal,
 // ignoring the last 2 significant digits of machine precision.
@@ -49,5 +52,67 @@ void fZeros(const double* x, const double* f, int n,
 
 double InterpExtrapStp(double XVal, const double* XAry,
                        const double* YAry, int& Ind, int AryLen);
+
+// ---- InterpStp (NWTC_Num.f90:3455, InterpStpReal8) ----
+// Like InterpExtrapStp but clamps at boundaries instead of extrapolating.
+// At XVal <= XAry[0]: returns YAry[0] directly.
+// At XVal >= XAry[AryLen-1]: returns YAry[AryLen-1] directly.
+// Ind: 1-based tracking index (same convention as InterpExtrapStp).
+
+double InterpStp(double XVal, const double* XAry,
+                 const double* YAry, int& Ind, int AryLen);
+
+// ---- kernelSmoothing (NWTC_Num.f90:4157) ----
+// Weighted kernel density smoothing.
+// x[0..n-1]: independent axis (0-based)
+// f[0..n-1]: function values to smooth (0-based)
+// kernelType: kernel function selector (use kernelType_TRIWEIGHT etc.)
+// radius: window width in units of x
+// fNew[0..n-1]: smoothed output (0-based)
+
+void kernelSmoothing(const double* x, const double* f, int n,
+                     int kernelType, double radius, double* fNew);
+
+// Kernel type constants (from NWTC_Num.f90:77-82)
+static constexpr int kernelType_EPANECHINIKOV = 1;
+static constexpr int kernelType_QUARTIC       = 2;
+static constexpr int kernelType_BIWEIGHT      = 3;
+static constexpr int kernelType_TRIWEIGHT     = 4;
+static constexpr int kernelType_TRICUBE       = 5;
+static constexpr int kernelType_GAUSSIAN      = 6;
+
+// ---- MPi2Pi (NWTC_Num.f90:4475, MPi2Pi_R8) ----
+// Normalize angle to [-Pi, Pi].
+
+inline double MPi2Pi(double angle) {
+    angle = std::fmod(angle, TwoPi);
+    if (angle < 0.0) angle += TwoPi;  // fmod can be negative; MODULO is always non-negative
+    if (angle > Pi) angle -= TwoPi;
+    return angle;
+}
+
+// ---- LocateBin (NWTC_Num.f90:4256) ----
+// Binary search returning lower-bound 1-based index.
+// XAry[0..AryLen-1]: 0-based sorted array.
+// Returns: 1-based index ILo such that XAry[ILo-1] <= XVal < XAry[ILo].
+//          Returns 0 if XVal < XAry[0], AryLen if XVal >= XAry[AryLen-1].
+
+int LocateBin(double XVal, const double* XAry, int AryLen);
+
+// ---- CubicSplineInterpM (NWTC_Num.f90:1021) ----
+// Cubic spline interpolation for multiple columns.
+// X: value to interpolate at
+// XAry[0..NumPts-1]: x knots (0-based)
+// YAry: 2D column-major [NumPts rows x nCols cols] (0-based)
+// Coef: 3D column-major [nCoefRows x nCols x 4] with 0-based 3rd dim (coeff order 0..3)
+//       Note: nCoefRows = NumPts-1 (one fewer than knot points)
+// Res[0..nCols-1]: output interpolated values (0-based)
+// NumPts: number of knot points
+// nCols: number of output columns
+// nCoefRows: first dimension of Coef array (typically NumPts-1)
+
+void CubicSplineInterpM(double X, const double* XAry, const double* YAry,
+                        const double* Coef, double* Res,
+                        int NumPts, int nCols, int nCoefRows);
 
 #endif // VIT_NWTC_H

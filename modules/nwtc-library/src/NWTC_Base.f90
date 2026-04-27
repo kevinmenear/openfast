@@ -25,6 +25,7 @@ MODULE NWTC_Base
    USE                             Precision
 
    IMPLICIT  NONE
+   PUBLIC kw_externs_in_nwtc_base 
 
 !=======================================================================
 
@@ -110,4 +111,13 @@ contains
          
    end subroutine    
 
+
+   SUBROUTINE kw_externs_in_nwtc_base(kgen_unit) 
+       INTEGER, INTENT(IN) :: kgen_unit 
+       LOGICAL :: kgen_istrue 
+       REAL(KIND=8) :: kgen_array_sum 
+         
+       kgen_istrue = .TRUE. 
+       WRITE (UNIT = kgen_unit) aborterrlev 
+   END SUBROUTINE kw_externs_in_nwtc_base 
 END MODULE NWTC_Base
