@@ -125,6 +125,18 @@ translations:
     cases_skipped: 0
     kernel_dir: ''
     verification: simulation
+  AFI_WrHeader:
+    status: integrated
+    cpp_file: translations/AirfoilInfo/afi_wrheader.cpp
+    verification: file-output
+  AFI_WrData:
+    status: integrated
+    cpp_file: translations/AirfoilInfo/afi_wrdata.cpp
+    verification: file-output
+  AFI_WrTables:
+    status: integrated
+    cpp_file: translations/AirfoilInfo/afi_wrtables.cpp
+    verification: file-output
 types:
   AFI_ParameterType:
     strategy: view
