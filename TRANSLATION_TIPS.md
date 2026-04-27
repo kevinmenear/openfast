@@ -12,18 +12,27 @@ AirfoilInfo functions frequently access `p%Coefs(Row, Col)` — a 2D ALLOCATABLE
 
 All indices are 1-based in Fortran. The macro preserves 1-based indexing to match the Fortran exactly.
 
-## EqualRealNos (Machine-Precision Comparison)
+## Shared NWTC Utility Library (`vit_nwtc.h` / `vit_nwtc.cpp`)
 
-Several functions call `EqualRealNos(a, b)` from the NWTC Library. This is NOT a callee bridge — it's a pure function that should be inlined:
+All translations should `#include "vit_nwtc.h"` for NWTC Library functions and constants. Do NOT inline these — the implementations are compiled once in `vit_nwtc.cpp` and linked into all translations. VIT automatically copies both files to kernel directories during verification.
 
-```cpp
-static inline bool EqualRealNos(double a, double b) {
-    const double Eps = std::numeric_limits<double>::epsilon();
-    const double Tol = 100.0 * Eps / 2.0;
-    double Fraction = std::max(std::abs(a + b), 1.0);
-    return std::abs(a - b) <= Fraction * Tol;
-}
-```
+**Constants:** `Pi`, `TwoPi`, `PiBy2`, `D2R`, `R2D`, `ErrMsgLen`
+
+**Functions (12 total):**
+- `EqualRealNos(a, b)` — epsilon-based floating-point comparison
+- `fZeros(x, f, n, roots, roots_size, nZeros, ...)` — zero-crossing finder
+- `InterpExtrapStp(XVal, XAry, YAry, Ind, AryLen)` — linear interpolation with stepping (Ind is 1-based)
+- `InterpStp(XVal, XAry, YAry, Ind, AryLen)` — same but clamps at boundaries
+- `kernelSmoothing(x, f, n, kernelType, radius, fNew)` — kernel density smoothing
+- `MPi2Pi(angle)` — normalize angle to [-Pi, Pi] (inline)
+- `LocateBin(XVal, XAry, AryLen)` — binary search, returns 1-based index
+- `CubicSplineInterpM(X, XAry, YAry, Coef, Res, NumPts, nCols, nCoefRows)` — multi-column cubic spline evaluation
+- `CubicSplineInitM(XAry, YAry, Coef, NumPts, NumCrvs, errStat, errMsg)` — cubic spline coefficient computation (tridiagonal Gaussian elimination)
+- `CubicLinSplineInitM(XAry, YAry, Coef, NumPts, NumCrvs, errStat, errMsg)` — linear spline coefficients in cubic format
+- `AddOrSub2Pi(OldAngle, NewAngle*)` — adjust angle to within Pi of reference
+- `Angles_ExtrapInterp1(Angle1, Angle2, tin, Angle_out, tin_out)` — angle-aware linear interpolation
+
+All arrays are 0-based in C++. Index-tracking parameters (Ind in InterpStp/InterpExtrapStp, return from LocateBin) are 1-based to match Fortran convention. See `vit_nwtc.h` for full signatures and documentation.
 
 ## MINLOC / MAXLOC with Masks
 
