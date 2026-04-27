@@ -83,264 +83,192 @@ CONTAINS
    
    !=============================================================================
    SUBROUTINE AFI_Init ( InitInput, p, ErrStat, ErrMsg, UnEcho )
+      ! C++ wrapper: two-pass multi-table validation + spline initialization
+      USE ISO_C_BINDING
+      USE vit_afi_parametertype_view, ONLY: afi_parametertype_view_t, &
+          vit_populate_afi_parametertype, vit_copy_scalars_to_afi_parametertype
+      USE vit_afi_table_type_view, ONLY: afi_table_type_view_t, vit_copy_scalars_to_afi_table_type
+      IMPLICIT NONE
 
+      ! --- Arguments (unchanged from original) ---
+      INTEGER(IntKi), INTENT(OUT)               :: ErrStat
+      INTEGER, INTENT(IN), OPTIONAL             :: UnEcho
+      CHARACTER(*), INTENT(OUT)                 :: ErrMsg
+      TYPE (AFI_InitInputType), INTENT(IN   )   :: InitInput
+      TYPE (AFI_ParameterType), INTENT(  OUT)   :: p
 
-         ! This routine initializes AirfoilInfo by reading the airfoil files and generating the spline coefficients.
+      ! --- BIND(C) mirror of AFI_InitInputType ---
+      TYPE, BIND(C) :: afi_initinput_c_t
+          CHARACTER(KIND=C_CHAR) :: FileName(1024)
+          INTEGER(C_INT) :: AFTabMod
+          INTEGER(C_INT) :: InCol_Alfa
+          INTEGER(C_INT) :: InCol_Cl
+          INTEGER(C_INT) :: InCol_Cd
+          INTEGER(C_INT) :: InCol_Cm
+          INTEGER(C_INT) :: InCol_Cpmin
+          INTEGER(C_INT) :: UAMod
+      END TYPE afi_initinput_c_t
 
+      ! --- C function interfaces ---
+      INTERFACE
+          SUBROUTINE afi_init_pass1_c(InitInp, p, n_secondVals_out, secondVals_buf, &
+                                       spline_dim1_out, spline_dim2_out, errStat, errMsg) BIND(C)
+              USE ISO_C_BINDING
+              TYPE(C_PTR), VALUE :: InitInp
+              TYPE(C_PTR), VALUE :: p
+              TYPE(C_PTR), VALUE :: n_secondVals_out
+              TYPE(C_PTR), VALUE :: secondVals_buf
+              TYPE(C_PTR), VALUE :: spline_dim1_out
+              TYPE(C_PTR), VALUE :: spline_dim2_out
+              TYPE(C_PTR), VALUE :: errStat
+              TYPE(C_PTR), VALUE :: errMsg
+          END SUBROUTINE afi_init_pass1_c
+          SUBROUTINE afi_init_pass2_c(p, secondVals_buf, n_secondVals, errStat, errMsg) BIND(C)
+              USE ISO_C_BINDING
+              TYPE(C_PTR), VALUE :: p
+              TYPE(C_PTR), VALUE :: secondVals_buf
+              INTEGER(C_INT), VALUE :: n_secondVals
+              TYPE(C_PTR), VALUE :: errStat
+              TYPE(C_PTR), VALUE :: errMsg
+          END SUBROUTINE afi_init_pass2_c
+      END INTERFACE
 
-         ! Argument declarations.
-
-      INTEGER(IntKi), INTENT(OUT)               :: ErrStat                    ! Error status.
-
-      INTEGER, INTENT(IN), OPTIONAL             :: UnEcho                     ! I/O unit for echo file. If present and > 0, write to UnEcho.
-
-      CHARACTER(*), INTENT(OUT)                 :: ErrMsg                     ! Error message.
-
-      TYPE (AFI_InitInputType), INTENT(IN   )   :: InitInput                  ! This structure stores values that are set by the calling routine during the initialization phase.
-      TYPE (AFI_ParameterType), INTENT(  OUT)   :: p                          ! This structure stores all the module parameters that are set by AirfoilInfo during the initialization phase.
-
-
-         ! Local declarations.
-
-      REAL(ReKi), ALLOCATABLE                :: Coef          (:)             ! The coefficients to send to the regrid routine for 2D splines.
-
-      INTEGER                                :: UnEc                          ! Local echo file unit number
-      INTEGER                                :: NumCoefs                      ! The number of aerodynamic coefficients to be stored
-      integer                                :: iTable                        ! Iterator for airfoil tables
-      
-      
-      INTEGER                                :: ErrStat2                      ! Local error status.
-      CHARACTER(ErrMsgLen)                   :: ErrMsg2
-      CHARACTER(*), PARAMETER                :: RoutineName = 'AFI_Init'
+      ! --- Local variables ---
+      TYPE(afi_parametertype_view_t), TARGET :: p_view
+      TYPE(afi_initinput_c_t), TARGET :: initinp_c
+      INTEGER(C_INT), TARGET :: c_errStat
+      CHARACTER(KIND=C_CHAR), TARGET :: c_errMsg(ErrMsgLen)
+      INTEGER(C_INT), TARGET :: n_secondVals
+      REAL(C_DOUBLE), TARGET :: secondVals_buf(100)
+      INTEGER(C_INT), TARGET :: spline_dim1(100)
+      INTEGER(C_INT), TARGET :: spline_dim2(100)
+      INTEGER :: iTable, i, UnEc, NumCoefs
+      INTEGER :: ErrStat2
+      CHARACTER(ErrMsgLen) :: ErrMsg2
+      CHARACTER(*), PARAMETER :: RoutineName = 'AFI_Init'
+      TYPE(afi_table_type_view_t), POINTER :: table_views(:)
 
       ErrStat = ErrID_None
       ErrMsg  = ""
 
-         ! Display the version for this module.
+      p%FileName = InitInput%FileName
 
-      !CALL DispNVD ( AFI_Ver )
-      p%FileName = InitInput%FileName ! store this for error messages later (e.g., in UA)
-
-      
+      ! --- Validate inputs ---
       CALL AFI_ValidateInitInput(InitInput, ErrStat2, ErrMsg2)
-         call SetErrStat(ErrStat2,ErrMsg2,ErrStat,ErrMsg,RoutineName)
-         if (ErrStat >= AbortErrLev) return
-      
-      IF ( PRESENT(UnEcho) ) THEN
+         CALL SetErrStat(ErrStat2, ErrMsg2, ErrStat, ErrMsg, RoutineName)
+         IF (ErrStat >= AbortErrLev) RETURN
+
+      ! --- Handle OPTIONAL UnEcho ---
+      IF (PRESENT(UnEcho)) THEN
          UnEc = UnEcho
       ELSE
          UnEc = -1
       END IF
-             
-         ! Set the lookup model:  1 = 1D, 2 = 2D based on (AoA,Re), 3 = 2D based on (AoA,UserProp)
-      p%AFTabMod   = InitInput%AFTabMod
-      
-         ! Set the column indices for the various airfoil coefficients as they will be stored in our data structures, 
-         !   NOT as they are recorded in the airfoil input file (InitInput%InCol_*) !
-      p%ColCl    = 1  
-      p%ColCd    = 2  
-      p%ColCm    = 0 ! These may or may not be used; initialize to zero in case they aren't used
-      p%ColCpmin = 0 ! These may or may not be used; initialize to zero in case they aren't used
-      p%ColUAf   = 0 ! These may or may not be used; initialize to zero in case they aren't used
-      
-      IF ( InitInput%InCol_Cm > 0 )  THEN
+
+      ! --- Set AFTabMod before ReadAFfile ---
+      p%AFTabMod = InitInput%AFTabMod
+
+      ! --- Compute NumCoefs for ReadAFfile ---
+      ! (Column index logic replicated here since ReadAFfile needs NumCoefs)
+      p%ColCl    = 1
+      p%ColCd    = 2
+      p%ColCm    = 0
+      p%ColCpmin = 0
+      p%ColUAf   = 0
+      IF (InitInput%InCol_Cm > 0) THEN
          p%ColCm = 3
-         IF ( InitInput%InCol_Cpmin > 0 )  THEN
+         IF (InitInput%InCol_Cpmin > 0) THEN
             p%ColCpmin = 4
          END IF
-      ELSE IF ( InitInput%InCol_Cpmin > 0 )  THEN
-            p%ColCpmin = 3
-      END IF      
-      NumCoefs = MAX(p%ColCd, p%ColCm,p%ColCpmin) ! number of non-zero coefficient columns
-      
-              
-      ! Process the airfoil file.
-      
-
-      IF ( UnEc > 0 )  THEN
-         WRITE (UnEc,'("--",/,A)')  'Contents of "'//TRIM( InitInput%FileName )//'":'
+      ELSE IF (InitInput%InCol_Cpmin > 0) THEN
+         p%ColCpmin = 3
       END IF
-         
+      NumCoefs = MAX(p%ColCd, p%ColCm, p%ColCpmin)
 
-      CALL ReadAFfile ( InitInput, NumCoefs, p, ErrStat2, ErrMsg2, UnEc ) 
-         CALL SetErrStat ( ErrStat2, ErrMsg2, ErrStat, ErrMsg, RoutineName )
-         IF ( ErrStat >= AbortErrLev )  THEN
-            CALL Cleanup ( )
-            RETURN
-         ENDIF
+      ! --- Echo header ---
+      IF (UnEc > 0) THEN
+         WRITE (UnEc,'("--",/,A)') 'Contents of "'//TRIM(InitInput%FileName)//'":'
+      END IF
 
+      ! --- Read airfoil file (existing two-pass wrapper) ---
+      CALL ReadAFfile(InitInput, NumCoefs, p, ErrStat2, ErrMsg2, UnEc)
+         CALL SetErrStat(ErrStat2, ErrMsg2, ErrStat, ErrMsg, RoutineName)
+         IF (ErrStat >= AbortErrLev) RETURN
 
-         ! Make sure that all the tables meet the current restrictions.
-         
-      IF ( p%NumTabs > 1 )  THEN
+      ! --- Pack InitInput for C++ ---
+      DO i = 1, 1024
+          initinp_c%FileName(i) = InitInput%FileName(i:i)
+      END DO
+      initinp_c%AFTabMod   = INT(InitInput%AFTabMod, C_INT)
+      initinp_c%InCol_Alfa = INT(InitInput%InCol_Alfa, C_INT)
+      initinp_c%InCol_Cl   = INT(InitInput%InCol_Cl, C_INT)
+      initinp_c%InCol_Cd   = INT(InitInput%InCol_Cd, C_INT)
+      initinp_c%InCol_Cm   = INT(InitInput%InCol_Cm, C_INT)
+      initinp_c%InCol_Cpmin = INT(InitInput%InCol_Cpmin, C_INT)
+      initinp_c%UAMod      = 0
 
-         IF ( p%AFTabMod == AFITable_1 ) THEN
-               ! 1D interpolation was specified even though multiple tables exist in the file
-            
-            p%NumTabs = 1
-            CALL SetErrStat ( ErrID_Warn, 'DimModel = 1D, therefore using only the first airfoil table in the file: "'//TRIM( InitInput%FileName ), ErrStat, ErrMsg, RoutineName )
-         
-         ELSE !IF ( p%AFTabMod /= AFITable_1 ) THEN
-               
-            !--------------
-            ! Check that secondary values are unique and monotonically increasing:
-            !--------------
-            ALLOCATE(p%secondVals(p%NumTabs), STAT=ErrStat2 )
-               IF ( ErrStat2 /= 0 )  THEN
-                  CALL SetErrStat ( ErrID_Fatal, 'Error allocating memory for the secondVals array.', ErrStat, ErrMsg, RoutineName )
+      ! --- Populate view with ReadAFfile results ---
+      CALL vit_populate_afi_parametertype(p, p_view)
+
+      ! --- Pass 1: Column setup + multi-table validation ---
+      CALL afi_init_pass1_c(C_LOC(initinp_c), C_LOC(p_view), &
+                            C_LOC(n_secondVals), C_LOC(secondVals_buf), &
+                            C_LOC(spline_dim1), C_LOC(spline_dim2), &
+                            C_LOC(c_errStat), C_LOC(c_errMsg))
+
+      ErrStat2 = INT(c_errStat, IntKi)
+      DO i = 1, MIN(LEN(ErrMsg2), ErrMsgLen)
+          ErrMsg2(i:i) = c_errMsg(i)
+      END DO
+      CALL SetErrStat(ErrStat2, ErrMsg2, ErrStat, ErrMsg, RoutineName)
+      IF (ErrStat >= AbortErrLev) RETURN
+
+      ! --- Copy modified scalars back from view ---
+      CALL vit_copy_scalars_to_afi_parametertype(p_view, p)
+      CALL C_F_POINTER(p_view%Table, table_views, [p%NumTabs])
+      DO iTable = 1, p%NumTabs
+          CALL vit_copy_scalars_to_afi_table_type(table_views(iTable), p%Table(iTable))
+      END DO
+
+      ! --- Allocate secondVals if needed ---
+      IF (n_secondVals > 0) THEN
+          ALLOCATE(p%secondVals(n_secondVals), STAT=ErrStat2)
+          IF (ErrStat2 /= 0) THEN
+              CALL SetErrStat(ErrID_Fatal, 'Error allocating memory for the secondVals array.', &
+                              ErrStat, ErrMsg, RoutineName)
+              RETURN
+          END IF
+      END IF
+
+      ! --- Allocate SplineCoefs per table ---
+      DO iTable = 1, p%NumTabs
+          IF (spline_dim1(iTable) > 0) THEN
+              ALLOCATE(p%Table(iTable)%SplineCoefs(spline_dim1(iTable), &
+                       spline_dim2(iTable), 0:3), STAT=ErrStat2)
+              IF (ErrStat2 /= 0) THEN
+                  CALL SetErrStat(ErrStat2, 'Error allocating memory for the SplineCoefs array.', &
+                                  ErrStat, ErrMsg, RoutineName)
                   RETURN
-               ENDIF
-                  
-               
-            IF (p%AFTabMod == AFITable_2Re) THEN
-               ! Ctrl Value must be the same, Re must be monotonic increasing without repeats
-               
-               DO iTable=2,p%NumTabs
-                     
-                  IF ( p%Table(iTable)%UserProp /= p%Table(1)%UserProp )  THEN
-                     CALL SetErrStat ( ErrID_Fatal, 'Fatal Error: airfoil file "'//TRIM( InitInput%FileName ) &
-                                    //'", Table #'//TRIM( Num2LStr( iTable ) ) &
-                                    //' does not have the same value for Ctrl Property (UserProp) as the first table.', ErrStat, ErrMsg, RoutineName )
-                     CALL Cleanup()
-                     RETURN
-                  ENDIF
-                  
-               END DO ! iTable
+              END IF
+          END IF
+      END DO
 
-               DO iTable=1,p%NumTabs
-                  if (p%Table(iTable)%Re < 0.0_ReKi) then
-                     CALL SetErrStat ( ErrID_Fatal, 'Fatal Error: airfoil file "'//TRIM( InitInput%FileName ) &
-                                    //'", Table #'//TRIM( Num2LStr( iTable ) ) &
-                                    //' has a negative Reynolds Number.', ErrStat, ErrMsg, RoutineName )
-                     CALL Cleanup()
-                     RETURN
-                  end if
-                  
-                  p%Table(iTable)%Re   = max( p%Table(iTable)%Re, 0.001_ReKi )
-                  
-#ifndef AFI_USE_LINEAR_RE
-                  p%secondVals(iTable) = log( p%Table(iTable)%Re )
-#else
-                  p%secondVals(iTable) =      p%Table(iTable)%Re
-#endif
-               END DO ! iTable
+      ! --- Re-populate view with newly allocated arrays ---
+      CALL vit_populate_afi_parametertype(p, p_view)
 
-            ELSE IF (p%AFTabMod == AFITable_2User) THEN
-               ! Re must be the same, Ctrl must be different
-                     
-               p%secondVals(1) = p%Table(1)%UserProp
-               
-               DO iTable=2,p%NumTabs
-                  IF ( p%Table(iTable)%Re /= p%Table(1)%Re )  THEN
-                     CALL SetErrStat ( ErrID_Fatal, 'Fatal Error: airfoil file "'//TRIM( InitInput%FileName ) &
-                                    //'", Table #'//TRIM( Num2LStr( iTable ) ) &
-                                    //' does not have the same value for Re Property (Re) as the first table.', ErrStat, ErrMsg, RoutineName )
-                     CALL Cleanup()
-                     RETURN
-                  ENDIF
-                  p%secondVals(iTable) = p%Table(iTable)%UserProp
-               END DO ! iTable
-                     
-            END IF
-                  
-               
-            IF (.NOT. CheckValuesAreUniqueMonotonicIncreasing(p%secondVals)) THEN
-            
-               ErrMsg2 = 'Fatal Error: airfoil file "'//TRIM( InitInput%FileName ) &
-                           //'", is not monotonic and increasing in the '
-               IF (p%AFTabMod == AFITable_2Re) THEN
-                  ErrMsg2 = trim(ErrMsg2)//' Re Property (Re).'
-               ELSE
-                  ErrMsg2 = trim(ErrMsg2)//' Ctrl Property (UserProp).'
-               END IF
-                     
-               CALL SetErrStat ( ErrID_Fatal, ErrMsg2, ErrStat, ErrMsg, RoutineName )
-               CALL Cleanup()
-               RETURN
-               
-            END IF
-            
-                
-         END IF
-      ELSE
-         p%AFTabMod   = AFITable_1
-      ENDIF ! ( p%NumTabs > 1 )
+      ! --- Pass 2: Fill secondVals + compute spline coefficients ---
+      CALL afi_init_pass2_c(C_LOC(p_view), C_LOC(secondVals_buf), &
+                            INT(n_secondVals, C_INT), &
+                            C_LOC(c_errStat), C_LOC(c_errMsg))
 
-      
-      do iTable = 1, p%NumTabs
-               ! We need to deal with constant data.
-         IF ( p%Table(iTable)%ConstData )  CYCLE  ! skip this table; it's just constant
-
-            ! Allocate the arrays to hold spline coefficients.
-
-         allocate ( p%Table(iTable)%SplineCoefs( p%Table(iTable)%NumAlf-1, size(p%Table(iTable)%Coefs,2), 0:3 ), STAT=ErrStat2 )
-         if ( ErrStat2 /= 0 )  then
-            call SetErrStat ( ErrStat2, 'Error allocating memory for the SplineCoefs array.', ErrStat, ErrMsg, RoutineName )
-            call Cleanup()
-            return
-         end if
-
-            
-            ! Compute the one set of coefficients of the piecewise polynomials for the irregularly-spaced data.
-            ! Unlike the 2-D interpolation in which we use diffent knots for each airfoil coefficient, we can do
-            ! the 1-D stuff all at once.
-
-            
-            
-         if ( p%InterpOrd == 3_IntKi ) then
-               
-            ! bjj: what happens at the end points (these are periodic, so we should maybe extend the tables to make sure the end point?) 
-
-               ! use this for cubic splines:
-            call CubicSplineInitM ( p%Table(iTable)%Alpha &
-                                    , p%Table(iTable)%Coefs &
-                                    , p%Table(iTable)%SplineCoefs &
-                                    , ErrStat2, ErrMsg2 )
-            call SetErrStat ( ErrStat2, ErrMsg2, ErrStat, ErrMsg, RoutineName )
-                           
-         else if ( p%InterpOrd == 1_IntKi ) then
-               
-               ! use this for linear interpolation (sets the higher order coeffs to zero):
-               
-               ! This is not the greatest way to get linear interpolation, but then we can use the same cubic spline routine
-               ! later without checking interp order there
-            call CubicLinSplineInitM ( p%Table(iTable)%Alpha &
-                                       , p%Table(iTable)%Coefs &
-                                       , p%Table(iTable)%SplineCoefs &
-                                       , ErrStat2, ErrMsg2 )
-            call SetErrStat ( ErrStat2, ErrMsg2, ErrStat, ErrMsg, RoutineName )
-               
-         else
-               
-            call SetErrStat ( ErrID_FATAL, 'Airfoil file "'//trim( InitInput%FileName ) &
-                                       //'": InterpOrd must be 1 (linear) or 3 (cubic spline).', ErrStat, ErrMsg, RoutineName )
-            call Cleanup()
-            return
-               
-         end if
-            
-      end do
-
-      CALL Cleanup ( )
-
-      RETURN
-
-   !=======================================================================
-   CONTAINS
-   !=======================================================================
-      SUBROUTINE Cleanup ( )
-
-         ! This subroutine cleans up the parent routine before exiting.
-            ! Deallocate the temporary Coef array.
-
-         IF ( ALLOCATED( Coef       ) ) DEALLOCATE( Coef )
-
-         RETURN
-
-      END SUBROUTINE Cleanup 
+      ErrStat2 = INT(c_errStat, IntKi)
+      DO i = 1, MIN(LEN(ErrMsg2), ErrMsgLen)
+          ErrMsg2(i:i) = c_errMsg(i)
+      END DO
+      CALL SetErrStat(ErrStat2, ErrMsg2, ErrStat, ErrMsg, RoutineName)
 
    END SUBROUTINE AFI_Init
-   
+
    !=============================================================================
    !> This routine checks the init input values for AFI and makes sure they are valid
    !! before using them.

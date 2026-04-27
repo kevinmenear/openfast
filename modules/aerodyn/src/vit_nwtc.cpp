@@ -4,7 +4,10 @@
 
 #include "vit_nwtc.h"
 #include <algorithm>
+#include <cstring>
 #include <limits>
+#include <string>
+#include <vector>
 
 // ---- EqualRealNos (NWTC_Num.f90:1647, EqualRealNos8) ----
 
@@ -233,6 +236,112 @@ int LocateBin(double XVal, const double* XAry, int AryLen) {
         }
     }
     return ILo;  // 1-based index
+}
+
+// ---- CubicSplineInitM (NWTC_Num.f90:742) ----
+
+static void setNwtcErrMsg(char* errMsg, const std::string& msg) {
+    std::memset(errMsg, ' ', ErrMsgLen);
+    size_t n = std::min(msg.size(), (size_t)ErrMsgLen);
+    std::memcpy(errMsg, msg.c_str(), n);
+}
+
+static constexpr int ErrID_None  = 0;
+static constexpr int ErrID_Fatal = 4;
+
+void CubicSplineInitM(const double* XAry, const double* YAry, double* Coef,
+                      int NumPts, int NumCrvs, int* errStat, char* errMsg) {
+    *errStat = ErrID_None;
+    std::memset(errMsg, ' ', ErrMsgLen);
+
+    int nSeg = NumPts - 1;
+    int slice = nSeg * NumCrvs;  // stride for 3rd dimension of Coef
+
+    std::vector<double> DelX(nSeg);
+    std::vector<double> Slope(nSeg * NumCrvs);
+    std::vector<double> U(nSeg);
+    std::vector<double> V(nSeg * NumCrvs);
+    std::vector<double> ZHi(NumCrvs);
+    std::vector<double> ZLo(NumCrvs);
+
+    // Compute spacing and slopes
+    for (int i = 0; i < nSeg; i++) {
+        DelX[i] = XAry[i + 1] - XAry[i];
+        if (EqualRealNos(DelX[i], 0.0)) {
+            *errStat = ErrID_Fatal;
+            setNwtcErrMsg(errMsg, "CubicSplineInitM:XAry must have unique values.");
+            return;
+        }
+        for (int j = 0; j < NumCrvs; j++) {
+            Slope[j * nSeg + i] = (YAry[j * NumPts + (i + 1)] - YAry[j * NumPts + i]) / DelX[i];
+        }
+    }
+
+    // Forward Gaussian elimination on tridiagonal system
+    U[0] = 2.0 * (DelX[1] + DelX[0]);
+    for (int j = 0; j < NumCrvs; j++) {
+        V[j * nSeg + 0] = 6.0 * (Slope[j * nSeg + 1] - Slope[j * nSeg + 0]);
+    }
+
+    for (int i = 1; i < nSeg; i++) {
+        if (EqualRealNos(U[i - 1], 0.0)) {
+            *errStat = ErrID_Fatal;
+            setNwtcErrMsg(errMsg, "CubicSplineInitM:XAry must be monotonic.");
+            return;
+        }
+        U[i] = 2.0 * (DelX[i - 1] + DelX[i]) - DelX[i - 1] * DelX[i - 1] / U[i - 1];
+        for (int j = 0; j < NumCrvs; j++) {
+            V[j * nSeg + i] = 6.0 * (Slope[j * nSeg + i] - Slope[j * nSeg + (i - 1)])
+                             - DelX[i - 1] * V[j * nSeg + (i - 1)] / U[i - 1];
+        }
+    }
+
+    // Coef(:,:,0) = YAry(1:NumPts-1,:)
+    for (int j = 0; j < NumCrvs; j++) {
+        for (int i = 0; i < nSeg; i++) {
+            Coef[0 * slice + j * nSeg + i] = YAry[j * NumPts + i];
+        }
+    }
+
+    // Back-substitution
+    for (int j = 0; j < NumCrvs; j++) ZHi[j] = 0.0;
+
+    for (int i = nSeg - 1; i >= 0; i--) {
+        for (int j = 0; j < NumCrvs; j++) {
+            ZLo[j] = (V[j * nSeg + i] - DelX[i] * ZHi[j]) / U[i];
+            Coef[1 * slice + j * nSeg + i] = Slope[j * nSeg + i]
+                - DelX[i] * (ZHi[j] / 6.0 + ZLo[j] / 3.0);
+            Coef[2 * slice + j * nSeg + i] = 0.5 * ZLo[j];
+            Coef[3 * slice + j * nSeg + i] = (ZHi[j] - ZLo[j]) / (6.0 * DelX[i]);
+            ZHi[j] = ZLo[j];
+        }
+    }
+}
+
+// ---- CubicLinSplineInitM (NWTC_Num.f90:907) ----
+
+void CubicLinSplineInitM(const double* XAry, const double* YAry, double* Coef,
+                         int NumPts, int NumCrvs, int* errStat, char* errMsg) {
+    *errStat = ErrID_None;
+    std::memset(errMsg, ' ', ErrMsgLen);
+
+    int nSeg = NumPts - 1;
+    int slice = nSeg * NumCrvs;
+
+    for (int i = nSeg - 1; i >= 0; i--) {
+        double DelX = XAry[i + 1] - XAry[i];
+        if (EqualRealNos(DelX, 0.0)) {
+            *errStat = ErrID_Fatal;
+            setNwtcErrMsg(errMsg, "CubicLinSplineInitM:XAry must have unique values.");
+            return;
+        }
+        for (int j = 0; j < NumCrvs; j++) {
+            Coef[0 * slice + j * nSeg + i] = YAry[j * NumPts + i];
+            Coef[1 * slice + j * nSeg + i] = (YAry[j * NumPts + (i + 1)] - YAry[j * NumPts + i]) / DelX;
+            Coef[2 * slice + j * nSeg + i] = 0.0;
+            Coef[3 * slice + j * nSeg + i] = 0.0;
+        }
+    }
 }
 
 // ---- CubicSplineInterpM (NWTC_Num.f90:1021) ----

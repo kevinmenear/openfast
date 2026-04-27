@@ -131,4 +131,23 @@ void CubicSplineInterpM(double X, const double* XAry, const double* YAry,
                         const double* Coef, double* Res,
                         int NumPts, int nCols, int nCoefRows);
 
+// ---- CubicSplineInitM (NWTC_Num.f90:742) ----
+// Compute natural cubic spline coefficients for irregularly-spaced data.
+// Handles multiple curves sharing the same X values.
+// XAry[0..NumPts-1]: knot x-values (0-based, must be unique)
+// YAry: 2D column-major [NumPts x NumCrvs] (0-based)
+// Coef: 3D column-major output [nCoefRows x NumCrvs x 4], nCoefRows = NumPts-1
+//       Coef(i,j,k) = Coef[k * nCoefRows * NumCrvs + j * nCoefRows + i]
+// errStat/errMsg: error output (ErrID_Fatal if X not unique or system singular)
+
+void CubicSplineInitM(const double* XAry, const double* YAry, double* Coef,
+                      int NumPts, int NumCrvs, int* errStat, char* errMsg);
+
+// ---- CubicLinSplineInitM (NWTC_Num.f90:907) ----
+// Compute linear spline coefficients in cubic format (c2=c3=0).
+// Same array layouts as CubicSplineInitM.
+
+void CubicLinSplineInitM(const double* XAry, const double* YAry, double* Coef,
+                         int NumPts, int NumCrvs, int* errStat, char* errMsg);
+
 #endif // VIT_NWTC_H

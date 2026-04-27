@@ -117,6 +117,14 @@ translations:
     cases_skipped: 0
     kernel_dir: ''
     verification: simulation
+  AFI_Init:
+    status: integrated
+    cpp_file: translations/AirfoilInfo/afi_init.cpp
+    cases_passed: 17
+    cases_total: 17
+    cases_skipped: 0
+    kernel_dir: ''
+    verification: simulation
 types:
   AFI_ParameterType:
     strategy: view
