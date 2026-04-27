@@ -1,0 +1,21 @@
+Drift report: ad_MHK_RM1_Fixed_UA vs NREL r-test reference
+Generated: 2026-04-27T03:10:46Z
+Platform: NAME="Ubuntu"
+
+Our output: /workspace/openfast/build/modules/aerodyn/baseline_gen_ad_MHK_RM1_Fixed_UA/ad_driver.outb
+NREL ref:   /workspace/openfast/build/modules/aerodyn/baseline_gen_ad_MHK_RM1_Fixed_UA/ad_driver_nrel_ref.outb
+Array shape: (600, 54) (timesteps, channels) = 32400 values
+
+Bit-identical:                  30000 / 32400 (92.59%)
+Within 1e-5 rel:                30000 / 32400 (92.59%)
+Within 1e-5 rel OR 1e-6 abs:    30000 / 32400 (92.59%)
+Max abs difference:            3.921592e+01
+Max rel difference:            1.000000e+00
+
+Per-channel drift (non-zero channels only):
+  B1N3SigCr              (-       )  abs=3.922e+01  rel=1.000e+00  at t_idx=394
+  B2N5SigCr              (-       )  abs=1.495e+01  rel=1.000e+00  at t_idx=367
+  B1N2SgCav              (-       )  abs=5.275e+00  rel=1.000e+00  at t_idx=63
+  B2N6SgCav              (-       )  abs=1.777e+00  rel=1.000e+00  at t_idx=130
+
+Total channels with drift:     4 / 54
