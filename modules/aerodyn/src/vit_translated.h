@@ -28,6 +28,8 @@ void calculateuacoeffs_c(afi_ua_bl_default_type_t* CalcDefaults, afi_table_type_
 void afi_validateinitinput_c(afi_initinputtype_t* InitInput, int* ErrStat, char* ErrMsg);
 void afi_computeairfoilcoefs_c(double AOA, double Re, double UserProp, afi_parametertype_view_t* p, afi_outputtype_t* AFI_interp, int* errStat, char* errMsg);
 void afi_computeuacoefs_c(afi_parametertype_view_t* p, double Re, double UserProp, afi_ua_bl_type_t* UA_BL, char* errMsg, int* errStat);
+void readaffile_pass1_c(const afi_initinputtype_t* InitInp, int NumCoefsIn, afi_parametertype_view_t* p, int* numalf_out, int* ncoefstab_out, int* errStat, char* errMsg);
+void readaffile_fill_c(afi_parametertype_view_t* p, const afi_initinputtype_t* InitInp, int NumCoefsIn, int* errStat, char* errMsg);
 
 #ifdef __cplusplus
 }

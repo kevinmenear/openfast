@@ -368,474 +368,141 @@ CONTAINS
   
    !=============================================================================
    SUBROUTINE ReadAFfile ( InitInp, NumCoefsIn, p, ErrStat, ErrMsg, UnEc )
+      ! C++ wrapper: two-pass idiomatic file parser
+      USE ISO_C_BINDING
+      USE vit_afi_parametertype_view, ONLY: afi_parametertype_view_t, &
+          vit_populate_afi_parametertype, vit_copy_scalars_to_afi_parametertype
+      USE vit_afi_table_type_view, ONLY: afi_table_type_view_t, vit_copy_scalars_to_afi_table_type
+      IMPLICIT NONE
 
-
-         ! This routine reads an airfoil file.
-
-
-         ! Argument declarations.
-
-      TYPE (AFI_InitInputType), INTENT(IN)    :: InitInp                       ! This structure stores values that are set by the calling routine during the initialization phase.
-      INTEGER(IntKi),    INTENT(  OUT)        :: ErrStat                       ! Error status
-      INTEGER(IntKi),    INTENT(IN   )        :: NumCoefsIn                    ! The number of aerodynamic coefficients to be stored
+      ! --- Arguments (unchanged from original) ---
+      TYPE (AFI_InitInputType), INTENT(IN)    :: InitInp
+      INTEGER(IntKi),    INTENT(  OUT)        :: ErrStat
+      INTEGER(IntKi),    INTENT(IN   )        :: NumCoefsIn
+      INTEGER,           INTENT(IN)           :: UnEc
+      CHARACTER(*),      INTENT(  OUT)        :: ErrMsg
+      TYPE (AFI_ParameterType), INTENT(INOUT) :: p
       
+      ! --- BIND(C) mirror of AFI_InitInputType ---
+      TYPE, BIND(C) :: afi_initinput_c_t
+          CHARACTER(KIND=C_CHAR) :: FileName(1024)
+          INTEGER(C_INT) :: AFTabMod
+          INTEGER(C_INT) :: InCol_Alfa
+          INTEGER(C_INT) :: InCol_Cl
+          INTEGER(C_INT) :: InCol_Cd
+          INTEGER(C_INT) :: InCol_Cm
+          INTEGER(C_INT) :: InCol_Cpmin
+          INTEGER(C_INT) :: UAMod
+      END TYPE afi_initinput_c_t
 
-      INTEGER,           INTENT(IN)           :: UnEc                          ! I/O unit for echo file. If present and > 0, write to UnEc.
+      ! --- C function interfaces ---
+      INTERFACE
+          SUBROUTINE readaffile_pass1_c(InitInp, NumCoefsIn, p, numalf_out, &
+                                         ncoefstab_out, errStat, errMsg) BIND(C)
+              USE ISO_C_BINDING
+              TYPE(C_PTR), VALUE :: InitInp
+              INTEGER(C_INT), VALUE :: NumCoefsIn
+              TYPE(C_PTR), VALUE :: p
+              TYPE(C_PTR), VALUE :: numalf_out
+              TYPE(C_PTR), VALUE :: ncoefstab_out
+              TYPE(C_PTR), VALUE :: errStat
+              TYPE(C_PTR), VALUE :: errMsg
+          END SUBROUTINE readaffile_pass1_c
+          SUBROUTINE readaffile_fill_c(p, InitInp, NumCoefsIn, errStat, errMsg) BIND(C)
+              USE ISO_C_BINDING
+              TYPE(C_PTR), VALUE :: p
+              TYPE(C_PTR), VALUE :: InitInp
+              INTEGER(C_INT), VALUE :: NumCoefsIn
+              TYPE(C_PTR), VALUE :: errStat
+              TYPE(C_PTR), VALUE :: errMsg
+          END SUBROUTINE readaffile_fill_c
+      END INTERFACE
 
-      CHARACTER(*),      INTENT(  OUT)        :: ErrMsg                        ! Error message.
+      ! --- Local variables ---
+      TYPE(afi_parametertype_view_t), TARGET :: p_view
+      TYPE(afi_initinput_c_t), TARGET :: initinp_c
+      INTEGER(C_INT), TARGET :: numalf_out(100)
+      INTEGER(C_INT), TARGET :: ncoefstab_out(100)
+      INTEGER(C_INT), TARGET :: c_errStat
+      CHARACTER(KIND=C_CHAR), TARGET :: c_errMsg(ErrMsgLen)
+      INTEGER :: iTable, i
+      TYPE(afi_table_type_view_t), POINTER :: table_views(:)
 
-      TYPE (AFI_ParameterType), INTENT(INOUT)   :: p                          ! This structure stores all the module parameters that are set by AirfoilInfo during the initialization phase.
-
-
-         ! Local declarations.
-
-      REAL(ReKi)                              :: Coords   (2)                  ! An array to hold data from the airfoil-shape table.
-      REAL(ReKi), ALLOCATABLE                 :: SiAry    (:)                  ! A temporary array to hold data from a table.
-                                              
-      INTEGER                                 :: Coef                          ! A DO index that points into the coefficient array.
-      INTEGER                                 :: Cols2Parse                    ! The number of columns that must be read from the coefficient tables.
-      INTEGER                                 :: CurLine                       ! The current line to be parsed in the FileInfo structure.
-      INTEGER                                 :: NumAlf                        ! The number of rows in the current table.
-      INTEGER                                 :: Row                           ! The row of a table to be parsed in the FileInfo structure.
-      INTEGER                                 :: iTable                        ! The DO index for the tables.
-                                              
-      LOGICAL                                 :: BadVals                       ! A flag that indicates if the values in a table are invalid.
-
-      TYPE (FileInfoType)                     :: FileInfo                      ! The derived type for holding the file information.
-      INTEGER(IntKi)                          :: NumCoefsTab                   ! The number of aerodynamic coefficients to be stored.
-
-      INTEGER(IntKi), parameter               :: DefaultInterpOrd = 1          ! value of default interp order
-      INTEGER(IntKi)                          :: ErrStat2                      ! Error status local to this routine.
-      CHARACTER(ErrMsgLen)                    :: ErrMsg2
-      CHARACTER(*), PARAMETER                 :: RoutineName = 'ReadAFfile'
-      CHARACTER(10)                           :: defaultStr
-      CHARACTER(1024)                         :: PriPath
-      
-      TYPE (AFI_UA_BL_Default_Type), ALLOCATABLE :: CalcDefaults(:)            ! Whether to calculate default values for the UA parameters
-      
       ErrStat = ErrID_None
       ErrMsg  = ""
-      defaultStr = ""
-      
-      ! Getting parent folder of airfoils data (e.g. "Arifoils/")
-      CALL GetPath( InitInp%FileName, PriPath )
 
-         ! Process the (possibly) nested set of files.  This copies the decommented contents of
-         ! AFI_FileInfo%FileName and the files it includes (both directly and indirectly) into
-         ! the FileInfo structure that we can then parse.
-
-      CALL ProcessComFile ( InitInp%FileName, FileInfo, ErrStat2, ErrMsg2 )
-         CALL SetErrStat( ErrStat2, ErrMsg2, ErrStat, ErrMsg, RoutineName )
-         IF (ErrStat >= AbortErrLev) THEN
-            CALL Cleanup()
-            RETURN
-         END IF
-         
-
-         ! Process the airfoil shape information if it is included.
-
-      CurLine = 1
-      
-      CALL ParseVarWDefault ( FileInfo, CurLine, 'InterpOrd', p%InterpOrd, DefaultInterpOrd, ErrStat2, ErrMsg2, UnEc )
-         CALL SetErrStat( ErrStat2, ErrMsg2, ErrStat, ErrMsg, RoutineName )
-         IF (ErrStat >= AbortErrLev) THEN
-            CALL Cleanup()
-            RETURN
-         END IF
-         
-         ! RelThickness, default is 0.2 if user doesn't know it, only used for Boeing-Vertol UA model = 7
-      CALL ParseVarWDefault ( FileInfo, CurLine, 'RelThickness', p%RelThickness, 0.2_ReKi, ErrStat2, ErrMsg2, UnEc )
-         if (ErrStat2 >= AbortErrLev) then ! if the line is missing, set RelThickness = -1 and move on...
-            p%RelThickness=-1 ! To trigger an error
-            !call WrScr('Skipping. RelThickness not found on line 7 of Profile file: '//trim(InitInp%FileName) )
-         else
-            CALL SetErrStat( ErrStat2, ErrMsg2, ErrStat, ErrMsg, RoutineName )
-         end if
-         
-         
-         ! NonDimArea is currently unused by AirfoilInfo or codes using AirfoilInfo.  GJH 9/13/2017
-      CALL ParseVar ( FileInfo, CurLine, 'NonDimArea', p%NonDimArea, ErrStat2, ErrMsg2, UnEc )
-         CALL SetErrStat( ErrStat2, ErrMsg2, ErrStat, ErrMsg, RoutineName )
-         
-         ! NumCoords, with the Coords data, is used for determining the blade shape (currently used 
-         !   for visualization only).  This data (blade coordinates) is passed to the caller via 
-         !   the InitOut%BladeShape data structure, and stored in p%XCoord, etc.,
-         !   but is currently unused by AFI module.  GJH 9/13/2017
-      CALL ParseVar ( FileInfo, CurLine, 'NumCoords' , p%NumCoords , ErrStat2, ErrMsg2, UnEc )
-         CALL SetErrStat( ErrStat2, ErrMsg2, ErrStat, ErrMsg, RoutineName )
-         IF (ErrStat >= AbortErrLev) THEN
-            CALL Cleanup()
-            RETURN
-         END IF
-
-      IF ( p%NumCoords > 0 )  THEN
-
-         ALLOCATE ( p%X_Coord( p%NumCoords ) , STAT=ErrStat2 )
-         IF ( ErrStat2 /= 0 )  THEN
-            CALL SetErrStat ( ErrID_Fatal, 'Error allocating memory for p%X_Coord.', ErrStat, ErrMsg, RoutineName )
-            CALL Cleanup()
-            RETURN
-         ENDIF
-
-         ALLOCATE ( p%Y_Coord( p%NumCoords ) , STAT=ErrStat2 )
-         IF ( ErrStat2 /= 0 )  THEN
-            CALL SetErrStat ( ErrID_Fatal, 'Error allocating memory for p%Y_Coord.', ErrStat, ErrMsg, RoutineName )
-            CALL Cleanup()
-            RETURN
-         ENDIF
-
-         DO Row=1,p%NumCoords
-            CALL ParseAry ( FileInfo, CurLine, 'X_Coord/Y_Coord', Coords, 2, ErrStat2, ErrMsg2, UnEc )
-               CALL SetErrStat( ErrStat2, ErrMsg2, ErrStat, ErrMsg, RoutineName )
-               IF (ErrStat >= AbortErrLev) THEN
-                  CALL Cleanup()
-                  RETURN
-               END IF
-            p%X_Coord(Row) = Coords(1)
-            p%Y_Coord(Row) = Coords(2)
-         ENDDO ! Row
-
-      ENDIF
-      
-      ! Reading Boundary layer file for aeroacoustics
-      CALL ParseVar ( FileInfo, CurLine, 'BL_file' , p%BL_file , ErrStat2, ErrMsg2, UnEc, IsPath=.true. )
-         IF (ErrStat2 >= AbortErrLev) p%BL_file = "NOT_SET_IN_AIRFOIL_FILE"
-         !CALL SetErrStat( ErrStat2, ErrMsg2, ErrStat, ErrMsg, RoutineName )
-      IF ( PathIsRelative( p%BL_file ) )  p%BL_file=trim(PriPath)//trim(p%BL_file)
-
-
-         ! How many columns do we need to read in the input and how many total coefficients will be used?
-      Cols2Parse = MAX( InitInp%InCol_Alfa, InitInp%InCol_Cl, InitInp%InCol_Cd, InitInp%InCol_Cm, InitInp%InCol_Cpmin )
-      ALLOCATE ( SiAry( Cols2Parse ) , STAT=ErrStat2 )
-      IF ( ErrStat2 /= 0 )  THEN
-         CALL SetErrStat ( ErrID_Fatal, 'Error allocating memory for SiAry.', ErrStat, ErrMsg, RoutineName )
-         CALL Cleanup()
-         RETURN
-      ENDIF
-
-
-         ! Work through the multiple tables.
-
-      CALL ParseVar ( FileInfo, CurLine, 'NumTabs' , p%NumTabs , ErrStat2, ErrMsg2, UnEc )
-         CALL SetErrStat( ErrStat2, ErrMsg2, ErrStat, ErrMsg, RoutineName )
-         IF (ErrStat >= AbortErrLev) THEN
-            CALL Cleanup()
-            RETURN
-         END IF
-
-      IF ( p%NumTabs < 1 )  THEN
-         CALL SetErrStat ( ErrID_Fatal, 'NumTabs must be > 0.', ErrStat, ErrMsg, RoutineName )
-         CALL Cleanup()
-         RETURN
-      ENDIF
-
-      ALLOCATE ( p%Table( p%NumTabs ) , CalcDefaults(p%NumTabs), STAT=ErrStat2 )
-      IF ( ErrStat2 /= 0 )  THEN
-         CALL SetErrStat ( ErrID_Fatal, 'Error allocating memory for p%Table.', ErrStat, ErrMsg, RoutineName )
-         CALL Cleanup()
-         RETURN
-      ENDIF
-
-      DO iTable=1,p%NumTabs
-        NumCoefsTab = NumCoefsIn
-        
-         CALL ParseVar ( FileInfo, CurLine, 'Re', p%Table(iTable)%Re, ErrStat2, ErrMsg2, UnEc )
-            CALL SetErrStat( ErrStat2, ErrMsg2, ErrStat, ErrMsg, RoutineName )
-            IF (ErrStat >= AbortErrLev) THEN
-               CALL Cleanup()
-               RETURN
-            END IF
-         p%Table(iTable)%Re = p%Table(iTable)%Re * 1.0e6  ! Entered in millions, so multiply here
-         IF ( p%Table(iTable)%Re <= 0.0 )  THEN
-               CALL SetErrStat ( ErrID_Severe, 'Re must be > 0 in "'//TRIM( InitInp%FileName ) &
-                                      //'".'//NewLine//'  >> The error occurred on line #' &
-                                      //TRIM( Num2LStr( FileInfo%FileLine(CurLine-1) ) )//'.', ErrStat, ErrMsg, RoutineName )
-               CALL Cleanup()
-               RETURN
-         ENDIF ! ( p%Table(iTable)%Re <= 0.0 )
-
-         CALL ParseVar ( FileInfo, CurLine, 'UserProp', p%Table(iTable)%UserProp, ErrStat2, ErrMsg2, UnEc )
-         if (ErrStat2 >= AbortErrLev) then ! for backward compatibility of input files
-            CALL ParseVar ( FileInfo, CurLine, 'Ctrl', p%Table(iTable)%UserProp, ErrStat2, ErrMsg2, UnEc )
-         end if
-            CALL SetErrStat( ErrStat2, ErrMsg2, ErrStat, ErrMsg, RoutineName )
-            IF (ErrStat >= AbortErrLev) THEN
-               CALL Cleanup()
-               RETURN
-            END IF
-
-         CALL ParseVar ( FileInfo, CurLine, 'InclUAdata', p%Table(iTable)%InclUAdata, ErrStat2, ErrMsg2, UnEc )
-            if (ErrStat2 >= AbortErrLev) p%Table(iTable)%InclUAdata = .false. ! assume we don't have any UA data included, so we'll calculate it later.
-
-         IF ( p%Table(iTable)%InclUAdata )  THEN
-
-               CALL ParseVar ( FileInfo, CurLine, 'alpha0', p%Table(iTable)%UA_BL%alpha0, ErrStat2, ErrMsg2, UnEc )
-               CalcDefaults(iTable)%alpha0 = ErrStat2 >= AbortErrLev
-               if (.not. CalcDefaults(iTable)%alpha0) p%Table(iTable)%UA_BL%alpha0 = p%Table(iTable)%UA_BL%alpha0*D2R
-
-               CALL ParseVar ( FileInfo, CurLine, 'alpha1', p%Table(iTable)%UA_BL%alpha1, ErrStat2, ErrMsg2, UnEc )
-               CalcDefaults(iTable)%alpha1 = ErrStat2 >= AbortErrLev
-               if (.not. CalcDefaults(iTable)%alpha1) p%Table(iTable)%UA_BL%alpha1 = p%Table(iTable)%UA_BL%alpha1*D2R
-
-               CALL ParseVar ( FileInfo, CurLine, 'alpha2', p%Table(iTable)%UA_BL%alpha2, ErrStat2, ErrMsg2, UnEc )
-               CalcDefaults(iTable)%alpha2 = ErrStat2 >= AbortErrLev
-               if (.not. CalcDefaults(iTable)%alpha2) p%Table(iTable)%UA_BL%alpha2 = p%Table(iTable)%UA_BL%alpha2*D2R
-               
-               CALL ParseVar ( FileInfo, CurLine, 'alphaUpper', p%Table(iTable)%UA_BL%alphaUpper, ErrStat2, ErrMsg2, UnEc )
-               CalcDefaults(iTable)%alphaUpper = ErrStat2 >= AbortErrLev
-               if (.not. CalcDefaults(iTable)%alphaUpper) p%Table(iTable)%UA_BL%alphaUpper = p%Table(iTable)%UA_BL%alphaUpper*D2R
-               
-               CALL ParseVar ( FileInfo, CurLine, 'alphaLower', p%Table(iTable)%UA_BL%alphaLower, ErrStat2, ErrMsg2, UnEc )
-               CalcDefaults(iTable)%alphaLower = ErrStat2 >= AbortErrLev
-               if (.not. CalcDefaults(iTable)%alphaLower) p%Table(iTable)%UA_BL%alphaLower = p%Table(iTable)%UA_BL%alphaLower*D2R
-
-               CALL ParseVar ( FileInfo, CurLine, 'eta_e', p%Table(iTable)%UA_BL%eta_e, ErrStat2, ErrMsg2, UnEc )
-               CalcDefaults(iTable)%eta_e = ErrStat2 >= AbortErrLev
-
-               CALL ParseVar ( FileInfo, CurLine, 'C_nalpha', p%Table(iTable)%UA_BL%C_nalpha, ErrStat2, ErrMsg2, UnEc )
-               CalcDefaults(iTable)%C_nalpha = ErrStat2 >= AbortErrLev
-            
-               CALL ParseVar ( FileInfo, CurLine, 'C_lalpha', p%Table(iTable)%UA_BL%C_lalpha, ErrStat2, ErrMsg2, UnEc )
-               CalcDefaults(iTable)%C_lalpha = ErrStat2 >= AbortErrLev
-               
-               CALL ParseVarWDefault ( FileInfo, CurLine, 'T_f0', p%Table(iTable)%UA_BL%T_f0, 3.0_ReKi, ErrStat2, ErrMsg2, UnEc )
-               CalcDefaults(iTable)%T_f0 = ErrStat2 >= AbortErrLev
-         
-               CALL ParseVarWDefault ( FileInfo, CurLine, 'T_V0', p%Table(iTable)%UA_BL%T_V0, 6.0_ReKi, ErrStat2, ErrMsg2, UnEc )
-               CalcDefaults(iTable)%T_V0 = ErrStat2 >= AbortErrLev
-               
-               CALL ParseVarWDefault ( FileInfo, CurLine, 'T_p', p%Table(iTable)%UA_BL%T_p, 1.7_ReKi, ErrStat2, ErrMsg2, UnEc )
-               CalcDefaults(iTable)%T_p = ErrStat2 >= AbortErrLev
-
-               CALL ParseVarWDefault ( FileInfo, CurLine, 'T_VL', p%Table(iTable)%UA_BL%T_VL, 11.0_ReKi, ErrStat2, ErrMsg2, UnEc )
-               CalcDefaults(iTable)%T_VL = ErrStat2 >= AbortErrLev
-
-               CALL ParseVarWDefault ( FileInfo, CurLine, 'b1', p%Table(iTable)%UA_BL%b1, .14_ReKi, ErrStat2, ErrMsg2, UnEc )
-               CalcDefaults(iTable)%b1 = ErrStat2 >= AbortErrLev
-
-               CALL ParseVarWDefault ( FileInfo, CurLine, 'b2', p%Table(iTable)%UA_BL%b2, .53_ReKi, ErrStat2, ErrMsg2, UnEc )
-               CalcDefaults(iTable)%b2 = ErrStat2 >= AbortErrLev
-
-               CALL ParseVarWDefault ( FileInfo, CurLine, 'b5', p%Table(iTable)%UA_BL%b5, 5.0_ReKi, ErrStat2, ErrMsg2, UnEc )
-               CalcDefaults(iTable)%b5 = ErrStat2 >= AbortErrLev
-
-               CALL ParseVarWDefault ( FileInfo, CurLine, 'A1', p%Table(iTable)%UA_BL%A1, .3_ReKi, ErrStat2, ErrMsg2, UnEc )
-               CalcDefaults(iTable)%A1 = ErrStat2 >= AbortErrLev
-
-               CALL ParseVarWDefault ( FileInfo, CurLine, 'A2', p%Table(iTable)%UA_BL%A2, .7_ReKi, ErrStat2, ErrMsg2, UnEc )
-               CalcDefaults(iTable)%A2 = ErrStat2 >= AbortErrLev
-
-               CALL ParseVarWDefault ( FileInfo, CurLine, 'A5', p%Table(iTable)%UA_BL%A5, 1.0_ReKi, ErrStat2, ErrMsg2, UnEc )
-               CalcDefaults(iTable)%A5 = ErrStat2 >= AbortErrLev
-
-               CALL ParseVar ( FileInfo, CurLine, 'S1', p%Table(iTable)%UA_BL%S1, ErrStat2, ErrMsg2, UnEc )
-               CalcDefaults(iTable)%S1 = ErrStat2 >= AbortErrLev
-
-               CALL ParseVar ( FileInfo, CurLine, 'S2', p%Table(iTable)%UA_BL%S2, ErrStat2, ErrMsg2, UnEc )
-               CalcDefaults(iTable)%S2 = ErrStat2 >= AbortErrLev
-
-               CALL ParseVar ( FileInfo, CurLine, 'S3', p%Table(iTable)%UA_BL%S3, ErrStat2, ErrMsg2, UnEc )
-               CalcDefaults(iTable)%S3 = ErrStat2 >= AbortErrLev
-
-               CALL ParseVar ( FileInfo, CurLine, 'S4', p%Table(iTable)%UA_BL%S4, ErrStat2, ErrMsg2, UnEc )
-               CalcDefaults(iTable)%S4 = ErrStat2 >= AbortErrLev
-
-               CALL ParseVar ( FileInfo, CurLine, 'Cn1', p%Table(iTable)%UA_BL%Cn1, ErrStat2, ErrMsg2, UnEc )
-               CalcDefaults(iTable)%Cn1 = ErrStat2 >= AbortErrLev
-
-               CALL ParseVar ( FileInfo, CurLine, 'Cn2', p%Table(iTable)%UA_BL%Cn2, ErrStat2, ErrMsg2, UnEc )
-               CalcDefaults(iTable)%Cn2 = ErrStat2 >= AbortErrLev
-
-               CALL ParseVarWDefault ( FileInfo, CurLine, 'St_sh', p%Table(iTable)%UA_BL%St_sh, .19_ReKi, ErrStat2, ErrMsg2, UnEc )
-               CalcDefaults(iTable)%St_sh = ErrStat2 >= AbortErrLev
-
-               CALL ParseVar ( FileInfo, CurLine, 'Cd0', p%Table(iTable)%UA_BL%Cd0, ErrStat2, ErrMsg2, UnEc )
-               CalcDefaults(iTable)%Cd0 = ErrStat2 >= AbortErrLev
-
-               CALL ParseVar ( FileInfo, CurLine, 'Cm0', p%Table(iTable)%UA_BL%Cm0, ErrStat2, ErrMsg2, UnEc )
-               CalcDefaults(iTable)%Cm0 = ErrStat2 >= AbortErrLev
-
-               CALL ParseVar ( FileInfo, CurLine, 'k0', p%Table(iTable)%UA_BL%k0, ErrStat2, ErrMsg2, UnEc )
-               CalcDefaults(iTable)%k0 = ErrStat2 >= AbortErrLev
-
-               CALL ParseVar ( FileInfo, CurLine, 'k1', p%Table(iTable)%UA_BL%k1, ErrStat2, ErrMsg2, UnEc )
-               CalcDefaults(iTable)%k1 = ErrStat2 >= AbortErrLev
-
-               CALL ParseVar ( FileInfo, CurLine, 'k2', p%Table(iTable)%UA_BL%k2, ErrStat2, ErrMsg2, UnEc )
-               CalcDefaults(iTable)%k2 = ErrStat2 >= AbortErrLev
-
-               CALL ParseVar ( FileInfo, CurLine, 'k3', p%Table(iTable)%UA_BL%k3, ErrStat2, ErrMsg2, UnEc )
-               CalcDefaults(iTable)%k3 = ErrStat2 >= AbortErrLev
-
-               CALL ParseVar ( FileInfo, CurLine, 'k1_hat', p%Table(iTable)%UA_BL%k1_hat, ErrStat2, ErrMsg2, UnEc )
-               CalcDefaults(iTable)%k1_hat = ErrStat2 >= AbortErrLev
-
-               CALL ParseVarWDefault ( FileInfo, CurLine, 'x_cp_bar', p%Table(iTable)%UA_BL%x_cp_bar, .2_ReKi, ErrStat2, ErrMsg2, UnEc )
-               CalcDefaults(iTable)%x_cp_bar = ErrStat2 >= AbortErrLev
-                  
-               CALL ParseVarWDefault ( FileInfo, CurLine, 'UACutout', p%Table(iTable)%UA_BL%UACutout, 45.0_ReKi, ErrStat2, ErrMsg2, UnEc )
-               CalcDefaults(iTable)%UACutout = ErrStat2 >= AbortErrLev
-               if (.not. CalcDefaults(iTable)%UACutout ) p%Table(iTable)%UA_BL%UACutout = p%Table(iTable)%UA_BL%UACutout*D2R
-
-               CALL ParseVarWDefault ( FileInfo, CurLine, 'UACutout_delta', p%Table(iTable)%UA_BL%UACutout_delta, 5.0_ReKi, ErrStat2, ErrMsg2, UnEc )
-               CalcDefaults(iTable)%UACutout_delta = ErrStat2 >= AbortErrLev
-               if (.not. CalcDefaults(iTable)%UACutout_delta) p%Table(iTable)%UA_BL%UACutout_delta = p%Table(iTable)%UA_BL%UACutout_delta*D2R
-
-               CALL ParseVarWDefault ( FileInfo, CurLine, 'filtCutOff', p%Table(iTable)%UA_BL%filtCutOff, 0.5_ReKi, ErrStat2, ErrMsg2, UnEc )
-               CalcDefaults(iTable)%filtCutOff = ErrStat2 >= AbortErrLev
-                  
-               IF (ErrStat >= AbortErrLev) THEN
-                  CALL Cleanup()
-                  RETURN
-               END IF
-         ELSE
-         
-            ! everything is default ( we could just attempt to read these from the file, but it will be faster to use the default settings of .true. for each variable)
-         
-            p%Table(iTable)%InclUAdata = .true. ! make sure we are calculating this for each table
-
-         ENDIF ! ( p%Table(iTable)%InclUAdata )
-
-         if ( p%Table(iTable)%InclUAdata ) then
-            p%ColUAf    = NumCoefsIn + 1 ! column for f_st for the UA models
-            NumCoefsTab = NumCoefsIn + 3 ! total number of columns if we have UA on (for f_st, cl/cn_fs, cl/cn_fa)
-         end if
-
-         
-         CALL ParseVar ( FileInfo, CurLine, 'NumAlf', p%Table(iTable)%NumAlf, ErrStat2, ErrMsg2, UnEc )
-            CALL SetErrStat( ErrStat2, ErrMsg2, ErrStat, ErrMsg, RoutineName )
-            IF (ErrStat >= AbortErrLev) THEN
-               CALL Cleanup()
-               RETURN
-            END IF
-
-         IF ( p%Table(iTable)%NumAlf < 1 )  THEN
-            CALL SetErrStat( ErrID_Fatal, 'NumAlf must be a positive number on line #' &
-                           //TRIM( Num2LStr( FileInfo%FileLine(CurLine-1) ) )//' in "'//TRIM( InitInp%FileName )//'".', ErrStat, ErrMsg, RoutineName )
-            CALL Cleanup()
-            RETURN
-         ENDIF ! ( Test for valid values for NumAlf )
-
-
-            ! Allocate the arrays for the airfoil coefficients.
-
-         ALLOCATE ( p%Table(iTable)%Alpha( p%Table(iTable)%NumAlf ), STAT=ErrStat2 )
-         IF ( ErrStat2 /= 0 )  THEN
-            CALL SetErrStat( ErrID_Fatal, 'Error allocating memory for p%Table%Alpha.', ErrStat, ErrMsg, RoutineName )
-            CALL Cleanup()
-            RETURN
-         ENDIF
-
-         ALLOCATE ( p%Table(iTable)%Coefs( p%Table(iTable)%NumAlf, NumCoefsTab ), STAT=ErrStat2 )
-         IF ( ErrStat2 /= 0 )  THEN
-            CALL SetErrStat( ErrID_Fatal, 'Error allocating memory for p%Table%Coefs.', ErrStat, ErrMsg, RoutineName )
-            CALL Cleanup()
-            RETURN
-         ENDIF
-         p%Table(iTable)%Coefs = 0.0_ReKi
-
-         DO Row=1,p%Table(iTable)%NumAlf
-
-            CALL ParseAry ( FileInfo, CurLine, 'CoeffData', SiAry, Cols2Parse, ErrStat2, ErrMsg2, UnEc )
-               CALL SetErrStat( ErrStat2, ErrMsg2, ErrStat, ErrMsg, RoutineName )
-               IF (ErrStat >= AbortErrLev) THEN
-                  CALL Cleanup()
-                  RETURN
-               END IF
-
-            p%Table(iTable)%Alpha(Row        ) = SiAry(InitInp%InCol_Alfa)*D2R
-            p%Table(iTable)%Coefs(Row,p%ColCl) = SiAry(InitInp%InCol_Cl  )
-            p%Table(iTable)%Coefs(Row,p%ColCd) = SiAry(InitInp%InCol_Cd  )
-
-            IF ( InitInp%InCol_Cm    > 0 ) p%Table(iTable)%Coefs(Row,p%ColCm   ) = SiAry(InitInp%InCol_Cm)
-            IF ( InitInp%InCol_Cpmin > 0 ) p%Table(iTable)%Coefs(Row,p%ColCpmin) = SiAry(InitInp%InCol_Cpmin)
-
-         ENDDO ! Row
-
-            ! check that not all the values are constant
-         IF ( p%Table(iTable)%NumAlf < 3 )  THEN
-            p%Table(iTable)%ConstData = .TRUE. ! we can't do splines with this many points, so it must be constant
-         ELSE
-               ! check if the columns change with alpha
-            p%Table(iTable)%ConstData = .TRUE.
-ALPHA_LOOP: DO Row=1,p%Table(iTable)%NumAlf-1
-               DO Coef=1,NumCoefsIn ! don't check the additional columns from UA
-                  IF ( .NOT. EqualRealNos( p%Table(iTable)%Coefs(Row,Coef), p%Table(iTable)%Coefs(Row+1,Coef) ) )  THEN
-                     p%Table(iTable)%ConstData = .FALSE.
-                     EXIT ALPHA_LOOP
-                  ENDIF
-               END DO ! Coef
-            END DO ALPHA_LOOP
-         END IF
-         
-         
-         if ( p%Table(iTable)%ConstData ) then
-            p%Table(iTable)%InclUAdata = .false.
-         else
-            call CalculateUACoeffs(CalcDefaults(iTable), p%Table(iTable), p%ColCl, p%ColCd, p%ColCm, p%ColUAf, InitInp%UAMod)
-         end if
-
-            ! Let's make sure that the data go from -Pi to Pi and that the values are the same for both
-            ! unless there is only one point.
-
-         NumAlf  = p%Table(iTable)%NumAlf
-         if (NumAlf > 1) then
-            BadVals = .FALSE.
-            
-            if (.not. p%Table(iTable)%ConstData) then
-               IF ( .NOT. EqualRealNos( p%Table(iTable)%Alpha(1), -Pi ) )  THEN
-                  BadVals = .TRUE.
-               ENDIF
-               IF ( .NOT. EqualRealNos( p%Table(iTable)%Alpha(NumAlf), Pi ) )  THEN
-                  BadVals = .TRUE.
-               ENDIF
-            end if
-               
-            DO Coef=1,NumCoefsIn ! don't check the additional columns from UA
-               IF ( .NOT. EqualRealNos( p%Table(iTable)%Coefs(1,Coef), p%Table(iTable)%Coefs(NumAlf,Coef) ) )  THEN
-                  BadVals = .TRUE.
-               ENDIF
-            ENDDO ! Coef
-            
-            IF ( BadVals )  THEN
-               if (p%Table(iTable)%ConstData) then
-                  ErrStat2 = ErrID_Fatal
-               else
-                  ErrStat2 = ErrID_Warn
-               end if
-            
-               CALL SetErrStat( ErrStat2, &
-                  'Airfoil data should go from -180 degrees to 180 degrees and the coefficients at the ends should be the same.', ErrStat, ErrMsg, RoutineName )
-            ENDIF
-         end if
-      ENDDO ! iTable
-
-
-      DO iTable=1,p%NumTabs
-         if ( .not. p%Table(iTable)%InclUAdata )  then
-            p%ColUAf = 0 ! in case some tables have UA data and others don't; this is not set on a per-table basis
-            exit ! exit loop
-         end if
-      ENDDO ! iTable
-
-      CALL Cleanup( )
-
-      RETURN
-
-      !=======================================================================
-      CONTAINS
-      !=======================================================================
-                  
-         SUBROUTINE Cleanup ()
-
-            ! This subroutine cleans up all the allocatable arrays, sets the error status/message and closes the binary file
-               
-            CALL NWTC_Library_DestroyFileInfoType (FileInfo, ErrStat2, ErrMsg2)
-            IF ( ALLOCATED(CalcDefaults) ) DEALLOCATE(CalcDefaults) ! this type contains only logicals, so no need to call a destroy routine
-            IF ( ALLOCATED(SiAry) ) DEALLOCATE(SiAry)
-            
-         END SUBROUTINE Cleanup 
-
+      ! --- Populate InitInp C struct ---
+      DO i = 1, 1024
+          initinp_c%FileName(i) = InitInp%FileName(i:i)
+      END DO
+      initinp_c%AFTabMod   = INT(InitInp%AFTabMod, C_INT)
+      initinp_c%InCol_Alfa = INT(InitInp%InCol_Alfa, C_INT)
+      initinp_c%InCol_Cl   = INT(InitInp%InCol_Cl, C_INT)
+      initinp_c%InCol_Cd   = INT(InitInp%InCol_Cd, C_INT)
+      initinp_c%InCol_Cm   = INT(InitInp%InCol_Cm, C_INT)
+      initinp_c%InCol_Cpmin = INT(InitInp%InCol_Cpmin, C_INT)
+      initinp_c%UAMod      = INT(InitInp%UAMod, C_INT)
+
+      ! --- Pass 1: Parse file, determine sizes ---
+      CALL readaffile_pass1_c(C_LOC(initinp_c), INT(NumCoefsIn, C_INT), &
+                              C_LOC(p_view), C_LOC(numalf_out), C_LOC(ncoefstab_out), &
+                              C_LOC(c_errStat), C_LOC(c_errMsg))
+
+      ErrStat = INT(c_errStat, IntKi)
+      ! Copy C error message back to Fortran
+      DO i = 1, MIN(LEN(ErrMsg), ErrMsgLen)
+          ErrMsg(i:i) = c_errMsg(i)
+      END DO
+      IF (ErrStat >= AbortErrLev) RETURN
+
+      ! --- Copy parsed scalars from view to Fortran p ---
+      p%InterpOrd    = INT(p_view%InterpOrd, IntKi)
+      p%RelThickness = REAL(p_view%RelThickness, ReKi)
+      p%NonDimArea   = REAL(p_view%NonDimArea, ReKi)
+      p%NumCoords    = INT(p_view%NumCoords, IntKi)
+      p%NumTabs      = INT(p_view%NumTabs, IntKi)
+      p%ColUAf       = INT(p_view%ColUAf, IntKi)
+      DO i = 1, 1024
+          p%BL_file(i:i) = p_view%BL_file(i)
+      END DO
+
+      ! --- Allocate Fortran arrays based on parsed sizes ---
+      ALLOCATE(p%Table(p%NumTabs))
+
+      IF (p%NumCoords > 0) THEN
+          ALLOCATE(p%X_Coord(p%NumCoords))
+          ALLOCATE(p%Y_Coord(p%NumCoords))
+      END IF
+
+      DO iTable = 1, p%NumTabs
+          ALLOCATE(p%Table(iTable)%Alpha(numalf_out(iTable)))
+          ALLOCATE(p%Table(iTable)%Coefs(numalf_out(iTable), ncoefstab_out(iTable)))
+          p%Table(iTable)%Coefs = 0.0_ReKi
+      END DO
+
+      ! --- Re-populate view with pointers to allocated arrays ---
+      CALL vit_populate_afi_parametertype(p, p_view)
+
+      ! --- Pass 2: Fill arrays from cache ---
+      CALL readaffile_fill_c(C_LOC(p_view), C_LOC(initinp_c), &
+                             INT(NumCoefsIn, C_INT), C_LOC(c_errStat), C_LOC(c_errMsg))
+
+      IF (INT(c_errStat, IntKi) > ErrStat) THEN
+          ErrStat = INT(c_errStat, IntKi)
+          DO i = 1, MIN(LEN(ErrMsg), ErrMsgLen)
+              ErrMsg(i:i) = c_errMsg(i)
+          END DO
+      END IF
+
+      ! --- Copy scalars back from views to Fortran types ---
+      ! Top-level scalar (ColUAf may have been modified by pass 2)
+      p%ColUAf = INT(p_view%ColUAf, IntKi)
+
+      ! Per-table scalars (Re, UserProp, NumAlf, ConstData, InclUAdata, UA_BL)
+      CALL C_F_POINTER(p_view%Table, table_views, [p%NumTabs])
+      DO iTable = 1, p%NumTabs
+          CALL vit_copy_scalars_to_afi_table_type(table_views(iTable), p%Table(iTable))
+      END DO
 
    END SUBROUTINE ReadAFfile
 !----------------------------------------------------------------------------------------------------------------------------------  
