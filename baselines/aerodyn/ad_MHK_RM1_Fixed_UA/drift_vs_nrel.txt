@@ -1,21 +1,27 @@
 Drift report: ad_MHK_RM1_Fixed_UA vs NREL r-test reference
-Generated: 2026-04-27T03:10:46Z
+Generated: 2026-04-27T03:29:56Z
 Platform: NAME="Ubuntu"
 
 Our output: /workspace/openfast/build/modules/aerodyn/baseline_gen_ad_MHK_RM1_Fixed_UA/ad_driver.outb
 NREL ref:   /workspace/openfast/build/modules/aerodyn/baseline_gen_ad_MHK_RM1_Fixed_UA/ad_driver_nrel_ref.outb
 Array shape: (600, 54) (timesteps, channels) = 32400 values
 
-Bit-identical:                  30000 / 32400 (92.59%)
-Within 1e-5 rel:                30000 / 32400 (92.59%)
-Within 1e-5 rel OR 1e-6 abs:    30000 / 32400 (92.59%)
-Max abs difference:            3.921592e+01
-Max rel difference:            1.000000e+00
+Bit-identical:                  26400 / 32400 (81.48%)
+Within 1e-5 rel:                26400 / 32400 (81.48%)
+Within 1e-5 rel OR 1e-6 abs:    26400 / 32400 (81.48%)
+Max abs difference:            5.367372e+06
+Max rel difference:            1.605573e+04
 
 Per-channel drift (non-zero channels only):
+  RtFldMxh               (N-m     )  abs=5.367e+06  rel=1.799e+01  at t_idx=226
+  B2FldMx                (N-m     )  abs=3.412e+06  rel=1.932e+01  at t_idx=228
+  RtFldMyg               (N-m     )  abs=1.464e+06  rel=2.797e+00  at t_idx=259
+  RtFldFyh               (N       )  abs=5.346e+05  rel=6.056e+00  at t_idx=198
+  RtFldFzg               (N       )  abs=5.134e+05  rel=7.101e+00  at t_idx=198
+  RtFldFxh               (N       )  abs=3.708e+05  rel=7.570e-01  at t_idx=198
   B1N3SigCr              (-       )  abs=3.922e+01  rel=1.000e+00  at t_idx=394
   B2N5SigCr              (-       )  abs=1.495e+01  rel=1.000e+00  at t_idx=367
   B1N2SgCav              (-       )  abs=5.275e+00  rel=1.000e+00  at t_idx=63
   B2N6SgCav              (-       )  abs=1.777e+00  rel=1.000e+00  at t_idx=130
 
-Total channels with drift:     4 / 54
+Total channels with drift:     10 / 54
