@@ -101,6 +101,22 @@ translations:
     cases_total: 20
     cases_skipped: 0
     kernel_dir: kernel/AFI_ComputeUACoefs
+  CheckValuesAreUniqueMonotonicIncreasing:
+    status: integrated
+    cpp_file: translations/AirfoilInfo/checkvaluesareuniquemonotonicincreasing.cpp
+    cases_passed: 11
+    cases_total: 11
+    cases_skipped: 0
+    kernel_dir: ''
+    verification: test-validate
+  ReadAFfile:
+    status: integrated
+    cpp_file: translations/AirfoilInfo/readaffile.cpp
+    cases_passed: 17
+    cases_total: 17
+    cases_skipped: 0
+    kernel_dir: ''
+    verification: simulation
 types:
   AFI_ParameterType:
     strategy: view
