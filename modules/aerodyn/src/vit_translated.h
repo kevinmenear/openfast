@@ -32,6 +32,9 @@ void readaffile_pass1_c(const afi_initinputtype_t* InitInp, int NumCoefsIn, afi_
 void readaffile_fill_c(afi_parametertype_view_t* p, const afi_initinputtype_t* InitInp, int NumCoefsIn, int* errStat, char* errMsg);
 void afi_init_pass1_c(const afi_initinputtype_t* InitInput, afi_parametertype_view_t* p, int* n_secondVals_out, double* secondVals_buf, int* spline_dim1_out, int* spline_dim2_out, int* errStat, char* errMsg);
 void afi_init_pass2_c(afi_parametertype_view_t* p, const double* secondVals_buf, int n_secondVals, int* errStat, char* errMsg);
+void afi_wrheader_c(const char* delim, const char* filename, int* errStat, char* errMsg);
+void afi_wrdata_c(int k, const char* filename, const char* delim, afi_parametertype_view_t* p);
+void afi_wrtables_c(afi_parametertype_view_t* p, int UAMod, const char* OutRootName);
 
 #ifdef __cplusplus
 }

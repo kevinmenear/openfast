@@ -44,6 +44,8 @@ MODULE AirfoilInfo
 
    integer, parameter                           :: MaxNumAFCoeffs = 7 !cl,cd,cm,cpMin, UA:f_st, FullySeparate, FullyAttached
 
+   ! Stashed filename for WrHeader→WrData file passing (C++ manages the file, Fortran passes the path)
+   CHARACTER(1024), SAVE                        :: vit_wr_stashed_filename = ' '
 
     ! Auto-generated interface for C++ implementation of AFI_ComputeUACoefs
     INTERFACE
@@ -1460,308 +1462,145 @@ end subroutine AFI_ComputeAirfoilCoefs
 
 !=============================================================================
 subroutine AFI_WrHeader(delim, FileName, unOutFile, ErrStat, ErrMsg)
+   ! C++ wrapper: opens file and writes header with 46 channel names/units
+   USE ISO_C_BINDING
+   IMPLICIT NONE
 
    character(*),                 intent(in   )  :: delim
    character(*),                 intent(in   )  :: FileName
    integer(IntKi),               intent(  out)  :: unOutFile
-   integer(IntKi),               intent(  out)  :: ErrStat     ! Error status of the operation
-   character(*),                 intent(  out)  :: ErrMsg      ! Error message if ErrStat /= ErrID_None
+   integer(IntKi),               intent(  out)  :: ErrStat
+   character(*),                 intent(  out)  :: ErrMsg
 
-   integer(IntKi)                               :: i
-   integer(IntKi)                               :: ErrStat2
-   character(ErrMsgLen)                         :: ErrMsg2
-   character(*), parameter                      :: RoutineName = 'AFI_WrHeader'
-   
-   integer, parameter                           :: MaxLen = 17
-   integer, parameter                           :: NumChans = 46
-   character(MaxLen)                            :: ChanName( NumChans)
-   character(MaxLen)                            :: ChanUnit( NumChans)
-   
-   
-   i=1
-   ChanName(i) = 'AirfoilNumber';     ChanUnit(i) = '(-)';        i = i+1;
-   ChanName(i) = 'TableNumber';       ChanUnit(i) = '(-)';        i = i+1;
-   ChanName(i) = 'alpha0';            ChanUnit(i) = '(deg)';      i = i+1;
-   ChanName(i) = 'alpha1';            ChanUnit(i) = '(deg)';      i = i+1;
-   ChanName(i) = 'alpha2';            ChanUnit(i) = '(deg)';      i = i+1;
-   ChanName(i) = 'eta_e';             ChanUnit(i) = '(-)';        i = i+1;
-   ChanName(i) = 'C_nalpha';          ChanUnit(i) = '(-/rad)';    i = i+1;
-   ChanName(i) = 'C_lalpha';          ChanUnit(i) = '(-/rad)';    i = i+1;
-   ChanName(i) = 'T_f0';              ChanUnit(i) = '(-)';        i = i+1;
-   ChanName(i) = 'T_V0';              ChanUnit(i) = '(-)';        i = i+1;
-   ChanName(i) = 'T_p';               ChanUnit(i) = '(-)';        i = i+1;
-   ChanName(i) = 'T_VL';              ChanUnit(i) = '(-)';        i = i+1;
-   ChanName(i) = 'b1';                ChanUnit(i) = '(-)';        i = i+1;
-   ChanName(i) = 'b2';                ChanUnit(i) = '(-)';        i = i+1;
-   ChanName(i) = 'b5';                ChanUnit(i) = '(-)';        i = i+1;
-   ChanName(i) = 'A1';                ChanUnit(i) = '(-)';        i = i+1;
-   ChanName(i) = 'A2';                ChanUnit(i) = '(-)';        i = i+1;
-   ChanName(i) = 'A5';                ChanUnit(i) = '(-)';        i = i+1;
-   ChanName(i) = 'S1';                ChanUnit(i) = '(-)';        i = i+1;
-   ChanName(i) = 'S2';                ChanUnit(i) = '(-)';        i = i+1;
-   ChanName(i) = 'S3';                ChanUnit(i) = '(-)';        i = i+1;
-   ChanName(i) = 'S4';                ChanUnit(i) = '(-)';        i = i+1;
-   ChanName(i) = 'Cn1';               ChanUnit(i) = '(-)';        i = i+1;
-   ChanName(i) = 'Cn2';               ChanUnit(i) = '(-)';        i = i+1;
-   ChanName(i) = 'St_sh';             ChanUnit(i) = '(-)';        i = i+1;
-   ChanName(i) = 'Cd0';               ChanUnit(i) = '(-)';        i = i+1;
-   ChanName(i) = 'Cm0';               ChanUnit(i) = '(-)';        i = i+1;
-   ChanName(i) = 'k0';                ChanUnit(i) = '(-)';        i = i+1;
-   ChanName(i) = 'k1';                ChanUnit(i) = '(-)';        i = i+1;
-   ChanName(i) = 'k2';                ChanUnit(i) = '(-)';        i = i+1;
-   ChanName(i) = 'k3';                ChanUnit(i) = '(-)';        i = i+1;
-   ChanName(i) = 'k1_hat';            ChanUnit(i) = '(-)';        i = i+1;
-   ChanName(i) = 'x_cp_bar';          ChanUnit(i) = '(-)';        i = i+1;
-   ChanName(i) = 'UACutout';          ChanUnit(i) = '(deg)';      i = i+1;
-   ChanName(i) = 'UACutout_delta';    ChanUnit(i) = '(deg)';      i = i+1;
-   ChanName(i) = 'UACutout_blend';    ChanUnit(i) = '(deg)';      i = i+1;
-   ChanName(i) = 'filtCutOff';        ChanUnit(i) = '(-)';        i = i+1;
-   ChanName(i) = 'alphaLower';        ChanUnit(i) = '(deg)';      i = i+1;
-   ChanName(i) = 'alphaUpper';        ChanUnit(i) = '(deg)';      i = i+1;
-   ChanName(i) = 'c_alphaLower';      ChanUnit(i) = '(-)';        i = i+1;
-   ChanName(i) = 'c_alphaUpper';      ChanUnit(i) = '(-)';        i = i+1;
-   ChanName(i) = 'alpha0ReverseFlow'; ChanUnit(i) = '(deg)';      i = i+1;
-   ChanName(i) = 'alphaBreakUpper';   ChanUnit(i) = '(deg)';      i = i+1;
-   ChanName(i) = 'CnBreakUpper';      ChanUnit(i) = '(-)';        i = i+1;
-   ChanName(i) = 'alphaBreakLower';   ChanUnit(i) = '(deg)';      i = i+1;
-   ChanName(i) = 'CnBreakLower';      ChanUnit(i) = '(-)';        i = i+1;
+   INTERFACE
+       SUBROUTINE afi_wrheader_c(delim, filename, errStat, errMsg) BIND(C)
+           USE ISO_C_BINDING
+           TYPE(C_PTR), VALUE :: delim
+           TYPE(C_PTR), VALUE :: filename
+           TYPE(C_PTR), VALUE :: errStat
+           TYPE(C_PTR), VALUE :: errMsg
+       END SUBROUTINE afi_wrheader_c
+   END INTERFACE
 
-   !$OMP critical(fileopen_critical)
-   CALL GetNewUnit( unOutFile, ErrStat, ErrMsg )
-   if (ErrStat < AbortErrLev) then
-      CALL OpenFOutFile ( unOutFile, trim(FileName), ErrStat2, ErrMsg2 )
-   endif
-   !$OMP end critical(fileopen_critical)
-         
-   ! Generate file outputs
+   CHARACTER(KIND=C_CHAR), TARGET :: c_delim(2)
+   CHARACTER(KIND=C_CHAR), TARGET :: c_filename(1024)
+   INTEGER(C_INT), TARGET :: c_errStat
+   CHARACTER(KIND=C_CHAR), TARGET :: c_errMsg(ErrMsgLen)
+   INTEGER :: i
 
-   write (unOutFile,'(/,A)')  'Predictions were generated on '//CurDate()//' at '//CurTime() !//' using '//trim(GetNVD(version))
-   write (unOutFile,'(1X,A)') trim(ProgName)
-   write (unOutFile,'()' )    !print a blank line
-   write (unOutFile,'()' )    !print a blank line
-   write (unOutFile,'()' )    !print a blank line
-              
+   ErrStat = ErrID_None
+   ErrMsg  = ""
 
-      !......................................................
-      ! Write the names of the output parameters on one line:
-      !......................................................
-   call WrFileNR ( unOutFile, ChanName(1) )
-   do i=2,size(ChanName)
-      call WrFileNR ( unOutFile, delim//ChanName(i) )
-   end do
-   write (unOutFile,'()')
+   ! Pack delimiter (null-terminated)
+   c_delim(1) = delim(1:1)
+   c_delim(2) = C_NULL_CHAR
 
-      !......................................................
-      ! Write the units of the output parameters on one line:
-      !......................................................
-   call WrFileNR ( unOutFile, ChanUnit(1) )
-   do i=2,size(ChanName)
-      call WrFileNR ( unOutFile, delim//ChanUnit(i) )
-   end do
-   write (unOutFile,'()')
-   
+   ! Pack filename (null-terminated)
+   DO i = 1, MIN(LEN_TRIM(FileName), 1023)
+       c_filename(i) = FileName(i:i)
+   END DO
+   c_filename(MIN(LEN_TRIM(FileName), 1023) + 1) = C_NULL_CHAR
+
+   ! Stash filename for WrData to use
+   vit_wr_stashed_filename = FileName
+
+   ! C++ opens file, writes header, closes
+   CALL afi_wrheader_c(C_LOC(c_delim), C_LOC(c_filename), C_LOC(c_errStat), C_LOC(c_errMsg))
+
+   ErrStat = INT(c_errStat, IntKi)
+   DO i = 1, MIN(LEN(ErrMsg), ErrMsgLen)
+       ErrMsg(i:i) = c_errMsg(i)
+   END DO
+   IF (ErrStat >= AbortErrLev) RETURN
+
+   ! Open Fortran unit to same file (APPEND mode) so caller's close() works
+   CALL GetNewUnit(unOutFile, ErrStat, ErrMsg)
+   IF (ErrStat >= AbortErrLev) RETURN
+   OPEN(UNIT=unOutFile, FILE=TRIM(FileName), POSITION='APPEND', STATUS='OLD', FORM='FORMATTED')
+
 end subroutine AFI_WrHeader
 !=============================================================================
 subroutine AFI_WrData(k, unOutFile, delim, AFInfo)
-   type(AFI_ParameterType),      intent(in   )  :: AFInfo      ! The airfoil parameter data (for all airfoils)
+   ! C++ wrapper: writes UA_BL parameter rows to file
+   USE ISO_C_BINDING
+   USE vit_afi_parametertype_view, ONLY: afi_parametertype_view_t, vit_populate_afi_parametertype
+   IMPLICIT NONE
+
+   type(AFI_ParameterType),      intent(in   )  :: AFInfo
    integer,                      intent(in   )  :: k
    integer(IntKi),               intent(in   )  :: unOutFile
    character(*),                 intent(in   )  :: delim
-   
-   integer(IntKi)                               :: i
-   
-   integer, parameter                           :: MaxLen = 17
-   integer, parameter                           :: NumChans = 46
-   real(ReKi)                                   :: TmpValues(NumChans)
-   character(3)                                 :: MaxLenStr
-   character(80)                                :: Fmt
-   
-   MaxLenStr = trim(num2lstr(MaxLen))
-   TmpValues = 0.0_ReKi ! initialize in case UAdata is not included in the airfoil table
 
-   Fmt = '(I'//MaxLenStr//',"'//delim//'",I'//MaxLenStr//','//trim(num2lstr(NumChans))//'("'//delim//'",F'//MaxLenStr//'.5))'
-   
-   do i=1,size(AFInfo%Table)
-      IF (AFInfo%Table(i)%InclUAdata) then
-         WRITE(unOutFile, Fmt) k, i, &
-                                    AFInfo%Table(i)%UA_BL%alpha0*R2D        , &
-                                    AFInfo%Table(i)%UA_BL%alpha1*R2D        , &
-                                    AFInfo%Table(i)%UA_BL%alpha2*R2D        , &
-                                    AFInfo%Table(i)%UA_BL%eta_e             , &
-                                    AFInfo%Table(i)%UA_BL%C_nalpha          , &
-                                    AFInfo%Table(i)%UA_BL%C_lalpha          , &
-                                    AFInfo%Table(i)%UA_BL%T_f0              , &
-                                    AFInfo%Table(i)%UA_BL%T_V0              , &
-                                    AFInfo%Table(i)%UA_BL%T_p               , &
-                                    AFInfo%Table(i)%UA_BL%T_VL              , &
-                                    AFInfo%Table(i)%UA_BL%b1                , &
-                                    AFInfo%Table(i)%UA_BL%b2                , &
-                                    AFInfo%Table(i)%UA_BL%b5                , &
-                                    AFInfo%Table(i)%UA_BL%A1                , &
-                                    AFInfo%Table(i)%UA_BL%A2                , &
-                                    AFInfo%Table(i)%UA_BL%A5                , &
-                                    AFInfo%Table(i)%UA_BL%S1                , &
-                                    AFInfo%Table(i)%UA_BL%S2                , &
-                                    AFInfo%Table(i)%UA_BL%S3                , &
-                                    AFInfo%Table(i)%UA_BL%S4                , &
-                                    AFInfo%Table(i)%UA_BL%Cn1               , &
-                                    AFInfo%Table(i)%UA_BL%Cn2               , &
-                                    AFInfo%Table(i)%UA_BL%St_sh             , &
-                                    AFInfo%Table(i)%UA_BL%Cd0               , &
-                                    AFInfo%Table(i)%UA_BL%Cm0               , &
-                                    AFInfo%Table(i)%UA_BL%k0                , &
-                                    AFInfo%Table(i)%UA_BL%k1                , &
-                                    AFInfo%Table(i)%UA_BL%k2                , &
-                                    AFInfo%Table(i)%UA_BL%k3                , &
-                                    AFInfo%Table(i)%UA_BL%k1_hat            , &
-                                    AFInfo%Table(i)%UA_BL%x_cp_bar          , &
-                                    AFInfo%Table(i)%UA_BL%UACutout*R2D      , &
-                                    AFInfo%Table(i)%UA_BL%UACutout_delta*R2D, &
-                                    AFInfo%Table(i)%UA_BL%UACutout_blend*R2D, &
-                                    AFInfo%Table(i)%UA_BL%filtCutOff        , &
-                                    AFInfo%Table(i)%UA_BL%alphaLower*R2D    , &
-                                    AFInfo%Table(i)%UA_BL%alphaUpper*R2D    , &
-                                    AFInfo%Table(i)%UA_BL%c_alphaLower      , &
-                                    AFInfo%Table(i)%UA_BL%c_alphaUpper      , &
-                                    AFInfo%Table(i)%UA_BL%alpha0ReverseFlow*R2D, &
-                                    AFInfo%Table(i)%UA_BL%alphaBreakUpper*R2D, &
-                                    AFInfo%Table(i)%UA_BL%CnBreakUpper       , &
-                                    AFInfo%Table(i)%UA_BL%alphaBreakLower*R2D, &
-                                    AFInfo%Table(i)%UA_BL%CnBreakLower
+   INTERFACE
+       SUBROUTINE afi_wrdata_c(k, filename, delim, p) BIND(C)
+           USE ISO_C_BINDING
+           INTEGER(C_INT), VALUE :: k
+           TYPE(C_PTR), VALUE :: filename
+           TYPE(C_PTR), VALUE :: delim
+           TYPE(C_PTR), VALUE :: p
+       END SUBROUTINE afi_wrdata_c
+   END INTERFACE
 
-      ELSE
-         WRITE(unOutFile, Fmt) k, i, TmpValues(3:)
-      END IF
-   end do
-      
+   TYPE(afi_parametertype_view_t), TARGET :: p_view
+   CHARACTER(KIND=C_CHAR), TARGET :: c_delim(2)
+   CHARACTER(KIND=C_CHAR), TARGET :: c_filename(1024)
+   INTEGER :: i
+
+   ! Pack delimiter
+   c_delim(1) = delim(1:1)
+   c_delim(2) = C_NULL_CHAR
+
+   ! Pack stashed filename
+   DO i = 1, MIN(LEN_TRIM(vit_wr_stashed_filename), 1023)
+       c_filename(i) = vit_wr_stashed_filename(i:i)
+   END DO
+   c_filename(MIN(LEN_TRIM(vit_wr_stashed_filename), 1023) + 1) = C_NULL_CHAR
+
+   ! Populate view struct
+   CALL vit_populate_afi_parametertype(AFInfo, p_view)
+
+   ! C++ reopens file in append mode, writes data, closes
+   CALL afi_wrdata_c(INT(k, C_INT), C_LOC(c_filename), C_LOC(c_delim), C_LOC(p_view))
+
 end subroutine AFI_WrData
 !=============================================================================
 subroutine AFI_WrTables(AFI_Params,UAMod,OutRootName)
-   
+   ! C++ wrapper: writes per-table coefficient files with derived quantities
+   USE ISO_C_BINDING
+   USE vit_afi_parametertype_view, ONLY: afi_parametertype_view_t, vit_populate_afi_parametertype
+   IMPLICIT NONE
+
    type(AFI_ParameterType), intent(in), target  :: AFI_Params
    integer(IntKi),          intent(in)          :: UAMod
    character(*),            intent(in)          :: OutRootName
-      
-   integer(IntKi)                               :: unOutFile
-   integer(IntKi)                               :: ErrStat
-   character(ErrMsgLen)                         :: ErrMsg
-   
-   Real(ReKi),      allocatable                 :: cl_smooth(:)
-   Real(ReKi),      allocatable                 :: cn_smooth(:)
-   Real(ReKi),      allocatable                 :: cn(:)
-   Real(ReKi),      allocatable                 :: cc(:)
-   Real(ReKi),      allocatable                 :: cl_lin(:)
-   Real(ReKi),      allocatable                 :: cn_lin(:)
-   
-   character(len=3)                             :: Prefix
-   character(len=11)                            :: sFullyAtt
-   character(len=8)                             :: sCm
-   integer                                      :: iTab, iRow
-   type(AFI_Table_Type), pointer                :: table !< Alias
-   
-   if (UAMod /= UA_HGM .and. UAMod /= UA_Oye) then
-      Prefix='Cn_'
-      sFullyAtt='Cn_FullyAtt'
-   else
-      Prefix='Cl_'
-      sFullyAtt='Dummy'
-   endif
-   if (AFI_Params%ColCm > 0) then
-      sCm='Cm'
-   else
-      sCm='Cm_Dummy'
-   endif
-   
-      
-   ! Loop on tables, write a different file for each table.
-   do iTab = 1, size(AFI_Params%Table)
-      table => AFI_Params%Table(iTab)
-      
-      ! Compute derived parameters from cl and cd, and UA_BL
-      allocate(cl_smooth(table%NumAlf))
-      allocate(cn_smooth(table%NumAlf))
-      allocate(cn       (table%NumAlf))
-      allocate(cc       (table%NumAlf))
-      allocate(cl_lin   (table%NumAlf))
-      allocate(cn_lin   (table%NumAlf))
-      
 
-      cn     = table%Coefs(:,AFI_Params%ColCl) * cos(table%alpha) + (table%Coefs(:,AFI_Params%ColCd) - table%UA_BL%Cd0) * sin(table%alpha);
-      cc     = table%Coefs(:,AFI_Params%ColCl) * sin(table%alpha) - (table%Coefs(:,AFI_Params%ColCd) - table%UA_BL%Cd0) * cos(table%alpha);
-      cn_lin = table%UA_BL%C_nalpha * (table%alpha - table%UA_BL%alpha0)
-      cl_lin = table%UA_BL%C_lalpha * (table%alpha - table%UA_BL%alpha0)
+   INTERFACE
+       SUBROUTINE afi_wrtables_c(p, UAMod, OutRootName) BIND(C)
+           USE ISO_C_BINDING
+           TYPE(C_PTR), VALUE :: p
+           INTEGER(C_INT), VALUE :: UAMod
+           TYPE(C_PTR), VALUE :: OutRootName
+       END SUBROUTINE afi_wrtables_c
+   END INTERFACE
 
-      do iRow = 1, table%NumAlf
-         if ((table%alpha(iRow)<table%UA_BL%alphaBreakLower).or. table%alpha(iRow)>table%UA_BL%alphaBreakUpper) then
-            cl_lin(iRow) =0.0_ReKi
-            cn_lin(iRow) =0.0_ReKi
-         endif
-      enddo
+   TYPE(afi_parametertype_view_t), TARGET :: p_view
+   CHARACTER(KIND=C_CHAR), TARGET :: c_rootname(1024)
+   INTEGER :: i
 
-      ! Smoothing (used priot to compute slope in CalculateUACoeffs)
-      call kernelSmoothing(table%alpha, cn                             , kernelType_TRIWEIGHT, 2.0_ReKi*D2R, cn_smooth)
-      call kernelSmoothing(table%alpha, table%Coefs(:,AFI_Params%ColCl), kernelType_TRIWEIGHT, 2.0_ReKi*D2R, cl_smooth)
+   ! Pack root name (space-padded to 1024 for C++ trimming)
+   DO i = 1, 1024
+       IF (i <= LEN_TRIM(OutRootName)) THEN
+           c_rootname(i) = OutRootName(i:i)
+       ELSE
+           c_rootname(i) = ' '
+       END IF
+   END DO
 
-      
-      ! Write to file
-      !$OMP critical(fileopen_critical)
-      CALL GetNewUnit( unOutFile, ErrStat, ErrMsg )
-      if (ErrStat < AbortErrLev) then
-         CALL OpenFOutFile ( unOutFile, trim(OutRootName)//'.Coefs.'//trim(num2lstr(iTab))//'.out', ErrStat, ErrMsg )
-      endif
-      !$OMP end critical(fileopen_critical)
-         if (ErrStat >= AbortErrLev) then
-            call WrScr(Trim(ErrMsg))
-            return
-         end if
-   
-      WRITE (unOutFile,'(/,A/)') 'These predictions were generated by AirfoilInfo on '//CurDate()//' at '//CurTime()//'.'
-      WRITE (unOutFile,'(/,A/)')  ' '
+   ! Populate view struct
+   CALL vit_populate_afi_parametertype(AFI_Params, p_view)
 
-      if (AFI_Params%ColUAf > 0) then
-         WRITE(unOutFile, '(20(A20,1x))') 'Alpha', 'Cl',  'Cd',  sCm,   'Cn',  'Cc', 'f_st', Prefix//'FullySep', sFullyAtt , 'Cl_lin','Cn_lin','Cl_smooth', 'Cn_smooth'
-         WRITE(unOutFile, '(20(A20,1x))') '(deg)', '(-)', '(-)', '(-)', '(-)', '(-)','(-)', '(-)'             , '(-)'     ,  '(-)'  , '(-)'  , '(-)'    ,'(-)'
-
-         ! TODO, we could do something with ColCpmim and ColUAf
-         if (AFI_Params%ColCm > 0) then
-            do iRow=1,size(table%Alpha)
-               WRITE(unOutFile, '(20(F20.6,1x))') table%Alpha(iRow)*R2D, table%Coefs(iRow,AFI_Params%ColCl), table%Coefs(iRow,AFI_Params%ColCd), table%Coefs(iRow,AFI_Params%ColCm), &
-                                              cn(iRow), cc(iRow),  table%Coefs(iRow,AFI_Params%ColUAf:), cl_lin(iRow), cn_lin(iRow), cl_smooth(iRow), cn_smooth(iRow)
-            end do
-         else
-            do iRow=1,size(table%Alpha)
-               WRITE(unOutFile, '(20(F20.6,1x))') table%Alpha(iRow)*R2D, table%Coefs(iRow,AFI_Params%ColCl), table%Coefs(iRow,AFI_Params%ColCd), 0.0_ReKi, &
-                                              cn(iRow), cc(iRow), table%Coefs(iRow,AFI_Params%ColUAf:), cl_lin(iRow), cn_lin(iRow), cl_smooth(iRow), cn_smooth(iRow)
-            end do
-         endif
-      else
-         WRITE(unOutFile, '(20(A20,1x))') 'Alpha', 'Cl',  'Cd',  sCm,   'Cn',  'Cc',  'Cl_lin','Cn_lin','Cl_smooth', 'Cn_smooth'
-         WRITE(unOutFile, '(20(A20,1x))') '(deg)', '(-)', '(-)', '(-)', '(-)', '(-)', '(-)'   ,'(-)'   ,'(-)'      ,'(-)'
-
-         ! TODO, we could do something with ColCpmim and ColUAf
-         if (AFI_Params%ColCm > 0) then
-            do iRow=1,size(table%Alpha)
-               WRITE(unOutFile, '(20(F20.6,1x))') table%Alpha(iRow)*R2D, table%Coefs(iRow,AFI_Params%ColCl), table%Coefs(iRow,AFI_Params%ColCd), table%Coefs(iRow,AFI_Params%ColCm), &
-                                              cn(iRow), cn(iRow), cl_lin(iRow), cn_lin(iRow), cl_smooth(iRow), cn_smooth(iRow)
-            end do
-         else
-            do iRow=1,size(table%Alpha)
-               WRITE(unOutFile, '(20(F20.6,1x))') table%Alpha(iRow)*R2D, table%Coefs(iRow,AFI_Params%ColCl), table%Coefs(iRow,AFI_Params%ColCd), 0.0_ReKi, &
-                                              cn(iRow), cn(iRow), cl_lin(iRow), cn_lin(iRow), cl_smooth(iRow), cn_smooth(iRow)
-            end do
-         endif
-      
-      end if
-      
-      CLOSE(unOutFile)
-      
-      if(allocated(cl_smooth)) deallocate(cl_smooth)
-      if(allocated(cn_smooth)) deallocate(cn_smooth)
-      if(allocated(cn       )) deallocate(cn       )
-      if(allocated(cc       )) deallocate(cc       )
-      if(allocated(cl_lin   )) deallocate(cl_lin   )
-      if(allocated(cn_lin   )) deallocate(cn_lin   )
-   enddo
+   ! C++ handles all file I/O
+   CALL afi_wrtables_c(C_LOC(p_view), INT(UAMod, C_INT), C_LOC(c_rootname))
 
 end subroutine AFI_WrTables
 !=============================================================================

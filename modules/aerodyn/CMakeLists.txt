@@ -56,6 +56,9 @@ add_library(basicaerolib STATIC
   src/afi_computeuacoefs.cpp
   src/readaffile.cpp
   src/afi_init.cpp
+  src/afi_wrheader.cpp
+  src/afi_wrdata.cpp
+  src/afi_wrtables.cpp
 )
 target_link_libraries(basicaerolib ifwlib nwtclibs stdc++)
 
