@@ -71,5 +71,19 @@ test_afi_wrheaderdata_filetest: afi_wrheaderdata_filetest.o afi_wrheaderdata_fil
 run_afi_wrheaderdata_filetest: test_afi_wrheaderdata_filetest
 	./test_afi_wrheaderdata_filetest
 
+# --- AFI_WrTables file-output test ---
+
+afi_wrtables_filetest_bridge.o: afi_wrtables_filetest_bridge.f90 AirfoilInfo.o
+	$(FC) $(FC_FLAGS) -c afi_wrtables_filetest_bridge.f90 -o $@
+
+afi_wrtables_filetest.o: afi_wrtables_filetest.cpp
+	$(CXX) $(CXX_FLAGS) -c afi_wrtables_filetest.cpp -o $@
+
+test_afi_wrtables_filetest: afi_wrtables_filetest.o afi_wrtables_filetest_bridge.o AirfoilInfo.o
+	$(CXX) -o $@ $^ $(LIBS)
+
+run_afi_wrtables_filetest: test_afi_wrtables_filetest
+	./test_afi_wrtables_filetest
+
 clean:
-	rm -f *.o test test_afi_init_validation test_afi_wrheaderdata_filetest *.hpp *.mod
+	rm -f *.o test test_afi_init_validation test_afi_wrheaderdata_filetest test_afi_wrtables_filetest *.hpp *.mod
