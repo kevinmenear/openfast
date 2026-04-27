@@ -80,16 +80,26 @@ void afi_wrheader_c(const char* delim, const char* filename,
     fprintf(f, "\n");
 
     // Channel names (WrFileNR pattern: first name, then delim+name for rest)
-    fputs(ChanName[0], f);
+    // Fortran uses CHARACTER(17) which left-pads shorter strings with spaces
+    static constexpr int MaxLen = 17;
+    auto writePadded = [&](const char* str) {
+        int len = (int)std::strlen(str);
+        int pad = MaxLen - len;
+        fputs(str, f);
+        for (int j = 0; j < pad; j++) fputc(' ', f);
+    };
+
+    writePadded(ChanName[0]);
     for (int i = 1; i < NumChans; i++) {
-        fprintf(f, "%s%s", delim, ChanName[i]);
+        fputs(delim, f);
+        writePadded(ChanName[i]);
     }
     fprintf(f, "\n");
 
-    // Channel units
-    fputs(ChanUnit[0], f);
+    writePadded(ChanUnit[0]);
     for (int i = 1; i < NumChans; i++) {
-        fprintf(f, "%s%s", delim, ChanUnit[i]);
+        fputs(delim, f);
+        writePadded(ChanUnit[i]);
     }
     fprintf(f, "\n");
 

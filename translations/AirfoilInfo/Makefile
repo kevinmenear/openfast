@@ -57,5 +57,19 @@ test_afi_init_validation: afi_init_validation_test.o afi_init_validation_bridge.
 run_afi_init_validation: test_afi_init_validation
 	./test_afi_init_validation
 
+# --- AFI_WrHeader+WrData file-output test ---
+
+afi_wrheaderdata_filetest_bridge.o: afi_wrheaderdata_filetest_bridge.f90 AirfoilInfo.o
+	$(FC) $(FC_FLAGS) -c afi_wrheaderdata_filetest_bridge.f90 -o $@
+
+afi_wrheaderdata_filetest.o: afi_wrheaderdata_filetest.cpp
+	$(CXX) $(CXX_FLAGS) -c afi_wrheaderdata_filetest.cpp -o $@
+
+test_afi_wrheaderdata_filetest: afi_wrheaderdata_filetest.o afi_wrheaderdata_filetest_bridge.o AirfoilInfo.o
+	$(CXX) -o $@ $^ $(LIBS)
+
+run_afi_wrheaderdata_filetest: test_afi_wrheaderdata_filetest
+	./test_afi_wrheaderdata_filetest
+
 clean:
-	rm -f *.o test test_afi_init_validation *.hpp *.mod
+	rm -f *.o test test_afi_init_validation test_afi_wrheaderdata_filetest *.hpp *.mod
