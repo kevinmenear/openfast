@@ -13,7 +13,7 @@ MODULE vit_afi_table_type_view
     ! Callee bridges USE this to pass the original type to Fortran callees.
     TYPE(AFI_Table_Type), POINTER, SAVE :: vit_original_afi_table_type => NULL()
 
-    ! Nested BIND(C) mirror for TYPE(AFI_UA_BL_Type)
+    ! Nested BIND(C) mirror for TYPE(AFI_UA_BL_TYPE)
     TYPE, BIND(C) :: afi_ua_bl_type_view_t
         REAL(C_DOUBLE) :: alpha0 = 0
         REAL(C_DOUBLE) :: alpha1 = 0
@@ -93,7 +93,7 @@ CONTAINS
         view%NumAlf = INT(src%NumAlf, C_INT)
         view%ConstData = LOGICAL(src%ConstData, C_BOOL)
         view%InclUAdata = LOGICAL(src%InclUAdata, C_BOOL)
-        ! --- Nested TYPE(AFI_UA_BL_Type) UA_BL ---
+        ! --- Nested TYPE(AFI_UA_BL_TYPE) UA_BL ---
         view%UA_BL%alpha0 = REAL(src%UA_BL%alpha0, C_DOUBLE)
         view%UA_BL%alpha1 = REAL(src%UA_BL%alpha1, C_DOUBLE)
         view%UA_BL%alpha2 = REAL(src%UA_BL%alpha2, C_DOUBLE)
@@ -180,7 +180,7 @@ CONTAINS
         dest%NumAlf = INT(view%NumAlf, C_INT)
         dest%ConstData = view%ConstData
         dest%InclUAdata = view%InclUAdata
-        ! --- Nested TYPE(AFI_UA_BL_Type) UA_BL ---
+        ! --- Nested TYPE(AFI_UA_BL_TYPE) UA_BL ---
         dest%UA_BL%alpha0 = REAL(view%UA_BL%alpha0, C_DOUBLE)
         dest%UA_BL%alpha1 = REAL(view%UA_BL%alpha1, C_DOUBLE)
         dest%UA_BL%alpha2 = REAL(view%UA_BL%alpha2, C_DOUBLE)

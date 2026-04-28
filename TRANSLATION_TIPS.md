@@ -68,6 +68,20 @@ Use `std::vector<double>` for the temporary arrays (Fortran's stack-allocated va
 
 If the function calls other already-translated functions, `vit translate` will show their `_c` signatures in the "Already-Translated Callees" section of the prompt. **Do NOT add your own `extern "C"` declarations or `#include "vit_translated.h"`.** VIT handles callee declarations automatically in both kernel verification (`vit_kernel_callees.h`) and production integration (`vit_translated.h`).
 
+## Fortran `**2` vs C++ `x * x` — Parenthesize When Multiplied
+
+Fortran `a*x**2` means `a * (x*x)` — exponentiation binds tighter than multiplication. C++ `a * x * x` means `(a*x) * x` — left-to-right associativity. The different intermediate rounding produces 1-3 ULP differences for certain values. Always parenthesize:
+
+```cpp
+// WRONG: (0.26 * spanRatio) * spanRatio — different from Fortran
+double k_tau = 0.39 - 0.26 * spanRatio * spanRatio;
+
+// CORRECT: 0.26 * (spanRatio * spanRatio) — matches Fortran a*x**2
+double k_tau = 0.39 - 0.26 * (spanRatio * spanRatio);
+```
+
+This applies to any `coeff * var**N` pattern. The parentheses ensure the exponentiation happens first, matching Fortran semantics.
+
 ## View-Type INOUT Arguments
 
 Functions that modify scalar fields in view-type INOUT arguments (e.g., `p%UA_BL.alphaBreakUpper`) need `--reverse-copy` during integration. VIT auto-generates the reverse-copy in kernel verification. ALLOCATABLE array modifications (e.g., `p%Coefs(Row,Col) = value`) work through `C_LOC` pointers and don't need reverse-copy.

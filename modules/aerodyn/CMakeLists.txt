@@ -95,7 +95,14 @@ add_library(aerodynlib STATIC
   src/FVW_BiotSavart.f90
   src/FVW_Tests.f90
   src/FVW_Types.f90
+  src/computetau2.cpp
 )
+# Prevent vectorization changes when function bodies are replaced by C++ wrappers.
+# Replacing a module-internal function with a wrapper call changes the loop body size,
+# causing gfortran to make different vectorization decisions (scalar exp vs SIMD
+# _ZGVnN2v_exp from libmvec, which differ by 1 ULP). The DBEMT exponential filter
+# feedback loop amplifies this into full divergence in UA-coupled test cases.
+set_source_files_properties(src/DBEMT.f90 PROPERTIES COMPILE_FLAGS "-fno-tree-loop-vectorize")
 target_link_libraries(aerodynlib basicaerolib aeroacousticslib seastlib nwtclibs)
 
 # ADI lib

@@ -35,6 +35,7 @@ void afi_init_pass2_c(afi_parametertype_view_t* p, const double* secondVals_buf,
 void afi_wrheader_c(const char* delim, const char* filename, int* errStat, char* errMsg);
 void afi_wrdata_c(int k, const char* filename, const char* delim, afi_parametertype_view_t* p);
 void afi_wrtables_c(afi_parametertype_view_t* p, int UAMod, const char* OutRootName);
+void computetau2_c(int i, int j, dbemt_elementinputtype_t* u, dbemt_parametertype_view_t* p, double tau1, double* tau2, int has_k_tau_out, double* k_tau_out);
 
 #ifdef __cplusplus
 }

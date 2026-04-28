@@ -103,7 +103,7 @@ translations:
     cpp_file: translations/AirfoilInfo/afi_wrtables.cpp
     verification: file-output
   ComputeTau2:
-    status: verified
+    status: integrated
     cpp_file: translations/DBEMT/computetau2.cpp
 types:
   AFI_ParameterType:

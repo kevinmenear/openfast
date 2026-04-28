@@ -1,27 +1,23 @@
 Drift report: ad_MHK_RM1_Fixed_UA vs NREL r-test reference
-Generated: 2026-04-27T03:33:40Z
+Generated: 2026-04-28T22:46:52Z
 Platform: NAME="Ubuntu"
 
 Our output: /workspace/openfast/build/modules/aerodyn/baseline_gen_ad_MHK_RM1_Fixed_UA/ad_driver.outb
 NREL ref:   /workspace/openfast/build/modules/aerodyn/baseline_gen_ad_MHK_RM1_Fixed_UA/ad_driver_nrel_ref.outb
 Array shape: (600, 54) (timesteps, channels) = 32400 values
 
-Bit-identical:                  26400 / 32400 (81.48%)
-Within 1e-5 rel:                26400 / 32400 (81.48%)
-Within 1e-5 rel OR 1e-6 abs:    26400 / 32400 (81.48%)
-Max abs difference:            5.367372e+06
-Max rel difference:            1.605573e+04
+Bit-identical:                  28800 / 32400 (88.89%)
+Within 1e-5 rel:                28895 / 32400 (89.18%)
+Within 1e-5 rel OR 1e-6 abs:    28895 / 32400 (89.18%)
+Max abs difference:            5.505215e+06
+Max rel difference:            2.253835e+03
 
 Per-channel drift (non-zero channels only):
-  RtFldMxh               (N-m     )  abs=5.367e+06  rel=1.799e+01  at t_idx=226
-  B2FldMx                (N-m     )  abs=3.412e+06  rel=1.932e+01  at t_idx=228
-  RtFldMyg               (N-m     )  abs=1.464e+06  rel=2.797e+00  at t_idx=259
-  RtFldFyh               (N       )  abs=5.346e+05  rel=6.056e+00  at t_idx=198
-  RtFldFzg               (N       )  abs=5.134e+05  rel=7.101e+00  at t_idx=198
-  RtFldFxh               (N       )  abs=3.708e+05  rel=7.570e-01  at t_idx=198
-  B1N3SigCr              (-       )  abs=3.922e+01  rel=1.000e+00  at t_idx=394
-  B2N5SigCr              (-       )  abs=1.495e+01  rel=1.000e+00  at t_idx=367
-  B1N2SgCav              (-       )  abs=5.275e+00  rel=1.000e+00  at t_idx=63
-  B2N6SgCav              (-       )  abs=1.777e+00  rel=1.000e+00  at t_idx=130
+  RtFldMxh               (N-m     )  abs=5.505e+06  rel=1.133e+00  at t_idx=429
+  B2FldMx                (N-m     )  abs=3.810e+06  rel=1.721e+01  at t_idx=228
+  RtFldMyg               (N-m     )  abs=2.686e+06  rel=1.198e+00  at t_idx=595
+  RtFldFyh               (N       )  abs=5.873e+05  rel=2.984e+00  at t_idx=351
+  RtFldFzg               (N       )  abs=5.814e+05  rel=3.163e+00  at t_idx=351
+  RtFldFxh               (N       )  abs=2.718e+05  rel=2.104e+01  at t_idx=429
 
-Total channels with drift:     10 / 54
+Total channels with drift:     6 / 54

@@ -1,5 +1,5 @@
 Drift report: ad_BAR_SineMotion_UA4_DBEMT3 vs NREL r-test reference
-Generated: 2026-04-24T18:34:25Z
+Generated: 2026-04-28T22:46:40Z
 Platform: NAME="Ubuntu"
 
 Our output: /workspace/openfast/build/modules/aerodyn/baseline_gen_ad_BAR_SineMotion_UA4_DBEMT3/ad_driver.outb

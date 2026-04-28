@@ -31,6 +31,7 @@ module DBEMT
    use NWTC_Library   
    use DBEMT_Types
    
+   USE ISO_C_BINDING
    implicit none 
 
 private
@@ -45,6 +46,22 @@ private
 
    public :: DBEMT_ReInit
    public :: DBEMT_InitStates_AllNodes
+
+
+    ! Auto-generated interface for C++ implementation of ComputeTau2
+    INTERFACE
+        SUBROUTINE computetau2_c(i, j, u, p, tau1, tau2, has_k_tau_out, k_tau_out) BIND(C, NAME='computetau2_c')
+            USE ISO_C_BINDING
+            INTEGER(C_INT), VALUE :: i
+            INTEGER(C_INT), VALUE :: j
+            TYPE(C_PTR), VALUE :: u
+            TYPE(C_PTR), VALUE :: p
+            REAL(C_DOUBLE), VALUE :: tau1
+            REAL(C_DOUBLE), INTENT(OUT) :: tau2
+            INTEGER(C_INT), VALUE :: has_k_tau_out
+            REAL(C_DOUBLE), INTENT(OUT) :: k_tau_out
+        END SUBROUTINE computetau2_c
+    END INTERFACE
 
    contains
    
@@ -469,32 +486,34 @@ end subroutine ComputeTau1
 !----------------------------------------------------------------------------------------------------------------------------------
 !> This subroutine computes the (rotor) value of tau1, tau2, and k_tau for DBEMT
 !----------------------------------------------------------------------------------------------------------------------------------
-subroutine ComputeTau2(i, j, u, p, tau1, tau2, k_tau_out)
-   integer(IntKi),                intent(in   ) :: i          !< blade node counter
-   integer(IntKi),                intent(in   ) :: j          !< blade counter
-   type(DBEMT_ElementInputType),  intent(in   ) :: u          !< element inputs at u(1)
-   type(DBEMT_ParameterType),     intent(in   ) :: p          !< Parameters
-   real(ReKi)           ,         intent(in   ) :: tau1       !< tau1 value used in DBEMT filter
-   real(ReKi)           ,         intent(  out) :: tau2       !< tau2 value used in DBEMT filter
-   real(ReKi), optional ,         intent(  out) :: k_tau_out  !< k_tau value used in DBEMT filter
+    SUBROUTINE ComputeTau2(i, j, u, p, tau1, tau2, k_tau_out)
+        USE ISO_C_BINDING
+        USE vit_dbemt_parametertype_view, ONLY: dbemt_parametertype_view_t, vit_populate_dbemt_parametertype
+        IMPLICIT NONE
+        INTEGER(4), INTENT(IN) :: i
+        INTEGER(4), INTENT(IN) :: j
+        TYPE(DBEMT_ELEMENTINPUTTYPE), INTENT(IN), TARGET :: u
+        TYPE(DBEMT_PARAMETERTYPE), INTENT(IN), TARGET :: p
+        REAL(8), INTENT(IN) :: tau1
+        REAL(8), INTENT(OUT) :: tau2
+        REAL(8), INTENT(OUT), OPTIONAL :: k_tau_out
+        TYPE(dbemt_parametertype_view_t), TARGET :: p_view
 
-   ! local variables
-   real(ReKi)                                   :: spanRatio  ! local version of r / R
-   real(ReKi)                                   :: k_tau      
+        ! Local variables for OPTIONAL args
+        INTEGER(C_INT) :: has_k_tau_out_flag
+        REAL(C_DOUBLE) :: k_tau_out_val
 
-
-   if ( p%DBEMT_Mod == DBEMT_tauConst .or. p%DBEMT_Mod == DBEMT_cont_tauConst ) then
-      spanRatio = p%spanRatio(i,j)
-   else
-      spanRatio = u%spanRatio
-   end if
-   
-   k_tau = 0.39 - 0.26*spanRatio**2
-   tau2  = k_tau*tau1               ! Eq. (1) from [1]
-   
-   if (present(k_tau_out) ) k_tau_out = k_tau
-   
-end subroutine ComputeTau2
+        has_k_tau_out_flag = 0
+        k_tau_out_val = 0.0D0
+        IF (PRESENT(k_tau_out)) THEN
+            has_k_tau_out_flag = 1
+            k_tau_out_val = REAL(k_tau_out, C_DOUBLE)
+        END IF
+        ! Populate view structs from Fortran types
+        CALL vit_populate_dbemt_parametertype(p, p_view)
+        CALL computetau2_c(i, j, C_LOC(u), C_LOC(p_view), tau1, tau2, has_k_tau_out_flag, k_tau_out_val)
+        IF (PRESENT(k_tau_out)) k_tau_out = k_tau_out_val
+    END SUBROUTINE ComputeTau2
 
 !----------------------------------------------------------------------------------------------------------------------------------
 !> Routine for computing outputs, used in both loose and tight coupling.
