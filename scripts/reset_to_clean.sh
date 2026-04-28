@@ -23,7 +23,8 @@ PRE_INTEGRATION_COMMIT="edab46311"
 #    which still has wrappers. We need the upstream version WITHOUT wrappers.
 #    Add more files here as integration expands to other modules.
 restored=0
-for f in modules/aerodyn/src/AirfoilInfo.f90; do
+for f in modules/aerodyn/src/AirfoilInfo.f90 \
+         modules/aerodyn/src/DBEMT.f90; do
     git checkout "$PRE_INTEGRATION_COMMIT" -- "$f"
     echo "  Restored: $f (from $PRE_INTEGRATION_COMMIT)"
     restored=$((restored + 1))
