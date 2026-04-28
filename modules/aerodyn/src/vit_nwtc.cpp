@@ -240,15 +240,6 @@ int LocateBin(double XVal, const double* XAry, int AryLen) {
 
 // ---- CubicSplineInitM (NWTC_Num.f90:742) ----
 
-static void setNwtcErrMsg(char* errMsg, const std::string& msg) {
-    std::memset(errMsg, ' ', ErrMsgLen);
-    size_t n = std::min(msg.size(), (size_t)ErrMsgLen);
-    std::memcpy(errMsg, msg.c_str(), n);
-}
-
-static constexpr int ErrID_None  = 0;
-static constexpr int ErrID_Fatal = 4;
-
 void CubicSplineInitM(const double* XAry, const double* YAry, double* Coef,
                       int NumPts, int NumCrvs, int* errStat, char* errMsg) {
     *errStat = ErrID_None;
@@ -269,7 +260,7 @@ void CubicSplineInitM(const double* XAry, const double* YAry, double* Coef,
         DelX[i] = XAry[i + 1] - XAry[i];
         if (EqualRealNos(DelX[i], 0.0)) {
             *errStat = ErrID_Fatal;
-            setNwtcErrMsg(errMsg, "CubicSplineInitM:XAry must have unique values.");
+            setErrMsg(errMsg, "CubicSplineInitM:XAry must have unique values.");
             return;
         }
         for (int j = 0; j < NumCrvs; j++) {
@@ -286,7 +277,7 @@ void CubicSplineInitM(const double* XAry, const double* YAry, double* Coef,
     for (int i = 1; i < nSeg; i++) {
         if (EqualRealNos(U[i - 1], 0.0)) {
             *errStat = ErrID_Fatal;
-            setNwtcErrMsg(errMsg, "CubicSplineInitM:XAry must be monotonic.");
+            setErrMsg(errMsg, "CubicSplineInitM:XAry must be monotonic.");
             return;
         }
         U[i] = 2.0 * (DelX[i - 1] + DelX[i]) - DelX[i - 1] * DelX[i - 1] / U[i - 1];
@@ -332,7 +323,7 @@ void CubicLinSplineInitM(const double* XAry, const double* YAry, double* Coef,
         double DelX = XAry[i + 1] - XAry[i];
         if (EqualRealNos(DelX, 0.0)) {
             *errStat = ErrID_Fatal;
-            setNwtcErrMsg(errMsg, "CubicLinSplineInitM:XAry must have unique values.");
+            setErrMsg(errMsg, "CubicLinSplineInitM:XAry must have unique values.");
             return;
         }
         for (int j = 0; j < NumCrvs; j++) {

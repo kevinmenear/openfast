@@ -23,8 +23,6 @@
 #include "vit_aerodyn_constants.h"
 
 void AFI_ValidateInitInput(afi_initinputtype_t* InitInput, int* ErrStat, char* ErrMsg) {
-    constexpr int ErrID_None = 0;
-    constexpr int ErrID_Fatal = 4;
     const char* RoutineName = "AFI_Validate";
 
     *ErrStat = ErrID_None;

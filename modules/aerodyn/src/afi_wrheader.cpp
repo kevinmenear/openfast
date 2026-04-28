@@ -13,15 +13,6 @@
 #include <ctime>
 #include <string>
 
-static constexpr int ErrID_None  = 0;
-static constexpr int ErrID_Fatal = 4;
-
-static void setErrMsg(char* errMsg, const std::string& msg) {
-    std::memset(errMsg, ' ', ErrMsgLen);
-    size_t n = std::min(msg.size(), (size_t)ErrMsgLen);
-    std::memcpy(errMsg, msg.c_str(), n);
-}
-
 static constexpr int NumChans = 46;
 
 static const char* ChanName[NumChans] = {

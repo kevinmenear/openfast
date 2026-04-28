@@ -12,7 +12,10 @@
 #ifndef VIT_NWTC_H
 #define VIT_NWTC_H
 
+#include <algorithm>
 #include <cmath>
+#include <cstring>
+#include <string>
 
 // ---- Constants (from NWTC_Library precision/system modules) ----
 
@@ -24,6 +27,19 @@ static constexpr double R2D   = 180.0 / M_PI;
 
 // Error message length (from NWTC_Base.f90:37)
 static constexpr int ErrMsgLen = 8196;
+
+// Error status codes (from NWTC_Base.f90)
+static constexpr int ErrID_None  = 0;
+static constexpr int ErrID_Warn  = 2;
+static constexpr int ErrID_Fatal = 4;
+
+// Error message helper — space-pads errMsg buffer, copies msg into it.
+// Used by all AeroDyn translations for NWTC-compatible error reporting.
+inline void setErrMsg(char* errMsg, const std::string& msg) {
+    std::memset(errMsg, ' ', ErrMsgLen);
+    size_t n = std::min(msg.size(), (size_t)ErrMsgLen);
+    std::memcpy(errMsg, msg.c_str(), n);
+}
 
 // ---- EqualRealNos (NWTC_Num.f90:1647, EqualRealNos8) ----
 // Returns true if two doubles are approximately equal,

@@ -15,16 +15,6 @@
 #include <cstring>
 #include <string>
 
-static constexpr int ErrID_None  = 0;
-static constexpr int ErrID_Warn  = 2;
-static constexpr int ErrID_Fatal = 4;
-
-static void setErrMsg(char* errMsg, const std::string& msg) {
-    std::memset(errMsg, ' ', ErrMsgLen);
-    size_t n = std::min(msg.size(), (size_t)ErrMsgLen);
-    std::memcpy(errMsg, msg.c_str(), n);
-}
-
 static void setErrStat(int errStatIn, const std::string& errMsgIn,
                        int* errStat, char* errMsg) {
     if (errStatIn > *errStat) {

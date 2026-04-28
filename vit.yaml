@@ -102,13 +102,14 @@ translations:
     cases_skipped: 0
     kernel_dir: kernel/AFI_ComputeUACoefs
   CheckValuesAreUniqueMonotonicIncreasing:
-    status: integrated
+    status: verified
     cpp_file: translations/AirfoilInfo/checkvaluesareuniquemonotonicincreasing.cpp
     cases_passed: 11
     cases_total: 11
     cases_skipped: 0
     kernel_dir: ''
     verification: test-validate
+    note: inlined as static helper in afi_init.cpp; original Fortran remains in AirfoilInfo.f90 for external callers
   ReadAFfile:
     status: integrated
     cpp_file: translations/AirfoilInfo/readaffile.cpp

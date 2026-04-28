@@ -31,9 +31,6 @@ void Calculate_C_alpha(double* alpha, int n_alpha, double* Cn, int n_Cn,
                        double* Cl, int n_Cl,
                        double* Default_Cn_alpha, double* Default_Cl_alpha,
                        double* Default_alpha0, int* ErrStat, char* ErrMsg) {
-    constexpr int ErrID_None = 0;
-    constexpr int ErrID_Fatal = 4;
-
     // Early return if not enough data
     if (n_Cn < 2 || n_Cl < 2) {
         const char* msg = "Calculate_C_alpha: Not enough data points to compute Cn and Cl slopes.";

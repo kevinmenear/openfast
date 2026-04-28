@@ -18,15 +18,11 @@
 
 #include "vit_types.h"
 #include "vit_nwtc.h"
+#include "vit_aerodyn_constants.h"
 #include <vector>
 
 // 2D column-major access: Coefs(Row, Col) in Fortran = Coefs[(Col-1)*nrows + (Row-1)] in C
 #define COEFS(row1, col1) p->Coefs[((col1)-1) * p->n_Coefs_rows + ((row1)-1)]
-
-// UA model constants (from AirfoilInfo_Types.f90)
-static constexpr int UA_HGM     = 4;
-static constexpr int UA_Oye     = 6;
-static constexpr int UA_HGMV360 = 8;
 
 void CalculateUACoeffs(afi_ua_bl_default_type_t* CalcDefaults, afi_table_type_view_t* p, int ColCl, int ColCd, int ColCm, int ColUAf, int UAMod) {
     int N = p->NumAlf;

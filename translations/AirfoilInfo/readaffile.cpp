@@ -19,16 +19,6 @@
 #include "vit_nwtc.h"
 #include "vit_aerodyn_constants.h"
 
-static constexpr int ErrID_None   = 0;
-static constexpr int ErrID_Warn   = 2;
-static constexpr int ErrID_Fatal  = 4;
-
-static void setErrMsg(char* errMsg, const std::string& msg) {
-    std::memset(errMsg, ' ', ErrMsgLen);
-    size_t n = std::min(msg.size(), (size_t)ErrMsgLen);
-    std::memcpy(errMsg, msg.c_str(), n);
-}
-
 extern "C" {
     void calculateuacoeffs_c(afi_ua_bl_default_type_t* CalcDefaults,
                              afi_table_type_view_t* p,

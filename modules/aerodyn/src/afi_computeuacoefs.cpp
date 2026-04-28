@@ -22,10 +22,6 @@
 #include "vit_nwtc.h"
 #include "vit_aerodyn_constants.h"
 
-// Error constants (from NWTC_Base.f90)
-static constexpr int ErrID_None  = 0;
-static constexpr int ErrID_Fatal = 4;
-
 // AFI_CopyUA_BL_Type (AirfoilInfo_Types.f90:222-275)
 // Registry-generated struct copy. In C++, this is a trivial struct assignment.
 // Defined here so VIT's C++ callee auto-detection skips Fortran bridge generation.

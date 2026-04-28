@@ -23,9 +23,6 @@
 #include "vit_nwtc.h"
 #include "vit_aerodyn_constants.h"
 
-// Error constants (from NWTC_Base.f90)
-static constexpr int ErrID_None  = 0;
-static constexpr int ErrID_Fatal = 4;
 static constexpr int AbortErrLev = ErrID_Fatal;
 
 // Maximum number of airfoil coefficient columns (from AirfoilInfo.f90:44)
