@@ -64,12 +64,13 @@ integrate ComputeUA360_AttachedFlow         $T/computeua360_attachedflow.cpp    
 integrate CalculateUACoeffs                 $T/calculateuacoeffs.cpp                 $F90 --reverse-copy
 
 echo ""
-echo "--- AirfoilInfo validation + orchestrators (2) ---"
+echo "--- AirfoilInfo validation + orchestrators (3) ---"
 integrate AFI_ValidateInitInput             $T/afi_validateinitinput.cpp              $F90
 integrate AFI_ComputeAirfoilCoefs           $T/afi_computeairfoilcoefs.cpp            $F90
+integrate AFI_ComputeUACoefs                $T/afi_computeuacoefs.cpp                 $F90
 
-# Hand-integrated functions (AFI_Init, ReadAFfile, AFI_ComputeUACoefs,
-# AFI_WrHeader, AFI_WrData, AFI_WrTables) are already in the committed
+# Hand-integrated functions (AFI_Init, ReadAFfile, AFI_WrHeader,
+# AFI_WrData, AFI_WrTables) are already in the committed
 # AirfoilInfo.f90 restored in Step 1.
 
 # -----------------------------------------------------------------------
