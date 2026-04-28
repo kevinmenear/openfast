@@ -35,17 +35,9 @@ translations:
   Calculate_Cn:
     status: integrated
     cpp_file: translations/AirfoilInfo/calculate_cn.cpp
-    cases_passed: 20
-    cases_total: 20
-    cases_skipped: 0
-    kernel_dir: kernel/Calculate_Cn
   FindBoundingTables:
     status: integrated
     cpp_file: translations/AirfoilInfo/findboundingtables.cpp
-    cases_passed: 21
-    cases_total: 21
-    cases_skipped: 0
-    kernel_dir: kernel/FindBoundingTables
   Compute_iLoweriUpper:
     status: integrated
     cpp_file: translations/AirfoilInfo/compute_iloweriupper.cpp
@@ -72,59 +64,31 @@ translations:
     status: integrated
     cpp_file: translations/AirfoilInfo/computeua360_attachedflow.cpp
     verification: simulation
-    cases_passed: 20
-    cases_total: 20
-    cases_skipped: 0
-    kernel_dir: kernel/ComputeUA360_AttachedFlow
   CalculateUACoeffs:
     status: integrated
     cpp_file: translations/AirfoilInfo/calculateuacoeffs.cpp
     verification: simulation
-    cases_passed: 20
-    cases_total: 20
-    cases_skipped: 0
-    kernel_dir: kernel/CalculateUACoeffs
   AFI_ValidateInitInput:
     status: integrated
     cpp_file: translations/AirfoilInfo/afi_validateinitinput.cpp
   AFI_ComputeAirfoilCoefs:
     status: integrated
     cpp_file: translations/AirfoilInfo/afi_computeairfoilcoefs.cpp
-    cases_passed: 20
-    cases_total: 20
-    cases_skipped: 0
-    kernel_dir: kernel/AFI_ComputeAirfoilCoefs
   AFI_ComputeUACoefs:
     status: integrated
     cpp_file: translations/AirfoilInfo/afi_computeuacoefs.cpp
-    cases_passed: 20
-    cases_total: 20
-    cases_skipped: 0
-    kernel_dir: kernel/AFI_ComputeUACoefs
   CheckValuesAreUniqueMonotonicIncreasing:
     status: verified
     cpp_file: translations/AirfoilInfo/checkvaluesareuniquemonotonicincreasing.cpp
-    cases_passed: 11
-    cases_total: 11
-    cases_skipped: 0
-    kernel_dir: ''
     verification: test-validate
     note: inlined as static helper in afi_init.cpp; original Fortran remains in AirfoilInfo.f90 for external callers
   ReadAFfile:
     status: integrated
     cpp_file: translations/AirfoilInfo/readaffile.cpp
-    cases_passed: 17
-    cases_total: 17
-    cases_skipped: 0
-    kernel_dir: ''
     verification: simulation
   AFI_Init:
     status: integrated
     cpp_file: translations/AirfoilInfo/afi_init.cpp
-    cases_passed: 17
-    cases_total: 17
-    cases_skipped: 0
-    kernel_dir: ''
     verification: simulation
   AFI_WrHeader:
     status: integrated
