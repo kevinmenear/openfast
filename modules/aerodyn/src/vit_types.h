@@ -271,4 +271,40 @@ typedef struct {
 
 #endif // AFI_OUTPUTTYPE_T_H
 
+// ============================================================================
+// DBEMT type definitions
+// ============================================================================
+
+// BIND(C)-compatible struct for Fortran TYPE(DBEMT_ElementInputType)
+// All fixed-size fields — no view struct needed.
+#ifndef DBEMT_ELEMENTINPUTTYPE_T_H
+#define DBEMT_ELEMENTINPUTTYPE_T_H
+
+typedef struct {
+    double vind_s[2];
+    double spanRatio;
+} dbemt_elementinputtype_t;
+
+#endif // DBEMT_ELEMENTINPUTTYPE_T_H
+
+// View struct for Fortran TYPE(DBEMT_ParameterType)
+// ALLOCATABLE field: spanRatio(:,:) exposed as pointer + row/col sizes.
+#ifndef DBEMT_PARAMETERTYPE_VIEW_T_H
+#define DBEMT_PARAMETERTYPE_VIEW_T_H
+
+typedef struct {
+    double DT;
+    int lin_nx;
+    int NumBlades;
+    int NumNodes;
+    double k_0ye;
+    double tau1_const;
+    int DBEMT_Mod;
+    double* spanRatio;
+    int32_t n_spanRatio_rows;
+    int32_t n_spanRatio_cols;
+} dbemt_parametertype_view_t;
+
+#endif // DBEMT_PARAMETERTYPE_VIEW_T_H
+
 #endif // VIT_TYPES_H

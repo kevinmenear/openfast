@@ -22,4 +22,11 @@ static constexpr int UA_Oye           = 6;
 static constexpr int UA_BV            = 7;
 static constexpr int UA_HGMV360       = 8;
 
+// DBEMT model selection (from DBEMT_Types.f90)
+static constexpr int DBEMT_frozen        = -1;
+static constexpr int DBEMT_none          =  0;
+static constexpr int DBEMT_tauConst      =  1;
+static constexpr int DBEMT_tauVaries     =  2;
+static constexpr int DBEMT_cont_tauConst =  3;
+
 #endif // VIT_AERODYN_CONSTANTS_H

@@ -84,6 +84,7 @@ add_library(aerodynlib STATIC
   src/AeroDyn_Types.f90
   src/BEMT_Types.f90
   src/DBEMT_Types.f90
+  src/vit_dbemt_parametertype_view.f90
 
   # FVW lib
   src/FVW.f90

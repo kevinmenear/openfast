@@ -81,7 +81,8 @@ translations:
     status: verified
     cpp_file: translations/AirfoilInfo/checkvaluesareuniquemonotonicincreasing.cpp
     verification: test-validate
-    note: inlined as static helper in afi_init.cpp; original Fortran remains in AirfoilInfo.f90 for external callers
+    note: inlined as static helper in afi_init.cpp; original Fortran remains in AirfoilInfo.f90
+      for external callers
   ReadAFfile:
     status: integrated
     cpp_file: translations/AirfoilInfo/readaffile.cpp
@@ -102,12 +103,18 @@ translations:
     status: integrated
     cpp_file: translations/AirfoilInfo/afi_wrtables.cpp
     verification: file-output
+  ComputeTau2:
+    status: verified
+    cpp_file: translations/DBEMT/computetau2.cpp
 types:
   AFI_ParameterType:
     strategy: view
   AFI_Table_Type:
     strategy: view
+  DBEMT_ParameterType:
+    strategy: view
 shared_files:
 - modules/aerodyn/src/vit_nwtc.h
 - modules/aerodyn/src/vit_nwtc.cpp
 - modules/aerodyn/src/vit_aerodyn_constants.h
+- modules/aerodyn/src/vit_types.h
