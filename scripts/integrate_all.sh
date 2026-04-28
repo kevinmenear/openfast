@@ -1,79 +1,112 @@
 #!/bin/bash
-# Integrate all translated AeroDyn functions into the source tree.
+# Re-apply all VIT integrations to AeroDyn source files.
+# Run ON THE MAC (not inside Docker) after reset_to_clean.sh.
 #
-# Run from the openfast repo root, inside the vit-dev-openfast container.
-# Assumes source has been reset to clean Fortran (reset_to_clean.sh).
-# After running, rebuild and run verify_aerodyn_baselines.sh.
-#
-# Usage: bash scripts/integrate_all.sh
-#        cd build && cmake --build . --target aerodyn_driver -j$(nproc)
-#        bash scripts/verify_aerodyn_baselines.sh all
+# Usage:
+#   bash scripts/reset_to_clean.sh    # clean source for extraction
+#   # ... run extraction ...
+#   bash scripts/integrate_all.sh     # restore integrated state
+#   docker exec vit-dev-openfast bash -c "cd /workspace/openfast/build && cmake .. && cmake --build . --target aerodyn_driver -j\$(nproc)"
+#   docker exec vit-dev-openfast bash -c "cd /workspace/openfast && bash scripts/verify_aerodyn_baselines.sh all"
 
 set -e
-cd "$(dirname "$0")/.."  # openfast repo root
+cd "$(dirname "$0")/.."
 
-SRC=modules/aerodyn/src/AirfoilInfo.f90
-passed=0
-failed=0
-total=0
+PASS=0
+FAIL=0
 
 integrate() {
-    local func="$1"
-    local cpp="$2"
-    local flags="${3:-}"
-    total=$((total + 1))
-
-    if vit integrate "$func" "$cpp" -f "$SRC" --apply $flags > /dev/null 2>&1; then
-        echo "  ✓ $func"
-        passed=$((passed + 1))
+    local name=$1; local cpp=$2; local f90=$3; shift 3
+    local flags="$@"
+    result=$(docker exec vit-dev-openfast bash -c "cd /workspace/openfast && vit integrate '$name' '$cpp' -f '$f90' --apply $flags" 2>&1)
+    if echo "$result" | grep -q "Integration applied successfully"; then
+        echo "  OK $name"
+        PASS=$((PASS + 1))
     else
-        echo "  ✗ $func"
-        failed=$((failed + 1))
+        echo "FAIL $name"
+        echo "$result" | tail -3
+        FAIL=$((FAIL + 1))
     fi
 }
 
-echo "Integrating AeroDyn translations..."
+echo "=== AeroDyn integrate_all.sh ==="
 echo ""
 
-# Order matters: functions that are callees of later functions must be
-# integrated first (so their _c declarations appear in vit_translated.h).
+# -----------------------------------------------------------------------
+# Step 1: Restore committed source files (hand-integrated wrappers)
+# -----------------------------------------------------------------------
+echo "Restoring committed source files..."
+git checkout HEAD -- modules/aerodyn/src/AirfoilInfo.f90
+git checkout HEAD -- modules/aerodyn/src/vit_afi_parametertype_view.f90
+git checkout HEAD -- modules/aerodyn/src/vit_afi_table_type_view.f90
+git checkout HEAD -- modules/aerodyn/src/vit_dbemt_parametertype_view.f90
+git checkout HEAD -- modules/aerodyn/src/vit_nwtc.cpp
+echo "  Done"
 
-# --- Leaf functions (no callees, or framework-only callees) ---
-integrate Calculate_Cn              translations/AirfoilInfo/calculate_cn.cpp
-integrate FindBoundingTables        translations/AirfoilInfo/findboundingtables.cpp
-integrate Compute_iLoweriUpper      translations/AirfoilInfo/compute_iloweriupper.cpp
-integrate ComputeUA360_CnOffset     translations/AirfoilInfo/computeua360_cnoffset.cpp
-integrate Calculate_C_alpha         translations/AirfoilInfo/calculate_c_alpha.cpp
+# -----------------------------------------------------------------------
+# Step 2: Integrate AirfoilInfo leaf functions via vit integrate
+# -----------------------------------------------------------------------
+echo ""
+echo "--- AirfoilInfo leaf functions (11) ---"
+F90=modules/aerodyn/src/AirfoilInfo.f90
+T=translations/AirfoilInfo
 
-# --- Functions that modify view-struct scalars (need --reverse-copy) ---
-integrate ComputeUASeparationFunction_zero \
-    translations/AirfoilInfo/computeuaseparationfunction_zero.cpp \
-    "--reverse-copy"
+integrate Calculate_Cn                      $T/calculate_cn.cpp                      $F90
+integrate FindBoundingTables                $T/findboundingtables.cpp                $F90
+integrate Compute_iLoweriUpper              $T/compute_iloweriupper.cpp              $F90
+integrate ComputeUA360_CnOffset             $T/computeua360_cnoffset.cpp             $F90
+integrate Calculate_C_alpha                 $T/calculate_c_alpha.cpp                 $F90
+integrate ComputeUASeparationFunction_zero  $T/computeuaseparationfunction_zero.cpp  $F90
+integrate ComputeUA360_updateCnSeparated    $T/computeua360_updatecnseparated.cpp    $F90
+integrate ComputeUA360_updateSeparationF    $T/computeua360_updateseparationf.cpp    $F90
+integrate ComputeUASeparationFunction_onCl  $T/computeuaseparationfunction_oncl.cpp  $F90
+integrate ComputeUA360_AttachedFlow         $T/computeua360_attachedflow.cpp         $F90 --reverse-copy
+integrate CalculateUACoeffs                 $T/calculateuacoeffs.cpp                 $F90 --reverse-copy
 
-# --- Functions that call already-translated callees ---
-integrate ComputeUA360_updateCnSeparated \
-    translations/AirfoilInfo/computeua360_updatecnseparated.cpp
-integrate ComputeUA360_updateSeparationF \
-    translations/AirfoilInfo/computeua360_updateseparationf.cpp
+echo ""
+echo "--- AirfoilInfo validation + orchestrators (2) ---"
+integrate AFI_ValidateInitInput             $T/afi_validateinitinput.cpp              $F90
+integrate AFI_ComputeAirfoilCoefs           $T/afi_computeairfoilcoefs.cpp            $F90
 
-# --- Callee-dependent functions ---
-integrate ComputeUASeparationFunction_onCl \
-    translations/AirfoilInfo/computeuaseparationfunction_oncl.cpp
+# Hand-integrated functions (AFI_Init, ReadAFfile, AFI_ComputeUACoefs,
+# AFI_WrHeader, AFI_WrData, AFI_WrTables) are already in the committed
+# AirfoilInfo.f90 restored in Step 1.
 
-# --- Functions with NWTC utility callees (fZeros, InterpExtrapStp) ---
-integrate ComputeUA360_AttachedFlow \
-    translations/AirfoilInfo/computeua360_attachedflow.cpp \
-    "--reverse-copy"
+# -----------------------------------------------------------------------
+# Step 3: Restore committed .cpp files
+# -----------------------------------------------------------------------
+# vit integrate creates .cpp files with duplicate extern "C" wrappers.
+# The committed versions have the correct single wrapper.
+echo ""
+echo "Restoring committed .cpp files..."
+git checkout HEAD -- \
+    modules/aerodyn/src/calculate_cn.cpp \
+    modules/aerodyn/src/findboundingtables.cpp \
+    modules/aerodyn/src/compute_iloweriupper.cpp \
+    modules/aerodyn/src/computeua360_cnoffset.cpp \
+    modules/aerodyn/src/calculate_c_alpha.cpp \
+    modules/aerodyn/src/computeuaseparationfunction_zero.cpp \
+    modules/aerodyn/src/computeua360_updatecnseparated.cpp \
+    modules/aerodyn/src/computeua360_updateseparationf.cpp \
+    modules/aerodyn/src/computeuaseparationfunction_oncl.cpp \
+    modules/aerodyn/src/computeua360_attachedflow.cpp \
+    modules/aerodyn/src/calculateuacoeffs.cpp \
+    modules/aerodyn/src/afi_validateinitinput.cpp \
+    modules/aerodyn/src/afi_computeairfoilcoefs.cpp \
+    modules/aerodyn/src/afi_computeuacoefs.cpp \
+    modules/aerodyn/src/readaffile.cpp \
+    modules/aerodyn/src/afi_init.cpp \
+    modules/aerodyn/src/afi_wrheader.cpp \
+    modules/aerodyn/src/afi_wrdata.cpp \
+    modules/aerodyn/src/afi_wrtables.cpp
+echo "  Done"
 
-# --- Orchestrator (calls most of the above + NWTC utilities) ---
-integrate CalculateUACoeffs \
-    translations/AirfoilInfo/calculateuacoeffs.cpp \
-    "--reverse-copy"
-
+# -----------------------------------------------------------------------
+# Summary
+# -----------------------------------------------------------------------
 echo ""
 echo "===================="
-echo "Summary: $passed/$total passed, $failed failed"
-
-if [ "$failed" -gt 0 ]; then
+echo "Summary: $PASS passed, $FAIL failed"
+if [ $FAIL -gt 0 ]; then
     exit 1
 fi

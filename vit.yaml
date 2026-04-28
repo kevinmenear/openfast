@@ -50,7 +50,6 @@ translations:
   ComputeUASeparationFunction_zero:
     status: integrated
     cpp_file: translations/AirfoilInfo/computeuaseparationfunction_zero.cpp
-    verification: simulation
   ComputeUA360_updateCnSeparated:
     status: integrated
     cpp_file: translations/AirfoilInfo/computeua360_updatecnseparated.cpp
