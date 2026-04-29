@@ -82,6 +82,22 @@ double k_tau = 0.39 - 0.26 * (spanRatio * spanRatio);
 
 This applies to any `coeff * var**N` pattern. The parentheses ensure the exponentiation happens first, matching Fortran semantics.
 
+## ErrMsg Blank-Padding
+
+Fortran `ErrMsg = ""` fills the entire CHARACTER variable with spaces (ASCII 32). C++ `errMsg[0] = '\0'` only sets the first byte — the rest is garbage. KGen compares the full buffer byte-by-byte, so this fails verification.
+
+Always initialize ErrMsg with `memset` to match Fortran:
+
+```cpp
+#include <cstring>
+#include "vit_nwtc.h"  // for ErrMsgLen
+
+*errStat = 0;
+std::memset(errMsg, ' ', ErrMsgLen);
+```
+
+Do NOT use `errMsg[0] = '\0'` — it will pass baselines (Fortran callers only read up to the first space-trim) but fail KGen kernel verification.
+
 ## View-Type INOUT Arguments
 
 Functions that modify scalar fields in view-type INOUT arguments (e.g., `p%UA_BL.alphaBreakUpper`) need `--reverse-copy` during integration. VIT auto-generates the reverse-copy in kernel verification. ALLOCATABLE array modifications (e.g., `p%Coefs(Row,Col) = value`) work through `C_LOC` pointers and don't need reverse-copy.
