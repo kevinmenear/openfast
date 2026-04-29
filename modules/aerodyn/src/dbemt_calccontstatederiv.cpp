@@ -33,11 +33,8 @@ void DBEMT_CalcContStateDeriv(int i, int j, double t, dbemt_elementinputtype_t* 
     }
 
     double tau1 = p->tau1_const;
-
-    // Inline tau2 computation — Mode 3 always uses p->spanRatio(i,j)
-    double spanRatio = p->spanRatio[(j - 1) * p->n_spanRatio_rows + (i - 1)];
-    double k_tau = 0.39 - 0.26 * (spanRatio * spanRatio);
-    double tau2 = k_tau * tau1;
+    double tau2;
+    computetau2_c(i, j, u, p, tau1, &tau2, 0, nullptr);
 
     double tau1inv = 1.0 / tau1;
     double tau2inv = 1.0 / tau2;
