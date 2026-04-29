@@ -114,6 +114,9 @@ translations:
   DBEMT_CalcOutput:
     status: integrated
     cpp_file: translations/DBEMT/dbemt_calcoutput.cpp
+  DBEMT_CalcContStateDeriv:
+    status: integrated
+    cpp_file: translations/DBEMT/dbemt_calccontstatederiv.cpp
 types:
   AFI_ParameterType:
     strategy: view

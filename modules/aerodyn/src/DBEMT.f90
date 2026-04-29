@@ -110,6 +110,25 @@ private
         END SUBROUTINE dbemt_calcoutput_c
     END INTERFACE
 
+
+    ! Auto-generated interface for C++ implementation of DBEMT_CalcContStateDeriv
+    INTERFACE
+        SUBROUTINE dbemt_calccontstatederiv_c(i, j, t, u, p, x, OtherState, m, dxdt, ErrStat, ErrMsg) BIND(C, NAME='dbemt_calccontstatederiv_c')
+            USE ISO_C_BINDING
+            INTEGER(C_INT), VALUE :: i
+            INTEGER(C_INT), VALUE :: j
+            REAL(C_DOUBLE), VALUE :: t
+            TYPE(C_PTR), VALUE :: u
+            TYPE(C_PTR), VALUE :: p
+            TYPE(C_PTR), VALUE :: x
+            TYPE(C_PTR), VALUE :: OtherState
+            TYPE(C_PTR), VALUE :: m
+            TYPE(C_PTR), VALUE :: dxdt
+            INTEGER(C_INT), INTENT(OUT) :: ErrStat
+            CHARACTER(KIND=C_CHAR), INTENT(OUT) :: ErrMsg(*)
+        END SUBROUTINE dbemt_calccontstatederiv_c
+    END INTERFACE
+
    contains
    
    
@@ -569,50 +588,39 @@ end subroutine DBEMT_UpdateStates
 
 !----------------------------------------------------------------------------------------------------------------------------------
 !> Tight coupling routine for computing derivatives of continuous states.
-SUBROUTINE DBEMT_CalcContStateDeriv( i, j, t, u, p, x, OtherState, m, dxdt, ErrStat, ErrMsg )
-!..................................................................................................................................
-
-   INTEGER(IntKi),                  INTENT(IN   )  :: i           !< blade node counter
-   INTEGER(IntKi),                  INTENT(IN   )  :: j           !< blade counter
-   REAL(DbKi),                      INTENT(IN   )  :: t           !< Current simulation time in seconds
-   TYPE(DBEMT_ElementInputType),    INTENT(IN   )  :: u           !< Inputs at t
-   TYPE(DBEMT_ParameterType),       INTENT(IN   )  :: p           !< Parameters
-   TYPE(DBEMT_ElementContinuousStateType), INTENT(IN   )  :: x           !< Continuous states at t (and i and j)
-   TYPE(DBEMT_OtherStateType),      INTENT(IN   )  :: OtherState  !< Other states
-   TYPE(DBEMT_MiscVarType),         INTENT(INOUT)  :: m           !< Misc variables for optimization (not copied in glue code)
-   TYPE(DBEMT_ElementContinuousStateType), INTENT(OUT)  :: dxdt        !< Continuous state derivatives at t (note that since we are operating on only a portion of the continuous states, I have made a separate, smaller type to avoid excessive memory allocation/deallocation)
-   INTEGER(IntKi),                  INTENT(  OUT)  :: ErrStat     !< Error status of the operation
-   CHARACTER(*),                    INTENT(  OUT)  :: ErrMsg      !< Error message if ErrStat /= ErrID_None
-
-      ! LOCAL variables
-   CHARACTER(*), PARAMETER                         :: RoutineName = 'DBEMT_CalcContStateDeriv'
-   
-   REAL(ReKi)                                      :: tau1inv
-   REAL(ReKi)                                      :: tau2inv
-   REAL(ReKi)                                      :: tau1
-   REAL(ReKi)                                      :: tau2
-   
-      ! Initialize ErrStat
-
-   ErrStat = ErrID_None
-   ErrMsg  = ""
-   
-         ! Compute the first time derivatives of the continuous states here:
-
-   if (p%DBEMT_Mod /= DBEMT_cont_tauConst) then
-      call SetErrStat(ErrID_Fatal,"Continuous state derivatives cannot be calculated unless DBEMT_Mod is 3.",ErrStat,ErrMsg,RoutineName)
-      return
-   end if
-   tau1 = p%tau1_const
-   call ComputeTau2(i, j, u, p, tau1, tau2)
-   tau1inv = 1.0_ReKi/(tau1)
-   tau2inv = 1.0_ReKi/(tau2)
-   
-   ! State derivatives, Eq. (7) from [1]
-   dxdt%vind_1 = -tau1inv * x%vind_1(:)                       + (1 - p%k_0ye) * tau1inv * u%vind_s(:)
-   dxdt%vind   =  tau2inv * x%vind_1(:) - tau2inv * x%vind(:) +      p%k_0ye  * tau2inv * u%vind_s(:)
-
-END SUBROUTINE DBEMT_CalcContStateDeriv
+    SUBROUTINE DBEMT_CalcContStateDeriv(i, j, t, u, p, x, OtherState, m, dxdt, ErrStat, ErrMsg)
+        USE ISO_C_BINDING
+        USE vit_dbemt_parametertype_view, ONLY: dbemt_parametertype_view_t, vit_populate_dbemt_parametertype
+        USE vit_dbemt_otherstatetype_view, ONLY: dbemt_otherstatetype_view_t, vit_populate_dbemt_otherstatetype
+        IMPLICIT NONE
+        INTEGER(4), INTENT(IN) :: i
+        INTEGER(4), INTENT(IN) :: j
+        REAL(8), INTENT(IN) :: t
+        TYPE(DBEMT_ELEMENTINPUTTYPE), INTENT(IN), TARGET :: u
+        TYPE(DBEMT_PARAMETERTYPE), INTENT(IN), TARGET :: p
+        TYPE(DBEMT_ELEMENTCONTINUOUSSTATETYPE), INTENT(IN), TARGET :: x
+        TYPE(DBEMT_OTHERSTATETYPE), INTENT(IN), TARGET :: OtherState
+        TYPE(DBEMT_MISCVARTYPE), INTENT(INOUT), TARGET :: m
+        TYPE(DBEMT_ELEMENTCONTINUOUSSTATETYPE), INTENT(OUT), TARGET :: dxdt
+        INTEGER(4), INTENT(OUT) :: ErrStat
+        CHARACTER(*), INTENT(OUT) :: ErrMsg
+        CHARACTER(KIND=C_CHAR) :: ErrMsg_c(LEN(ErrMsg))
+        INTEGER :: vit_i_ErrMsg
+        TYPE(dbemt_parametertype_view_t), TARGET :: p_view
+        TYPE(dbemt_otherstatetype_view_t), TARGET :: OtherState_view
+        ! Populate view structs from Fortran types
+        CALL vit_populate_dbemt_parametertype(p, p_view)
+        CALL vit_populate_dbemt_otherstatetype(OtherState, OtherState_view)
+        ! Convert CHARACTER args to C_CHAR arrays
+        DO vit_i_ErrMsg = 1, LEN(ErrMsg)
+            ErrMsg_c(vit_i_ErrMsg) = ErrMsg(vit_i_ErrMsg:vit_i_ErrMsg)
+        END DO
+        CALL dbemt_calccontstatederiv_c(i, j, t, C_LOC(u), C_LOC(p_view), C_LOC(x), C_LOC(OtherState_view), C_LOC(m), C_LOC(dxdt), ErrStat, ErrMsg_c)
+        ! Copy C_CHAR arrays back to CHARACTER args (INTENT OUT/INOUT)
+        DO vit_i_ErrMsg = 1, LEN(ErrMsg)
+            ErrMsg(vit_i_ErrMsg:vit_i_ErrMsg) = ErrMsg_c(vit_i_ErrMsg)
+        END DO
+    END SUBROUTINE DBEMT_CalcContStateDeriv
 !----------------------------------------------------------------------------------------------------------------------------------
 !> This subroutine implements the fourth-order Runge-Kutta Method (RK4) for numerically integrating ordinary differential equations:
 !!

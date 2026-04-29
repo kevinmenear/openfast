@@ -1,0 +1,41 @@
+// VIT Translation Scaffold
+// Function: DBEMT_CalcContStateDeriv
+// Source: DBEMT.f90
+// Module: DBEMT
+// Fortran: SUBROUTINE DBEMT_CalcContStateDeriv(i, j, t, u, p, x, OtherState, m, dxdt, ErrStat, ErrMsg)
+// Source MD5: 362a42074596
+// VIT: 0.1.0
+// Status: unverified
+// Generated: 2026-04-29T22:14:01Z
+
+#include "vit_types.h"
+#include "vit_nwtc.h"
+#include "vit_aerodyn_constants.h"
+#include <cstring>
+
+void DBEMT_CalcContStateDeriv(int i, int j, double t, dbemt_elementinputtype_t* u, dbemt_parametertype_view_t* p, dbemt_elementcontinuousstatetype_t* x, dbemt_otherstatetype_view_t* OtherState, dbemt_miscvartype_t* m, dbemt_elementcontinuousstatetype_t* dxdt, int* ErrStat, char* ErrMsg) {
+    *ErrStat = 0;
+    std::memset(ErrMsg, ' ', ErrMsgLen);
+
+    if (p->DBEMT_Mod != DBEMT_cont_tauConst) {
+        *ErrStat = ErrID_Fatal;
+        const char* msg = "DBEMT_CalcContStateDeriv:Continuous state derivatives cannot be calculated unless DBEMT_Mod is 3.";
+        std::memcpy(ErrMsg, msg, std::strlen(msg));
+        return;
+    }
+
+    double tau1 = p->tau1_const;
+
+    // Inline tau2 computation — Mode 3 always uses p->spanRatio(i,j)
+    double spanRatio = p->spanRatio[(j - 1) * p->n_spanRatio_rows + (i - 1)];
+    double k_tau = 0.39 - 0.26 * (spanRatio * spanRatio);
+    double tau2 = k_tau * tau1;
+
+    double tau1inv = 1.0 / tau1;
+    double tau2inv = 1.0 / tau2;
+
+    for (int k = 0; k < 2; k++) {
+        dxdt->vind_1[k] = -tau1inv * x->vind_1[k] + (1.0 - p->k_0ye) * tau1inv * u->vind_s[k];
+        dxdt->vind[k]   =  tau2inv * x->vind_1[k] - tau2inv * x->vind[k] + p->k_0ye * tau2inv * u->vind_s[k];
+    }
+}
