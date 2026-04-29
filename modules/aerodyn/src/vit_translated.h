@@ -38,6 +38,7 @@ void afi_wrtables_c(afi_parametertype_view_t* p, int UAMod, const char* OutRootN
 void computetau2_c(int i, int j, dbemt_elementinputtype_t* u, dbemt_parametertype_view_t* p, double tau1, double* tau2, int has_k_tau_out, double* k_tau_out);
 void computetau1_c(dbemt_inputtype_view_t* u, dbemt_parametertype_view_t* p, dbemt_miscvartype_t* m, double* tau1, int* errStat, char* errMsg);
 void dbemt_initstates_c(int i, int j, dbemt_inputtype_view_t* u, dbemt_parametertype_view_t* p, dbemt_continuousstatetype_view_t* x, dbemt_otherstatetype_view_t* OtherState);
+void dbemt_calcoutput_c(int i, int j, double t, dbemt_inputtype_view_t* u, double* y_vind, dbemt_parametertype_view_t* p, dbemt_continuousstatetype_view_t* x, dbemt_otherstatetype_view_t* OtherState, dbemt_miscvartype_t* m, int* errStat, char* errMsg);
 
 #ifdef __cplusplus
 }

@@ -91,6 +91,25 @@ private
         END SUBROUTINE dbemt_initstates_c
     END INTERFACE
 
+
+    ! Auto-generated interface for C++ implementation of DBEMT_CalcOutput
+    INTERFACE
+        SUBROUTINE dbemt_calcoutput_c(i, j, t, u, y_vind, p, x, OtherState, m, errStat, errMsg) BIND(C, NAME='dbemt_calcoutput_c')
+            USE ISO_C_BINDING
+            INTEGER(C_INT), VALUE :: i
+            INTEGER(C_INT), VALUE :: j
+            REAL(C_DOUBLE), VALUE :: t
+            TYPE(C_PTR), VALUE :: u
+            REAL(C_DOUBLE), INTENT(OUT) :: y_vind(*)
+            TYPE(C_PTR), VALUE :: p
+            TYPE(C_PTR), VALUE :: x
+            TYPE(C_PTR), VALUE :: OtherState
+            TYPE(C_PTR), VALUE :: m
+            INTEGER(C_INT), INTENT(OUT) :: errStat
+            CHARACTER(KIND=C_CHAR), INTENT(OUT) :: errMsg(*)
+        END SUBROUTINE dbemt_calcoutput_c
+    END INTERFACE
+
    contains
    
    
@@ -508,41 +527,45 @@ end subroutine DBEMT_UpdateStates
 !! This subroutine is used to compute the output channels (motions and loads) and place them in the WriteOutput() array.
 !! The descriptions of the output channels are not given here. Please see the included OutListParameters.xlsx sheet for
 !! for a complete description of each output parameter.
-subroutine DBEMT_CalcOutput( i, j, t, u, y_vind, p, x, OtherState, m, errStat, errMsg )
-! NOTE: no matter how many channels are selected for output, all of the outputs are calculated
-! All of the calculated output channels are placed into the m%AllOuts(:), while the channels selected for outputs are
-! placed in the y%WriteOutput(:) array.
-!..................................................................................................................................
-   integer(IntKi),                  intent(in   ) :: i          !< blade node counter
-   integer(IntKi),                  intent(in   ) :: j          !< blade counter
-   real(DbKi),                      intent(in   ) :: t          !< Current simulation time in seconds
-   type(DBEMT_InputType),           intent(in   ) :: u          !< Inputs at t 
-   real(ReKi),                      intent(  out) :: y_vind(2)
-   !type(DBEMT_OutputType),          intent(inout) :: y          !< Inputs at utimes (out only for mesh record-keeping in ExtrapInterp routine)
-   type(DBEMT_ParameterType),       intent(in   ) :: p          !< Parameters
-   type(DBEMT_ContinuousStateType), intent(in   ) :: x          !< Input: Continuous states at t;
-                                                                !!   Output: Continuous states at t + Interval
-   type(DBEMT_MiscVarType),         intent(inout) :: m          !< Initial misc/optimization variables
-   type(DBEMT_OtherStateType),      intent(in   ) :: OtherState !< Other/logical states at t
-
-   integer(IntKi),                  intent(  out) :: errStat    !< Error status of the operation
-   character(*),                    intent(  out) :: errMsg     !< Error message if ErrStat /= ErrID_None
-  
-   ! local variables
-   
-   character(*), parameter                      :: RoutineName = 'DBEMT_CalcOutput'
-      
-   ErrStat = ErrID_None
-   ErrMsg  = ""
-   
-   if ( .not. OtherState%areStatesInitialized(i,j) ) then
-      y_vind = u%element(i,j)%vind_s
-   else     
-      y_vind = x%element(i,j)%vind ! array copy
-   end if
-   
-      
-end subroutine DBEMT_CalcOutput
+    SUBROUTINE DBEMT_CalcOutput(i, j, t, u, y_vind, p, x, OtherState, m, errStat, errMsg)
+        USE ISO_C_BINDING
+        USE vit_dbemt_inputtype_view, ONLY: dbemt_inputtype_view_t, vit_populate_dbemt_inputtype
+        USE vit_dbemt_parametertype_view, ONLY: dbemt_parametertype_view_t, vit_populate_dbemt_parametertype
+        USE vit_dbemt_continuousstatetype_view, ONLY: dbemt_continuousstatetype_view_t, vit_populate_dbemt_continuousstatetype
+        USE vit_dbemt_otherstatetype_view, ONLY: dbemt_otherstatetype_view_t, vit_populate_dbemt_otherstatetype
+        IMPLICIT NONE
+        INTEGER(4), INTENT(IN) :: i
+        INTEGER(4), INTENT(IN) :: j
+        REAL(8), INTENT(IN) :: t
+        TYPE(DBEMT_INPUTTYPE), INTENT(IN), TARGET :: u
+        REAL(8), INTENT(OUT) :: y_vind(2)
+        TYPE(DBEMT_PARAMETERTYPE), INTENT(IN), TARGET :: p
+        TYPE(DBEMT_CONTINUOUSSTATETYPE), INTENT(IN), TARGET :: x
+        TYPE(DBEMT_OTHERSTATETYPE), INTENT(IN), TARGET :: OtherState
+        TYPE(DBEMT_MISCVARTYPE), INTENT(INOUT), TARGET :: m
+        INTEGER(4), INTENT(OUT) :: errStat
+        CHARACTER(*), INTENT(OUT) :: errMsg
+        CHARACTER(KIND=C_CHAR) :: errMsg_c(LEN(errMsg))
+        INTEGER :: vit_i_errMsg
+        TYPE(dbemt_inputtype_view_t), TARGET :: u_view
+        TYPE(dbemt_parametertype_view_t), TARGET :: p_view
+        TYPE(dbemt_continuousstatetype_view_t), TARGET :: x_view
+        TYPE(dbemt_otherstatetype_view_t), TARGET :: OtherState_view
+        ! Populate view structs from Fortran types
+        CALL vit_populate_dbemt_inputtype(u, u_view)
+        CALL vit_populate_dbemt_parametertype(p, p_view)
+        CALL vit_populate_dbemt_continuousstatetype(x, x_view)
+        CALL vit_populate_dbemt_otherstatetype(OtherState, OtherState_view)
+        ! Convert CHARACTER args to C_CHAR arrays
+        DO vit_i_errMsg = 1, LEN(errMsg)
+            errMsg_c(vit_i_errMsg) = errMsg(vit_i_errMsg:vit_i_errMsg)
+        END DO
+        CALL dbemt_calcoutput_c(i, j, t, C_LOC(u_view), y_vind, C_LOC(p_view), C_LOC(x_view), C_LOC(OtherState_view), C_LOC(m), errStat, errMsg_c)
+        ! Copy C_CHAR arrays back to CHARACTER args (INTENT OUT/INOUT)
+        DO vit_i_errMsg = 1, LEN(errMsg)
+            errMsg(vit_i_errMsg:vit_i_errMsg) = errMsg_c(vit_i_errMsg)
+        END DO
+    END SUBROUTINE DBEMT_CalcOutput
 
 !----------------------------------------------------------------------------------------------------------------------------------
 !> Tight coupling routine for computing derivatives of continuous states.
