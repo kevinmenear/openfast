@@ -29,9 +29,21 @@ static constexpr double R2D   = 180.0 / M_PI;
 static constexpr int ErrMsgLen = 8196;
 
 // Error status codes (from NWTC_Base.f90)
-static constexpr int ErrID_None  = 0;
-static constexpr int ErrID_Warn  = 2;
-static constexpr int ErrID_Fatal = 4;
+static constexpr int ErrID_None   = 0;
+static constexpr int ErrID_Warn   = 2;
+static constexpr int ErrID_Severe = 3;
+static constexpr int ErrID_Fatal  = 4;
+
+// num2lstr — convert double to left-adjusted string (matches Fortran Num2LStr).
+// Used in error/warning messages. Exact format match not critical.
+inline std::string num2lstr(double val) {
+    if (val == 0.0) return "0";
+    char buf[16];
+    std::snprintf(buf, sizeof(buf), "%15.5G", val);
+    std::string s(buf);
+    size_t start = s.find_first_not_of(' ');
+    return (start == std::string::npos) ? s : s.substr(start);
+}
 
 // Error message helper — space-pads errMsg buffer, copies msg into it.
 // Used by all AeroDyn translations for NWTC-compatible error reporting.

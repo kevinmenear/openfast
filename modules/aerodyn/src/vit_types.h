@@ -307,4 +307,32 @@ typedef struct {
 
 #endif // DBEMT_PARAMETERTYPE_VIEW_T_H
 
+// View struct for Fortran TYPE(DBEMT_InputType)
+// ALLOCATABLE field: element(:,:) exposed as typed pointer + row/col sizes.
+// ComputeTau1 only reads the 3 scalars; element is included for VIT's type system.
+#ifndef DBEMT_INPUTTYPE_VIEW_T_H
+#define DBEMT_INPUTTYPE_VIEW_T_H
+
+typedef struct {
+    double AxInd_disk;
+    double Un_disk;
+    double R_disk;
+    dbemt_elementinputtype_t* element;
+    int32_t n_element_rows;
+    int32_t n_element_cols;
+} dbemt_inputtype_view_t;
+
+#endif // DBEMT_INPUTTYPE_VIEW_T_H
+
+// BIND(C)-compatible struct for Fortran TYPE(DBEMT_MiscVarType)
+// Single LOGICAL field. Fortran default LOGICAL is 4 bytes → int32_t.
+#ifndef DBEMT_MISCVARTYPE_T_H
+#define DBEMT_MISCVARTYPE_T_H
+
+typedef struct {
+    int32_t FirstWarn_tau1;
+} dbemt_miscvartype_t;
+
+#endif // DBEMT_MISCVARTYPE_T_H
+
 #endif // VIT_TYPES_H

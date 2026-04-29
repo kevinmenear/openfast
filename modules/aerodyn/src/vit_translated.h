@@ -36,6 +36,7 @@ void afi_wrheader_c(const char* delim, const char* filename, int* errStat, char*
 void afi_wrdata_c(int k, const char* filename, const char* delim, afi_parametertype_view_t* p);
 void afi_wrtables_c(afi_parametertype_view_t* p, int UAMod, const char* OutRootName);
 void computetau2_c(int i, int j, dbemt_elementinputtype_t* u, dbemt_parametertype_view_t* p, double tau1, double* tau2, int has_k_tau_out, double* k_tau_out);
+void computetau1_c(dbemt_inputtype_view_t* u, dbemt_parametertype_view_t* p, dbemt_miscvartype_t* m, double* tau1, int* errStat, char* errMsg);
 
 #ifdef __cplusplus
 }

@@ -105,12 +105,17 @@ translations:
   ComputeTau2:
     status: integrated
     cpp_file: translations/DBEMT/computetau2.cpp
+  ComputeTau1:
+    status: integrated
+    cpp_file: translations/DBEMT/computetau1.cpp
 types:
   AFI_ParameterType:
     strategy: view
   AFI_Table_Type:
     strategy: view
   DBEMT_ParameterType:
+    strategy: view
+  DBEMT_InputType:
     strategy: view
 shared_files:
 - modules/aerodyn/src/vit_nwtc.h

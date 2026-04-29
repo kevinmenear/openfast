@@ -63,6 +63,20 @@ private
         END SUBROUTINE computetau2_c
     END INTERFACE
 
+
+    ! Auto-generated interface for C++ implementation of ComputeTau1
+    INTERFACE
+        SUBROUTINE computetau1_c(u, p, m, tau1, errStat, errMsg) BIND(C, NAME='computetau1_c')
+            USE ISO_C_BINDING
+            TYPE(C_PTR), VALUE :: u
+            TYPE(C_PTR), VALUE :: p
+            TYPE(C_PTR), VALUE :: m
+            REAL(C_DOUBLE), INTENT(OUT) :: tau1
+            INTEGER(C_INT), INTENT(OUT) :: errStat
+            CHARACTER(KIND=C_CHAR), INTENT(OUT) :: errMsg(*)
+        END SUBROUTINE computetau1_c
+    END INTERFACE
+
    contains
    
    
@@ -417,72 +431,34 @@ end subroutine DBEMT_UpdateStates
 !----------------------------------------------------------------------------------------------------------------------------------
 !> This subroutine computes the (rotor) value of tau1 for DBEMT
 !----------------------------------------------------------------------------------------------------------------------------------
-subroutine ComputeTau1(u, p, m, tau1, errStat, errMsg)
-   type(DBEMT_InputType),         intent(in   ) :: u          !< Inputs at u(1)
-   type(DBEMT_ParameterType),     intent(in   ) :: p          !< Parameters
-   type(DBEMT_MiscVarType),       intent(inout) :: m          !< Initial misc/optimization variables
-   real(ReKi)           ,         intent(  out) :: tau1       !< tau1 value used in DBEMT filter
-   integer(IntKi),                intent(  out) :: errStat    !< Error status of the operation
-   character(*),                  intent(  out) :: errMsg     !< Error message if ErrStat /= ErrID_None
-
-   ! local variables
-   real(ReKi)                                   :: temp
-
-   real(ReKi)                                   :: AxInd_disk
-   real(ReKi), parameter                        :: max_AxInd = 0.5_ReKi
-
-   real(ReKi)                                   :: Un_disk
-   real(ReKi), parameter                        :: min_Un = 0.1_ReKi
-   
-   character(*), parameter                      :: RoutineName = 'ComputeTau'
-
-
-   ErrStat = ErrID_None
-   ErrMsg  = ""
-
-   if ( p%DBEMT_Mod == DBEMT_tauConst .or. p%DBEMT_Mod == DBEMT_cont_tauConst) then
-      tau1       = p%tau1_const
-   else
-      
-   ! We need to extrapolate the radius and disk velocity to the i+1 timestep
-   ! We will grab the i+1 version of vind,s and the disk averaged induction by using the
-   ! the already updated states of the BEMT module.
-   
-      !bjj: I believe u(1) is at t, which seems inconsistant with this comment
-   
-         ! Check if input values are valid for this formulation:
-      if ( u%AxInd_disk > max_AxInd ) then
-         AxInd_disk = max_AxInd
-         if (m%FirstWarn_tau1) then
-            call setErrStat( ErrID_Severe, 'Rotor-averaged axial induction factor is greater than '//trim(num2lstr(max_AxInd)) &
-                    //'; limiting time-varying tau1. This message will not be repeated though the condition may persist.', &
-                    ErrStat, ErrMsg, RoutineName ) ! don't print this error more than one time
-            m%FirstWarn_tau1 = .false.
-         end if
-      else
-         AxInd_disk = u%AxInd_disk
-      end if
-      
-      if ( u%Un_disk < min_Un ) then
-         Un_disk = min_Un
-         if (m%FirstWarn_tau1) then
-            call setErrStat( ErrID_Severe, 'Uninduced axial relative air speed, Un, is less than '//trim(num2lstr(min_Un)) &
-                     // ' m/s; limiting time-varying tau1. This message will not be repeated though the ' &
-                     //'condition may persist.', ErrStat, ErrMsg, RoutineName ) ! don't print this error more than one time
-            m%FirstWarn_tau1 = .false.
-         end if
-      else
-         Un_disk = u%Un_disk
-      end if
-      
-      temp   = (1.0-1.3*AxInd_disk)*Un_disk
-      
-      tau1   = 1.1*u%R_disk/temp          ! Eq. (1) from [1] (note that we've eliminated possibility of temp being 0)
-      tau1   = min(tau1, 100.0_ReKi)      ! put a limit on this time constant so it isn't unrealistically long (particularly at initialization)
-      
-   end if
-
-end subroutine ComputeTau1
+    SUBROUTINE ComputeTau1(u, p, m, tau1, errStat, errMsg)
+        USE ISO_C_BINDING
+        USE vit_dbemt_inputtype_view, ONLY: dbemt_inputtype_view_t, vit_populate_dbemt_inputtype
+        USE vit_dbemt_parametertype_view, ONLY: dbemt_parametertype_view_t, vit_populate_dbemt_parametertype
+        IMPLICIT NONE
+        TYPE(DBEMT_INPUTTYPE), INTENT(IN), TARGET :: u
+        TYPE(DBEMT_PARAMETERTYPE), INTENT(IN), TARGET :: p
+        TYPE(DBEMT_MISCVARTYPE), INTENT(INOUT), TARGET :: m
+        REAL(8), INTENT(OUT) :: tau1
+        INTEGER(4), INTENT(OUT) :: errStat
+        CHARACTER(*), INTENT(OUT) :: errMsg
+        CHARACTER(KIND=C_CHAR) :: errMsg_c(LEN(errMsg))
+        INTEGER :: vit_i_errMsg
+        TYPE(dbemt_inputtype_view_t), TARGET :: u_view
+        TYPE(dbemt_parametertype_view_t), TARGET :: p_view
+        ! Populate view structs from Fortran types
+        CALL vit_populate_dbemt_inputtype(u, u_view)
+        CALL vit_populate_dbemt_parametertype(p, p_view)
+        ! Convert CHARACTER args to C_CHAR arrays
+        DO vit_i_errMsg = 1, LEN(errMsg)
+            errMsg_c(vit_i_errMsg) = errMsg(vit_i_errMsg:vit_i_errMsg)
+        END DO
+        CALL computetau1_c(C_LOC(u_view), C_LOC(p_view), C_LOC(m), tau1, errStat, errMsg_c)
+        ! Copy C_CHAR arrays back to CHARACTER args (INTENT OUT/INOUT)
+        DO vit_i_errMsg = 1, LEN(errMsg)
+            errMsg(vit_i_errMsg:vit_i_errMsg) = errMsg_c(vit_i_errMsg)
+        END DO
+    END SUBROUTINE ComputeTau1
 !----------------------------------------------------------------------------------------------------------------------------------
 !> This subroutine computes the (rotor) value of tau1, tau2, and k_tau for DBEMT
 !----------------------------------------------------------------------------------------------------------------------------------

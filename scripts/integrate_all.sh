@@ -39,6 +39,7 @@ echo "Restoring committed source files..."
 git checkout HEAD -- modules/aerodyn/src/AirfoilInfo.f90
 git checkout HEAD -- modules/aerodyn/src/DBEMT.f90
 git checkout HEAD -- modules/aerodyn/src/computetau2.cpp
+git checkout HEAD -- modules/aerodyn/src/computetau1.cpp
 git checkout HEAD -- modules/aerodyn/src/vit_afi_parametertype_view.f90
 git checkout HEAD -- modules/aerodyn/src/vit_afi_table_type_view.f90
 git checkout HEAD -- modules/aerodyn/src/vit_dbemt_parametertype_view.f90
@@ -102,7 +103,8 @@ git checkout HEAD -- \
     modules/aerodyn/src/afi_wrheader.cpp \
     modules/aerodyn/src/afi_wrdata.cpp \
     modules/aerodyn/src/afi_wrtables.cpp \
-    modules/aerodyn/src/computetau2.cpp
+    modules/aerodyn/src/computetau2.cpp \
+    modules/aerodyn/src/computetau1.cpp
 echo "  Done"
 
 # -----------------------------------------------------------------------
