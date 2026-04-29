@@ -108,6 +108,9 @@ translations:
   ComputeTau1:
     status: integrated
     cpp_file: translations/DBEMT/computetau1.cpp
+  DBEMT_InitStates:
+    status: integrated
+    cpp_file: translations/DBEMT/dbemt_initstates.cpp
 types:
   AFI_ParameterType:
     strategy: view
@@ -116,6 +119,10 @@ types:
   DBEMT_ParameterType:
     strategy: view
   DBEMT_InputType:
+    strategy: view
+  DBEMT_ContinuousStateType:
+    strategy: view
+  DBEMT_OtherStateType:
     strategy: view
 shared_files:
 - modules/aerodyn/src/vit_nwtc.h

@@ -98,6 +98,9 @@ add_library(aerodynlib STATIC
   src/FVW_Types.f90
   src/computetau2.cpp
   src/computetau1.cpp
+  src/vit_dbemt_otherstatetype_view.f90
+  src/vit_dbemt_continuousstatetype_view.f90
+  src/dbemt_initstates.cpp
 )
 # Prevent vectorization changes when function bodies are replaced by C++ wrappers.
 # Replacing a module-internal function with a wrapper call changes the loop body size,

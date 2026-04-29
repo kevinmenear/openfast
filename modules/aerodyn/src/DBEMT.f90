@@ -77,6 +77,20 @@ private
         END SUBROUTINE computetau1_c
     END INTERFACE
 
+
+    ! Auto-generated interface for C++ implementation of DBEMT_InitStates
+    INTERFACE
+        SUBROUTINE dbemt_initstates_c(i, j, u, p, x, OtherState) BIND(C, NAME='dbemt_initstates_c')
+            USE ISO_C_BINDING
+            INTEGER(C_INT), VALUE :: i
+            INTEGER(C_INT), VALUE :: j
+            TYPE(C_PTR), VALUE :: u
+            TYPE(C_PTR), VALUE :: p
+            TYPE(C_PTR), VALUE :: x
+            TYPE(C_PTR), VALUE :: OtherState
+        END SUBROUTINE dbemt_initstates_c
+    END INTERFACE
+
    contains
    
    
@@ -331,32 +345,30 @@ subroutine DBEMT_InitStates_AllNodes( u, p, x, OtherState )
 end subroutine DBEMT_InitStates_AllNodes
 !!----------------------------------------------------------------------------------------------------------------------------------
 !> routine to initialize the states based on inputs
-subroutine DBEMT_InitStates( i, j, u, p, x, OtherState )
-   integer(IntKi),                  intent(in   ) :: i          !< blade node counter
-   integer(IntKi),                  intent(in   ) :: j          !< blade counter
-   type(DBEMT_InputType),           intent(in   ) :: u          !< Inputs at t
-   type(DBEMT_ParameterType),       intent(in   ) :: p          !< Parameters
-   type(DBEMT_ContinuousStateType), intent(inout) :: x          !< Input: Continuous states at t;
-                                                                !!   Output: Continuous states at t + Interval
-   type(DBEMT_OtherStateType),      intent(inout) :: OtherState !< Other/logical states at t on input; at t+dt on output
-
-   if ( .not. OtherState%areStatesInitialized(i,j) ) then
-      x%element(i,j)%vind(1) = u%element(i,j)%vind_s(1)
-      x%element(i,j)%vind(2) = u%element(i,j)%vind_s(2)
-      
-      if (p%DBEMT_Mod == DBEMT_cont_tauConst) then
-         x%element(i,j)%vind_1(1) = (1._ReKi - p%k_0ye)*u%element(i,j)%vind_s(1)  ! Reduced velocity. Eq. (6) from [1]
-         x%element(i,j)%vind_1(2) = (1._ReKi - p%k_0ye)*u%element(i,j)%vind_s(2)
-      else
-         x%element(i,j)%vind_1(1) = u%element(i,j)%vind_s(1) ! Intermediate velocity
-         x%element(i,j)%vind_1(2) = u%element(i,j)%vind_s(2)
-      end if
-      
-      OtherState%areStatesInitialized(i,j) = .true.
-      return
-   end if
-   
-end subroutine DBEMT_InitStates
+    SUBROUTINE DBEMT_InitStates(i, j, u, p, x, OtherState)
+        USE ISO_C_BINDING
+        USE vit_dbemt_inputtype_view, ONLY: dbemt_inputtype_view_t, vit_populate_dbemt_inputtype
+        USE vit_dbemt_parametertype_view, ONLY: dbemt_parametertype_view_t, vit_populate_dbemt_parametertype
+        USE vit_dbemt_continuousstatetype_view, ONLY: dbemt_continuousstatetype_view_t, vit_populate_dbemt_continuousstatetype
+        USE vit_dbemt_otherstatetype_view, ONLY: dbemt_otherstatetype_view_t, vit_populate_dbemt_otherstatetype
+        IMPLICIT NONE
+        INTEGER(4), INTENT(IN) :: i
+        INTEGER(4), INTENT(IN) :: j
+        TYPE(DBEMT_INPUTTYPE), INTENT(IN), TARGET :: u
+        TYPE(DBEMT_PARAMETERTYPE), INTENT(IN), TARGET :: p
+        TYPE(DBEMT_CONTINUOUSSTATETYPE), INTENT(INOUT), TARGET :: x
+        TYPE(DBEMT_OTHERSTATETYPE), INTENT(INOUT), TARGET :: OtherState
+        TYPE(dbemt_inputtype_view_t), TARGET :: u_view
+        TYPE(dbemt_parametertype_view_t), TARGET :: p_view
+        TYPE(dbemt_continuousstatetype_view_t), TARGET :: x_view
+        TYPE(dbemt_otherstatetype_view_t), TARGET :: OtherState_view
+        ! Populate view structs from Fortran types
+        CALL vit_populate_dbemt_inputtype(u, u_view)
+        CALL vit_populate_dbemt_parametertype(p, p_view)
+        CALL vit_populate_dbemt_continuousstatetype(x, x_view)
+        CALL vit_populate_dbemt_otherstatetype(OtherState, OtherState_view)
+        CALL dbemt_initstates_c(i, j, C_LOC(u_view), C_LOC(p_view), C_LOC(x_view), C_LOC(OtherState_view))
+    END SUBROUTINE DBEMT_InitStates
 !!----------------------------------------------------------------------------------------------------------------------------------
 !> Loose coupling routine for solving for constraint states, integrating continuous states, and updating discrete and other states.
 !! Continuous, constraint, discrete, and other states are updated for t + Interval

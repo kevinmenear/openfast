@@ -37,7 +37,7 @@ CONTAINS
 
         ! --- ALLOCATABLE arrays ---
         IF (ALLOCATED(src%element)) THEN
-            view%element = C_NULL_PTR  ! TYPE() — opaque, not interoperable
+            view%element = C_LOC(src%element(LBOUND(src%element,1),LBOUND(src%element,2)))
             view%n_element_rows = INT(SIZE(src%element, 1), C_INT32_T)
             view%n_element_cols = INT(SIZE(src%element, 2), C_INT32_T)
         ELSE

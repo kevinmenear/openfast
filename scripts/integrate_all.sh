@@ -40,9 +40,13 @@ git checkout HEAD -- modules/aerodyn/src/AirfoilInfo.f90
 git checkout HEAD -- modules/aerodyn/src/DBEMT.f90
 git checkout HEAD -- modules/aerodyn/src/computetau2.cpp
 git checkout HEAD -- modules/aerodyn/src/computetau1.cpp
+git checkout HEAD -- modules/aerodyn/src/dbemt_initstates.cpp
 git checkout HEAD -- modules/aerodyn/src/vit_afi_parametertype_view.f90
 git checkout HEAD -- modules/aerodyn/src/vit_afi_table_type_view.f90
 git checkout HEAD -- modules/aerodyn/src/vit_dbemt_parametertype_view.f90
+git checkout HEAD -- modules/aerodyn/src/vit_dbemt_inputtype_view.f90
+git checkout HEAD -- modules/aerodyn/src/vit_dbemt_continuousstatetype_view.f90
+git checkout HEAD -- modules/aerodyn/src/vit_dbemt_otherstatetype_view.f90
 git checkout HEAD -- modules/aerodyn/src/vit_nwtc.cpp
 echo "  Done"
 
@@ -77,6 +81,15 @@ integrate AFI_ComputeUACoefs                $T/afi_computeuacoefs.cpp           
 # AirfoilInfo.f90 restored in Step 1.
 
 # -----------------------------------------------------------------------
+# Step 2b: Integrate DBEMT leaf functions
+# -----------------------------------------------------------------------
+echo ""
+echo "--- DBEMT leaf functions ---"
+F90=modules/aerodyn/src/DBEMT.f90
+T=translations/DBEMT
+integrate DBEMT_InitStates  $T/dbemt_initstates.cpp  $F90
+
+# -----------------------------------------------------------------------
 # Step 3: Restore committed .cpp files
 # -----------------------------------------------------------------------
 # vit integrate creates .cpp files with duplicate extern "C" wrappers.
@@ -104,7 +117,8 @@ git checkout HEAD -- \
     modules/aerodyn/src/afi_wrdata.cpp \
     modules/aerodyn/src/afi_wrtables.cpp \
     modules/aerodyn/src/computetau2.cpp \
-    modules/aerodyn/src/computetau1.cpp
+    modules/aerodyn/src/computetau1.cpp \
+    modules/aerodyn/src/dbemt_initstates.cpp
 echo "  Done"
 
 # -----------------------------------------------------------------------
