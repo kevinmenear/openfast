@@ -46,6 +46,7 @@ git checkout HEAD -- modules/aerodyn/src/dbemt_calccontstatederiv.cpp
 git checkout HEAD -- modules/aerodyn/src/dbemt_rk4.cpp
 git checkout HEAD -- modules/aerodyn/src/dbemt_ab4.cpp
 git checkout HEAD -- modules/aerodyn/src/dbemt_abm4.cpp
+git checkout HEAD -- modules/aerodyn/src/dbemt_updatestates.cpp
 git checkout HEAD -- modules/aerodyn/src/vit_bridge_extrapinterp.f90
 git checkout HEAD -- modules/aerodyn/src/vit_afi_parametertype_view.f90
 git checkout HEAD -- modules/aerodyn/src/vit_afi_table_type_view.f90
@@ -99,6 +100,7 @@ integrate DBEMT_CalcContStateDeriv   $T/dbemt_calccontstatederiv.cpp   $F90
 integrate DBEMT_RK4                 $T/dbemt_rk4.cpp                 $F90
 integrate DBEMT_AB4                 $T/dbemt_ab4.cpp                 $F90
 integrate DBEMT_ABM4                $T/dbemt_abm4.cpp                $F90
+integrate DBEMT_UpdateStates        $T/dbemt_updatestates.cpp        $F90 --reverse-copy
 
 # -----------------------------------------------------------------------
 # Step 3: Restore committed .cpp files
@@ -134,7 +136,8 @@ git checkout HEAD -- \
     modules/aerodyn/src/dbemt_calccontstatederiv.cpp \
     modules/aerodyn/src/dbemt_rk4.cpp \
     modules/aerodyn/src/dbemt_ab4.cpp \
-    modules/aerodyn/src/dbemt_abm4.cpp
+    modules/aerodyn/src/dbemt_abm4.cpp \
+    modules/aerodyn/src/dbemt_updatestates.cpp
 echo "  Done"
 
 # -----------------------------------------------------------------------

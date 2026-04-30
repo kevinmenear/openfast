@@ -130,10 +130,13 @@ translations:
   DBEMT_ABM4:
     status: integrated
     cpp_file: translations/DBEMT/dbemt_abm4.cpp
+  DBEMT_UpdateStates:
+    status: integrated
+    cpp_file: translations/DBEMT/dbemt_updatestates.cpp
     cases_passed: 20
     cases_total: 20
     cases_skipped: 0
-    kernel_dir: kernel/DBEMT_ABM4
+    kernel_dir: kernel/DBEMT_UpdateStates
 types:
   AFI_ParameterType:
     strategy: view

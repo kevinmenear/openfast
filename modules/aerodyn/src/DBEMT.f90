@@ -151,6 +151,71 @@ private
         END SUBROUTINE dbemt_rk4_c
     END INTERFACE
 
+
+    ! Auto-generated interface for C++ implementation of DBEMT_AB4
+    INTERFACE
+        SUBROUTINE dbemt_ab4_c(i, j, t, n, u, n_u, utimes, n_utimes, p, x, OtherState, m, ErrStat, ErrMsg) BIND(C, NAME='dbemt_ab4_c')
+            USE ISO_C_BINDING
+            INTEGER(C_INT), VALUE :: i
+            INTEGER(C_INT), VALUE :: j
+            REAL(C_DOUBLE), VALUE :: t
+            INTEGER(C_INT), VALUE :: n
+            TYPE(C_PTR), VALUE :: u
+            INTEGER(C_INT), VALUE :: n_u
+            REAL(C_DOUBLE), INTENT(IN) :: utimes(*)
+            INTEGER(C_INT), VALUE :: n_utimes
+            TYPE(C_PTR), VALUE :: p
+            TYPE(C_PTR), VALUE :: x
+            TYPE(C_PTR), VALUE :: OtherState
+            TYPE(C_PTR), VALUE :: m
+            INTEGER(C_INT), INTENT(OUT) :: ErrStat
+            CHARACTER(KIND=C_CHAR), INTENT(OUT) :: ErrMsg(*)
+        END SUBROUTINE dbemt_ab4_c
+    END INTERFACE
+
+
+    ! Auto-generated interface for C++ implementation of DBEMT_ABM4
+    INTERFACE
+        SUBROUTINE dbemt_abm4_c(i, j, t, n, u, n_u, utimes, n_utimes, p, x, OtherState, m, ErrStat, ErrMsg) BIND(C, NAME='dbemt_abm4_c')
+            USE ISO_C_BINDING
+            INTEGER(C_INT), VALUE :: i
+            INTEGER(C_INT), VALUE :: j
+            REAL(C_DOUBLE), VALUE :: t
+            INTEGER(C_INT), VALUE :: n
+            TYPE(C_PTR), VALUE :: u
+            INTEGER(C_INT), VALUE :: n_u
+            REAL(C_DOUBLE), INTENT(IN) :: utimes(*)
+            INTEGER(C_INT), VALUE :: n_utimes
+            TYPE(C_PTR), VALUE :: p
+            TYPE(C_PTR), VALUE :: x
+            TYPE(C_PTR), VALUE :: OtherState
+            TYPE(C_PTR), VALUE :: m
+            INTEGER(C_INT), INTENT(OUT) :: ErrStat
+            CHARACTER(KIND=C_CHAR), INTENT(OUT) :: ErrMsg(*)
+        END SUBROUTINE dbemt_abm4_c
+    END INTERFACE
+
+
+    ! Auto-generated interface for C++ implementation of DBEMT_UpdateStates
+    INTERFACE
+        SUBROUTINE dbemt_updatestates_c(i, j, t, n, u, n_u, uTimes, p, x, OtherState, m, errStat, errMsg) BIND(C, NAME='dbemt_updatestates_c')
+            USE ISO_C_BINDING
+            INTEGER(C_INT), VALUE :: i
+            INTEGER(C_INT), VALUE :: j
+            REAL(C_DOUBLE), VALUE :: t
+            INTEGER(C_INT), VALUE :: n
+            TYPE(C_PTR), VALUE :: u
+            INTEGER(C_INT), VALUE :: n_u
+            REAL(C_DOUBLE), INTENT(IN) :: uTimes(*)
+            TYPE(C_PTR), VALUE :: p
+            TYPE(C_PTR), VALUE :: x
+            TYPE(C_PTR), VALUE :: OtherState
+            TYPE(C_PTR), VALUE :: m
+            INTEGER(C_INT), INTENT(OUT) :: errStat
+            CHARACTER(KIND=C_CHAR), INTENT(OUT) :: errMsg(*)
+        END SUBROUTINE dbemt_updatestates_c
+    END INTERFACE
+
    contains
    
    
@@ -432,73 +497,52 @@ end subroutine DBEMT_InitStates_AllNodes
 !!----------------------------------------------------------------------------------------------------------------------------------
 !> Loose coupling routine for solving for constraint states, integrating continuous states, and updating discrete and other states.
 !! Continuous, constraint, discrete, and other states are updated for t + Interval
-subroutine DBEMT_UpdateStates( i, j, t, n, u, uTimes, p, x, OtherState, m, errStat, errMsg )
-!..................................................................................................................................
-   integer(IntKi),                  intent(in   ) :: i          !< blade node counter
-   integer(IntKi),                  intent(in   ) :: j          !< blade counter
-   real(DbKi),                      intent(in   ) :: t          !< Current simulation time in seconds
-   integer(IntKi),                  intent(in   ) :: n          !< Current simulation time step n = 0,1,...
-   type(DBEMT_InputType),           intent(in   ) :: u(2)       !< Inputs at t and t+dt
-   real(DbKi),                      intent(in   ) :: uTimes(2)  ! Times associated with u(:), in seconds
-   type(DBEMT_ParameterType),       intent(in   ) :: p          !< Parameters
-   type(DBEMT_ContinuousStateType), intent(inout) :: x          !< Input: Continuous states at t;
-                                                                !!   Output: Continuous states at t + Interval
-   type(DBEMT_MiscVarType),         intent(inout) :: m          !< Initial misc/optimization variables
-   type(DBEMT_OtherStateType),      intent(inout) :: OtherState !< Other/logical states at t on input; at t+dt on output
-   integer(IntKi),                  intent(  out) :: errStat    !< Error status of the operation
-   character(*),                    intent(  out) :: errMsg     !< Error message if ErrStat /= ErrID_None
-
-   ! local variables
-   real(ReKi)                                     :: A, B, C0, k_tau, C0_2 ! tau1_plus1, C_tau1, C, K1
-   integer(IntKi)                                 :: indx
-   
-   TYPE(DBEMT_ElementInputType)                   :: u_elem(2)        !< Inputs at utimes
-   
-   character(*), parameter                        :: RoutineName = 'DBEMT_UpdateStates'
-      
-   ErrStat = ErrID_None
-   ErrMsg  = ""
-   
-  !if (p%DBEMT_Mod == DBEMT_none) return  ! DBEMT is turned off.
-   
-   call ComputeTau1(u(1), p, m, OtherState%tau1, errStat, errMsg) ! place this here for DBEMTau1 output reasons
-      if (errStat >= AbortErrLev) return
-   call ComputeTau2(i, j, u(1)%element(i,j), p, OtherState%tau1, OtherState%tau2, k_tau)
-
-   call DBEMT_InitStates( i, j, u(1), p, x, OtherState )
-
-   if (p%DBEMT_Mod == DBEMT_cont_tauConst) then ! continuous formulation:
-      u_elem(1) = u(1)%element(i,j)
-      u_elem(2) = u(2)%element(i,j)
-      call DBEMT_ABM4( i, j, t, n, u_elem, utimes, p, x, OtherState, m, ErrStat, ErrMsg )
-   
-   else ! finite difference formulation:
-
-      do indx=1,2 !Axial and tangential components.  jmj questions if this should be done for tangential induction.
-      
-         B =  ( u(2)%element(i,j)%vind_s(indx) - u(1)%element(i,j)%vind_s(indx) ) / p%dt                    ! Eqn. 1.17c  ! bjj: note that interpOrder will affect this numerical derivative
-         A =    u(1)%element(i,j)%vind_s(indx) + B*p%k_0ye*OtherState%tau1                                  ! Eqn. 1.17b
-      
-         C0 = x%element(i,j)%vind_1(indx) - A + B*OtherState%tau1                                           ! Eqn. 1.21b
-      
-         x%element(i,j)%vind_1(indx) = C0*exp(-p%dt/OtherState%tau1) + A + B*(p%dt-OtherState%tau1)         ! Eqn. 1.21a, but this is using p%dt instead of t
-      
-         C0_2 = x%element(i,j)%vind(indx) - C0/(1-k_tau) - A + B*(OtherState%tau1 + OtherState%tau2)        ! Eqn. 1.24c
-         x%element(i,j)%vind(indx) = C0_2*exp(-p%dt/OtherState%tau2) + A + B*(p%dt-OtherState%tau1-OtherState%tau2) &
-                               + (C0/(1-k_tau))*exp(-p%dt/OtherState%tau1)                                  ! Eqn. 1.25
-      
-      
-         !C      = (u(2)%element(i,j)%vind_s(indx) - u(1)%element(i,j)%vind_s(indx))/p%dt ! v_ind_s_future could come from BEMT update states, but this seems to violate the framework  !Eqn. 1.27C
-         !A      = u(1)%element(i,j)%vind_s(indx) + C*p%k_0ye*tau1  !
-         !B      = C*(p%k_0ye*C_tau1+1)
-         !K1     = (A + A*C_tau1 - B*tau1) / (1+C_tau1)
-         !C0     = ( x%element(i,j)%vind_1(indx) - K1 )*tau1**(1.0/C_tau1)
-         !C0_2   = ( x%element(i,j)%vind(indx) - K1 - C0 / ((1-k_tau)**(1.0/C_tau1)) + B*k_tau*tau1/((1+C_tau1)*(1+k_tau*C_tau1)) ) * tau1**(1.0/(k_tau*C_tau1))
-         !x%element(i,j)%vind(indx) = K1 + B*(p%dt-k_tau*tau1)/((1+C_tau1)*(1+k_tau*C_tau1)) + C0 / ((1-k_tau)*(tau1+C_tau1*p%dt)**(1.0/C_tau1)) + C0_2 / ((tau1 + C_tau1*p%dt)**(1.0/(k_tau*C_tau1)))
-      end do
-      
-   end if
-end subroutine DBEMT_UpdateStates
+    SUBROUTINE DBEMT_UpdateStates(i, j, t, n, u, uTimes, p, x, OtherState, m, errStat, errMsg)
+        USE ISO_C_BINDING
+        USE vit_dbemt_inputtype_view, ONLY: dbemt_inputtype_view_t, vit_populate_dbemt_inputtype, vit_copy_scalars_to_dbemt_inputtype
+        USE vit_dbemt_parametertype_view, ONLY: dbemt_parametertype_view_t, vit_populate_dbemt_parametertype, vit_copy_scalars_to_dbemt_parametertype
+        USE vit_dbemt_continuousstatetype_view, ONLY: dbemt_continuousstatetype_view_t, vit_populate_dbemt_continuousstatetype, vit_copy_scalars_to_dbemt_continuousstatetype
+        USE vit_dbemt_otherstatetype_view, ONLY: dbemt_otherstatetype_view_t, vit_populate_dbemt_otherstatetype, vit_copy_scalars_to_dbemt_otherstatetype
+        IMPLICIT NONE
+        INTEGER(4), INTENT(IN) :: i
+        INTEGER(4), INTENT(IN) :: j
+        REAL(8), INTENT(IN) :: t
+        INTEGER(4), INTENT(IN) :: n
+        TYPE(DBEMT_INPUTTYPE), INTENT(IN), TARGET :: u(2)
+        REAL(8), INTENT(IN) :: uTimes(2)
+        TYPE(DBEMT_PARAMETERTYPE), INTENT(IN), TARGET :: p
+        TYPE(DBEMT_CONTINUOUSSTATETYPE), INTENT(INOUT), TARGET :: x
+        TYPE(DBEMT_OTHERSTATETYPE), INTENT(INOUT), TARGET :: OtherState
+        TYPE(DBEMT_MISCVARTYPE), INTENT(INOUT), TARGET :: m
+        INTEGER(4), INTENT(OUT) :: errStat
+        CHARACTER(*), INTENT(OUT) :: errMsg
+        CHARACTER(KIND=C_CHAR) :: errMsg_c(LEN(errMsg))
+        INTEGER :: vit_i_errMsg
+        TYPE(dbemt_inputtype_view_t), TARGET :: u_view(2)
+        TYPE(dbemt_parametertype_view_t), TARGET :: p_view
+        TYPE(dbemt_continuousstatetype_view_t), TARGET :: x_view
+        TYPE(dbemt_otherstatetype_view_t), TARGET :: OtherState_view
+        INTEGER :: vit_view_i
+        ! Populate view structs from Fortran types
+        DO vit_view_i = 1, 2
+            CALL vit_populate_dbemt_inputtype(u(vit_view_i), u_view(vit_view_i))
+        END DO
+        CALL vit_populate_dbemt_parametertype(p, p_view)
+        CALL vit_populate_dbemt_continuousstatetype(x, x_view)
+        CALL vit_populate_dbemt_otherstatetype(OtherState, OtherState_view)
+        ! Convert CHARACTER args to C_CHAR arrays
+        DO vit_i_errMsg = 1, LEN(errMsg)
+            errMsg_c(vit_i_errMsg) = errMsg(vit_i_errMsg:vit_i_errMsg)
+        END DO
+        CALL dbemt_updatestates_c(i, j, t, n, C_LOC(u_view(1)), 2, uTimes, C_LOC(p_view), C_LOC(x_view), C_LOC(OtherState_view), C_LOC(m), errStat, errMsg_c)
+        ! Copy C_CHAR arrays back to CHARACTER args (INTENT OUT/INOUT)
+        DO vit_i_errMsg = 1, LEN(errMsg)
+            errMsg(vit_i_errMsg:vit_i_errMsg) = errMsg_c(vit_i_errMsg)
+        END DO
+        ! Copy modified scalars back from view to Fortran type
+        CALL vit_copy_scalars_to_dbemt_continuousstatetype(x_view, x)
+        CALL vit_copy_scalars_to_dbemt_otherstatetype(OtherState_view, OtherState)
+    END SUBROUTINE DBEMT_UpdateStates
 
 !----------------------------------------------------------------------------------------------------------------------------------
 !> This subroutine computes the (rotor) value of tau1 for DBEMT
@@ -710,83 +754,43 @@ end subroutine DBEMT_UpdateStates
 !!  or
 !!
 !!  K. E. Atkinson, "An Introduction to Numerical Analysis", 1989, John Wiley & Sons, Inc, Second Edition.
-SUBROUTINE DBEMT_AB4( i, j, t, n, u, utimes, p, x, OtherState, m, ErrStat, ErrMsg )
-!..................................................................................................................................
-
-   integer(IntKi),                  INTENT(IN   )  :: i           !< blade node counter
-   integer(IntKi),                  INTENT(IN   )  :: j           !< blade counter
-   REAL(DbKi),                      INTENT(IN   )  :: t           !< Current simulation time in seconds
-   INTEGER(IntKi),                  INTENT(IN   )  :: n           !< time step number
-   TYPE(DBEMT_ElementInputType),    INTENT(IN   )  :: u(:)        !< Inputs at utimes
-   REAL(DbKi),                      INTENT(IN   )  :: utimes(:)   !< times of input
-   TYPE(DBEMT_ParameterType),       INTENT(IN   )  :: p           !< Parameters
-   TYPE(DBEMT_ContinuousStateType), INTENT(INOUT)  :: x           !< Continuous states at t on input at t + dt on output
-   TYPE(DBEMT_OtherStateType),      INTENT(INOUT)  :: OtherState  !< Other states
-   TYPE(DBEMT_MiscVarType),         INTENT(INOUT)  :: m           !< misc/optimization variables
-   INTEGER(IntKi),                  INTENT(  OUT)  :: ErrStat     !< Error status of the operation
-   CHARACTER(*),                    INTENT(  OUT)  :: ErrMsg      !< Error message if ErrStat /= ErrID_None
-
-
-   ! local variables
-   TYPE(DBEMT_ElementInputType)                    :: u_interp
-   TYPE(DBEMT_ElementContinuousStateType)          :: x_tmp
-         
-   INTEGER(IntKi)                                  :: ErrStat2    ! local error status
-   CHARACTER(ErrMsgLen)                            :: ErrMsg2     ! local error message (ErrMsg)
-   CHARACTER(*), PARAMETER                         :: RoutineName = 'DBEMT_AB4'
-
-
-      ! Initialize ErrStat
-
-      ErrStat = ErrID_None
-      ErrMsg  = "" 
-      
-      if (OtherState%n(i,j) < n) then
-
-         OtherState%n(i,j) = n
-            ! these types don't contain pointers or allocatable arrays, so we can copy them directly here:
-         OtherState%xdot(4)%element(i,j) = OtherState%xdot(3)%element(i,j)
-         OtherState%xdot(3)%element(i,j) = OtherState%xdot(2)%element(i,j)
-         OtherState%xdot(2)%element(i,j) = OtherState%xdot(1)%element(i,j)
-
-      elseif (OtherState%n(i,j) > n) then
-
-         CALL SetErrStat(ErrID_Fatal,'Backing up in time is not supported with a multistep method.',ErrStat,ErrMsg,RoutineName)
-         RETURN
-
-      endif
-      
-      ! need xdot at t, get inputs at t
-      CALL DBEMT_ElementInputType_ExtrapInterp(u, utimes, u_interp, t, ErrStat2, ErrMsg2)
-         CALL SetErrStat(ErrStat2,ErrMsg2,ErrStat,ErrMsg,RoutineName)
-         IF ( ErrStat >= AbortErrLev ) RETURN
-         
-      x_tmp     = x%element(i,j)
-      
-         ! calculate OtherState%xdot( 1 )%element(i,j)
-      CALL DBEMT_CalcContStateDeriv( i, j, t, u_interp, p, x_tmp, OtherState, m, OtherState%xdot( 1 )%element(i,j), ErrStat2, ErrMsg2 )
-         CALL SetErrStat(ErrStat2,ErrMsg2,ErrStat,ErrMsg,RoutineName)
-         IF ( ErrStat >= AbortErrLev ) RETURN
-         
-                                                    
-      if (n <= 2) then
-
-         CALL DBEMT_RK4(i, j, t, n, u, utimes, p, x, OtherState, m, ErrStat2, ErrMsg2 )
-            CALL SetErrStat(ErrStat2,ErrMsg2,ErrStat,ErrMsg,RoutineName)
-            IF ( ErrStat >= AbortErrLev ) RETURN
-
-      else
-         
-         x%element(i,j)%vind   = x%element(i,j)%vind   + p%DT/24. * ( 55.*OtherState%xdot(1)%element(i,j)%vind   - 59.*OtherState%xdot(2)%element(i,j)%vind &
-                                                                    + 37.*OtherState%xdot(3)%element(i,j)%vind   -  9.*OtherState%xdot(4)%element(i,j)%vind )
-
-         x%element(i,j)%vind_1 = x%element(i,j)%vind_1 + p%DT/24. * ( 55.*OtherState%xdot(1)%element(i,j)%vind_1 - 59.*OtherState%xdot(2)%element(i,j)%vind_1 &
-                                                                    + 37.*OtherState%xdot(3)%element(i,j)%vind_1 -  9.*OtherState%xdot(4)%element(i,j)%vind_1 )
-
-      endif
-
-      
-END SUBROUTINE DBEMT_AB4
+    SUBROUTINE DBEMT_AB4(i, j, t, n, u, utimes, p, x, OtherState, m, ErrStat, ErrMsg)
+        USE ISO_C_BINDING
+        USE vit_dbemt_parametertype_view, ONLY: dbemt_parametertype_view_t, vit_populate_dbemt_parametertype
+        USE vit_dbemt_continuousstatetype_view, ONLY: dbemt_continuousstatetype_view_t, vit_populate_dbemt_continuousstatetype
+        USE vit_dbemt_otherstatetype_view, ONLY: dbemt_otherstatetype_view_t, vit_populate_dbemt_otherstatetype
+        IMPLICIT NONE
+        INTEGER(4), INTENT(IN) :: i
+        INTEGER(4), INTENT(IN) :: j
+        REAL(8), INTENT(IN) :: t
+        INTEGER(4), INTENT(IN) :: n
+        TYPE(DBEMT_ELEMENTINPUTTYPE), INTENT(IN), TARGET :: u(:)
+        REAL(8), INTENT(IN) :: utimes(:)
+        TYPE(DBEMT_PARAMETERTYPE), INTENT(IN), TARGET :: p
+        TYPE(DBEMT_CONTINUOUSSTATETYPE), INTENT(INOUT), TARGET :: x
+        TYPE(DBEMT_OTHERSTATETYPE), INTENT(INOUT), TARGET :: OtherState
+        TYPE(DBEMT_MISCVARTYPE), INTENT(INOUT), TARGET :: m
+        INTEGER(4), INTENT(OUT) :: ErrStat
+        CHARACTER(*), INTENT(OUT) :: ErrMsg
+        CHARACTER(KIND=C_CHAR) :: ErrMsg_c(LEN(ErrMsg))
+        INTEGER :: vit_i_ErrMsg
+        TYPE(dbemt_parametertype_view_t), TARGET :: p_view
+        TYPE(dbemt_continuousstatetype_view_t), TARGET :: x_view
+        TYPE(dbemt_otherstatetype_view_t), TARGET :: OtherState_view
+        ! Populate view structs from Fortran types
+        CALL vit_populate_dbemt_parametertype(p, p_view)
+        CALL vit_populate_dbemt_continuousstatetype(x, x_view)
+        CALL vit_populate_dbemt_otherstatetype(OtherState, OtherState_view)
+        ! Convert CHARACTER args to C_CHAR arrays
+        DO vit_i_ErrMsg = 1, LEN(ErrMsg)
+            ErrMsg_c(vit_i_ErrMsg) = ErrMsg(vit_i_ErrMsg:vit_i_ErrMsg)
+        END DO
+        CALL dbemt_ab4_c(i, j, t, n, C_LOC(u(1)), SIZE(u), utimes, SIZE(utimes), C_LOC(p_view), C_LOC(x_view), C_LOC(OtherState_view), C_LOC(m), ErrStat, ErrMsg_c)
+        ! Copy C_CHAR arrays back to CHARACTER args (INTENT OUT/INOUT)
+        DO vit_i_ErrMsg = 1, LEN(ErrMsg)
+            ErrMsg(vit_i_ErrMsg:vit_i_ErrMsg) = ErrMsg_c(vit_i_ErrMsg)
+        END DO
+    END SUBROUTINE DBEMT_AB4
 !----------------------------------------------------------------------------------------------------------------------------------
 !> This subroutine implements the fourth-order Adams-Bashforth-Moulton Method (RK4) for numerically integrating ordinary 
 !! differential equations:
@@ -805,70 +809,43 @@ END SUBROUTINE DBEMT_AB4
 !!  or
 !!
 !!  K. E. Atkinson, "An Introduction to Numerical Analysis", 1989, John Wiley & Sons, Inc, Second Edition.
-SUBROUTINE DBEMT_ABM4( i, j, t, n, u, utimes, p, x, OtherState, m, ErrStat, ErrMsg )
-!..................................................................................................................................
-
-   integer(IntKi),                  INTENT(IN   )  :: i           !< blade node counter
-   integer(IntKi),                  INTENT(IN   )  :: j           !< blade counter
-   REAL(DbKi),                      INTENT(IN   )  :: t           !< Current simulation time in seconds
-   INTEGER(IntKi),                  INTENT(IN   )  :: n           !< time step number
-   TYPE(DBEMT_ElementInputType),    INTENT(IN   )  :: u(:)        !< Inputs at utimes
-   REAL(DbKi),                      INTENT(IN   )  :: utimes(:)   !< times of input
-   TYPE(DBEMT_ParameterType),       INTENT(IN   )  :: p           !< Parameters
-   TYPE(DBEMT_ContinuousStateType), INTENT(INOUT)  :: x           !< Continuous states at t on input at t + dt on output
-   TYPE(DBEMT_OtherStateType),      INTENT(INOUT)  :: OtherState  !< Other states
-   TYPE(DBEMT_MiscVarType),         INTENT(INOUT)  :: m           !< misc/optimization variables
-   INTEGER(IntKi),                  INTENT(  OUT)  :: ErrStat     !< Error status of the operation
-   CHARACTER(*),                    INTENT(  OUT)  :: ErrMsg      !< Error message if ErrStat /= ErrID_None
-
-   ! local variables
-
-   TYPE(DBEMT_ElementInputType)                    :: u_interp    ! Inputs at t
-   TYPE(DBEMT_ElementContinuousStateType)          :: x_in        ! Continuous states at t
-   TYPE(DBEMT_ElementContinuousStateType)          :: xdot_pred   ! Derivative of continuous states at t
-
-   INTEGER(IntKi)                                  :: ErrStat2    ! local error status
-   CHARACTER(ErrMsgLen)                            :: ErrMsg2     ! local error message (ErrMsg)
-   CHARACTER(*), PARAMETER                         :: RoutineName = 'DBEMT_ABM4'
-      
-      
-      ! Initialize ErrStat
-
-      ErrStat = ErrID_None
-      ErrMsg  = "" 
-
-      ! save copy of x(t):
-      x_in = x%element(i,j)
-      
-
-         ! predict: (note that we are overwriting x%element(i,j)%vind and x%element(i,j)%vind_1 here):
-      CALL DBEMT_AB4( i, j, t, n, u, utimes, p, x, OtherState, m, ErrStat2, ErrMsg2 )
-         CALL SetErrStat(ErrStat2,ErrMsg2,ErrStat,ErrMsg,RoutineName)
-         IF ( ErrStat >= AbortErrLev ) RETURN
-
-      if (n > 2_IntKi) then
-      
-            ! correct:
-         
-         CALL DBEMT_ElementInputType_ExtrapInterp(u, utimes, u_interp, t + p%dt, ErrStat2, ErrMsg2)
-            CALL SetErrStat(ErrStat2,ErrMsg2,ErrStat,ErrMsg,RoutineName)
-            IF ( ErrStat >= AbortErrLev ) RETURN
-
-         CALL DBEMT_CalcContStateDeriv(i, j, t + p%dt, u_interp, p, x%element(i,j), OtherState, m, xdot_pred, ErrStat2, ErrMsg2 )
-            CALL SetErrStat(ErrStat2,ErrMsg2,ErrStat,ErrMsg,RoutineName)
-            IF ( ErrStat >= AbortErrLev ) RETURN
-
-         
-         x%element(i,j)%vind   = x_in%vind   + p%DT/24. * ( 9. * xdot_pred%vind   + 19. * OtherState%xdot(1)%element(i,j)%vind &
-                                                                                  -  5. * OtherState%xdot(2)%element(i,j)%vind &
-                                                                                  +  1. * OtherState%xdot(3)%element(i,j)%vind )
-
-         x%element(i,j)%vind_1 = x_in%vind_1 + p%DT/24. * ( 9. * xdot_pred%vind_1 + 19. * OtherState%xdot(1)%element(i,j)%vind_1 &
-                                                                                  -  5. * OtherState%xdot(2)%element(i,j)%vind_1 &
-                                                                                  +  1. * OtherState%xdot(3)%element(i,j)%vind_1 )
-      endif
-      
-END SUBROUTINE DBEMT_ABM4
+    SUBROUTINE DBEMT_ABM4(i, j, t, n, u, utimes, p, x, OtherState, m, ErrStat, ErrMsg)
+        USE ISO_C_BINDING
+        USE vit_dbemt_parametertype_view, ONLY: dbemt_parametertype_view_t, vit_populate_dbemt_parametertype
+        USE vit_dbemt_continuousstatetype_view, ONLY: dbemt_continuousstatetype_view_t, vit_populate_dbemt_continuousstatetype
+        USE vit_dbemt_otherstatetype_view, ONLY: dbemt_otherstatetype_view_t, vit_populate_dbemt_otherstatetype
+        IMPLICIT NONE
+        INTEGER(4), INTENT(IN) :: i
+        INTEGER(4), INTENT(IN) :: j
+        REAL(8), INTENT(IN) :: t
+        INTEGER(4), INTENT(IN) :: n
+        TYPE(DBEMT_ELEMENTINPUTTYPE), INTENT(IN), TARGET :: u(:)
+        REAL(8), INTENT(IN) :: utimes(:)
+        TYPE(DBEMT_PARAMETERTYPE), INTENT(IN), TARGET :: p
+        TYPE(DBEMT_CONTINUOUSSTATETYPE), INTENT(INOUT), TARGET :: x
+        TYPE(DBEMT_OTHERSTATETYPE), INTENT(INOUT), TARGET :: OtherState
+        TYPE(DBEMT_MISCVARTYPE), INTENT(INOUT), TARGET :: m
+        INTEGER(4), INTENT(OUT) :: ErrStat
+        CHARACTER(*), INTENT(OUT) :: ErrMsg
+        CHARACTER(KIND=C_CHAR) :: ErrMsg_c(LEN(ErrMsg))
+        INTEGER :: vit_i_ErrMsg
+        TYPE(dbemt_parametertype_view_t), TARGET :: p_view
+        TYPE(dbemt_continuousstatetype_view_t), TARGET :: x_view
+        TYPE(dbemt_otherstatetype_view_t), TARGET :: OtherState_view
+        ! Populate view structs from Fortran types
+        CALL vit_populate_dbemt_parametertype(p, p_view)
+        CALL vit_populate_dbemt_continuousstatetype(x, x_view)
+        CALL vit_populate_dbemt_otherstatetype(OtherState, OtherState_view)
+        ! Convert CHARACTER args to C_CHAR arrays
+        DO vit_i_ErrMsg = 1, LEN(ErrMsg)
+            ErrMsg_c(vit_i_ErrMsg) = ErrMsg(vit_i_ErrMsg:vit_i_ErrMsg)
+        END DO
+        CALL dbemt_abm4_c(i, j, t, n, C_LOC(u(1)), SIZE(u), utimes, SIZE(utimes), C_LOC(p_view), C_LOC(x_view), C_LOC(OtherState_view), C_LOC(m), ErrStat, ErrMsg_c)
+        ! Copy C_CHAR arrays back to CHARACTER args (INTENT OUT/INOUT)
+        DO vit_i_ErrMsg = 1, LEN(ErrMsg)
+            ErrMsg(vit_i_ErrMsg:vit_i_ErrMsg) = ErrMsg_c(vit_i_ErrMsg)
+        END DO
+    END SUBROUTINE DBEMT_ABM4
 !----------------------------------------------------------------------------------------------------------------------------------
 !> This routine is called at the end of the simulation.
 subroutine DBEMT_End( u, p, x, OtherState, m, ErrStat, ErrMsg )
