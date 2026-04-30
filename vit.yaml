@@ -108,6 +108,10 @@ translations:
   ComputeTau1:
     status: integrated
     cpp_file: translations/DBEMT/computetau1.cpp
+    cases_passed: 20
+    cases_total: 20
+    cases_skipped: 0
+    kernel_dir: kernel/ComputeTau1
   DBEMT_InitStates:
     status: integrated
     cpp_file: translations/DBEMT/dbemt_initstates.cpp
@@ -120,6 +124,16 @@ translations:
   DBEMT_RK4:
     status: integrated
     cpp_file: translations/DBEMT/dbemt_rk4.cpp
+  DBEMT_AB4:
+    status: integrated
+    cpp_file: translations/DBEMT/dbemt_ab4.cpp
+  DBEMT_ABM4:
+    status: integrated
+    cpp_file: translations/DBEMT/dbemt_abm4.cpp
+    cases_passed: 20
+    cases_total: 20
+    cases_skipped: 0
+    kernel_dir: kernel/DBEMT_ABM4
 types:
   AFI_ParameterType:
     strategy: view

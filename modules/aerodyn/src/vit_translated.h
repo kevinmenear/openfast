@@ -42,6 +42,8 @@ void dbemt_calcoutput_c(int i, int j, double t, dbemt_inputtype_view_t* u, doubl
 void dbemt_calccontstatederiv_c(int i, int j, double t, dbemt_elementinputtype_t* u, dbemt_parametertype_view_t* p, dbemt_elementcontinuousstatetype_t* x, dbemt_otherstatetype_view_t* OtherState, dbemt_miscvartype_t* m, dbemt_elementcontinuousstatetype_t* dxdt, int* ErrStat, char* ErrMsg);
 void dbemt_rk4_c(int i, int j, double t, int n, dbemt_elementinputtype_t* u, int n_u, double* utimes, int n_utimes, dbemt_parametertype_view_t* p, dbemt_continuousstatetype_view_t* x, dbemt_otherstatetype_view_t* OtherState, dbemt_miscvartype_t* m, int* ErrStat, char* ErrMsg);
 void dbemt_elementinputtype_extrapinterp_c(dbemt_elementinputtype_t* u, int n_u, double* t, int n_t, dbemt_elementinputtype_t* u_out, double t_out, int* ErrStat, char* ErrMsg);
+void dbemt_ab4_c(int i, int j, double t, int n, dbemt_elementinputtype_t* u, int n_u, double* utimes, int n_utimes, dbemt_parametertype_view_t* p, dbemt_continuousstatetype_view_t* x, dbemt_otherstatetype_view_t* OtherState, dbemt_miscvartype_t* m, int* ErrStat, char* ErrMsg);
+void dbemt_abm4_c(int i, int j, double t, int n, dbemt_elementinputtype_t* u, int n_u, double* utimes, int n_utimes, dbemt_parametertype_view_t* p, dbemt_continuousstatetype_view_t* x, dbemt_otherstatetype_view_t* OtherState, dbemt_miscvartype_t* m, int* ErrStat, char* ErrMsg);
 
 #ifdef __cplusplus
 }
