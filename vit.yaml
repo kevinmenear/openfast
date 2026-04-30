@@ -133,10 +133,11 @@ translations:
   DBEMT_UpdateStates:
     status: integrated
     cpp_file: translations/DBEMT/dbemt_updatestates.cpp
-    cases_passed: 20
-    cases_total: 20
-    cases_skipped: 0
-    kernel_dir: kernel/DBEMT_UpdateStates
+    verification: simulation
+  DBEMT_InitStates_AllNodes:
+    status: integrated
+    cpp_file: translations/DBEMT/dbemt_initstates_allnodes.cpp
+    verification: test-validate
 types:
   AFI_ParameterType:
     strategy: view

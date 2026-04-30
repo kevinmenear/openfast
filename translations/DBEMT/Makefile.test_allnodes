@@ -1,0 +1,32 @@
+# Test harness for DBEMT_InitStates_AllNodes
+# Fortran test calls both original Fortran and C++ translation, compares results.
+
+FC = gfortran
+CXX = g++
+FC_FLAGS = -fPIC -ffree-line-length-none -cpp -fdefault-real-8 -fdefault-double-8 -ffp-contract=off -DOPENFAST_DOUBLE_PRECISION -DHAS_FORTRAN2008_FEATURES \
+           -I/workspace/openfast/build/ftnmods -I/workspace/openfast/modules/aerodyn/src -J.
+CXX_FLAGS = -O2 -fPIC -ffp-contract=off -I/workspace/openfast/modules/aerodyn/src
+
+LIBS = /workspace/openfast/build/modules/aerodyn/libaerodynlib.a \
+       -lstdc++ \
+       /workspace/openfast/build/modules/seastate/libseastlib.a \
+       /workspace/openfast/build/modules/inflowwind/libifwlib.a \
+       /workspace/openfast/build/modules/version/libversioninfolib.a \
+       /workspace/openfast/build/modules/nwtc-library/libnwtclibs.a \
+       /usr/lib/aarch64-linux-gnu/libopenblas.so \
+       -lm -ldl -lgfortran
+
+test_allnodes: test_dbemt_initstates_allnodes.o dbemt_initstates_allnodes.o
+	$(FC) $(FC_FLAGS) -o $@ $^ $(LIBS)
+
+test_dbemt_initstates_allnodes.o: test_dbemt_initstates_allnodes.f90
+	$(FC) $(FC_FLAGS) -c $< -o $@
+
+dbemt_initstates_allnodes.o: dbemt_initstates_allnodes.cpp
+	$(CXX) $(CXX_FLAGS) -c $< -o $@
+
+run: test_allnodes
+	./test_allnodes
+
+clean:
+	rm -f *.o test_allnodes *.mod
