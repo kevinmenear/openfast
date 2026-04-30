@@ -22,8 +22,6 @@
 #include "vit_nwtc.h"
 #include "vit_aerodyn_constants.h"
 
-static constexpr int AbortErrLev = ErrID_Fatal;
-
 // Maximum number of airfoil coefficient columns (from AirfoilInfo.f90:44)
 static constexpr int MaxNumAFCoeffs = 7;
 

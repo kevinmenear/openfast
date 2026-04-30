@@ -10,6 +10,7 @@
 
 #include "vit_types.h"
 #include "vit_nwtc.h"
+#include "vit_fortran_intrinsics.h"
 #include <vector>
 
 // 2D column-major access: Coefs(Row, Col) in Fortran = Coefs[(Col-1)*nrows + (Row-1)] in C
@@ -58,18 +59,10 @@ void ComputeUA360_AttachedFlow(afi_table_type_view_t* p, int ColUAf, double* cn_
 
     p->UA_BL.alpha0ReverseFlow = p->Alpha[0];  // default value
     if (nZeros > 0) {
-        // iRoot = maxloc(abs(roots(1:nZeros)), DIM=1, MASK=abs(roots(1:nZeros)) >= 45*D2R)
-        int iRoot = 0;
-        double maxVal = -1.0;
-        for (int i = 0; i < nZeros; i++) {
-            if (std::abs(roots[i]) >= 45.0 * D2R) {
-                if (std::abs(roots[i]) > maxVal) {
-                    maxVal = std::abs(roots[i]);
-                    iRoot = i + 1;  // 1-based
-                }
-            }
-        }
-        if (iRoot > 0) {
+        int iRoot = fortran_maxloc(nZeros,
+            [&](int i) { return std::abs(roots[i]); },
+            [&](int i) { return std::abs(roots[i]) >= 45.0 * D2R; });
+        if (std::abs(roots[iRoot - 1]) >= 45.0 * D2R) {
             p->UA_BL.alpha0ReverseFlow = roots[iRoot - 1];
             if (p->UA_BL.alpha0ReverseFlow < -PiBy2) {
                 p->UA_BL.alpha0ReverseFlow = p->UA_BL.alpha0ReverseFlow + TwoPi;

@@ -117,6 +117,9 @@ translations:
   DBEMT_CalcContStateDeriv:
     status: integrated
     cpp_file: translations/DBEMT/dbemt_calccontstatederiv.cpp
+  DBEMT_RK4:
+    status: integrated
+    cpp_file: translations/DBEMT/dbemt_rk4.cpp
 types:
   AFI_ParameterType:
     strategy: view
@@ -134,4 +137,5 @@ shared_files:
 - modules/aerodyn/src/vit_nwtc.h
 - modules/aerodyn/src/vit_nwtc.cpp
 - modules/aerodyn/src/vit_aerodyn_constants.h
+- modules/aerodyn/src/vit_fortran_intrinsics.h
 - modules/aerodyn/src/vit_types.h

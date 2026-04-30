@@ -16,35 +16,16 @@
 // Generated: 2026-04-24T22:30:43Z
 
 #include "vit_types.h"
+#include "vit_fortran_intrinsics.h"
 
 void Compute_iLoweriUpper(afi_table_type_view_t* p, int* iLower, int* iUpper) {
-    // MINLOC(p%alpha, DIM=1, MASK=p%alpha >= p%UA_BL%alphaLower)
-    // Fortran MINLOC returns 1-based index of minimum value where mask is true
-    double min_val = 1.0e30;
-    int min_idx = 1;  // 1-based default
-    for (int i = 0; i < p->n_Alpha; i++) {
-        if (p->Alpha[i] >= p->UA_BL.alphaLower) {
-            if (p->Alpha[i] < min_val) {
-                min_val = p->Alpha[i];
-                min_idx = i + 1;  // 1-based
-            }
-        }
-    }
-    *iLower = min_idx;
+    *iLower = fortran_minloc(p->n_Alpha,
+        [&](int i) { return p->Alpha[i]; },
+        [&](int i) { return p->Alpha[i] >= p->UA_BL.alphaLower; });
 
-    // MAXLOC(p%alpha, DIM=1, MASK=p%alpha <= p%UA_BL%alphaUpper)
-    // Fortran MAXLOC returns 1-based index of maximum value where mask is true
-    double max_val = -1.0e30;
-    int max_idx = 1;  // 1-based default
-    for (int i = 0; i < p->n_Alpha; i++) {
-        if (p->Alpha[i] <= p->UA_BL.alphaUpper) {
-            if (p->Alpha[i] > max_val) {
-                max_val = p->Alpha[i];
-                max_idx = i + 1;  // 1-based
-            }
-        }
-    }
-    *iUpper = max_idx;
+    *iUpper = fortran_maxloc(p->n_Alpha,
+        [&](int i) { return p->Alpha[i]; },
+        [&](int i) { return p->Alpha[i] <= p->UA_BL.alphaUpper; });
 
     // Clamp to valid ranges (1-based)
     int numAlf = p->NumAlf;

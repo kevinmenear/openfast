@@ -33,6 +33,7 @@ static constexpr int ErrID_None   = 0;
 static constexpr int ErrID_Warn   = 2;
 static constexpr int ErrID_Severe = 3;
 static constexpr int ErrID_Fatal  = 4;
+static constexpr int AbortErrLev  = ErrID_Fatal;
 
 // num2lstr — convert double to left-adjusted string (matches Fortran Num2LStr).
 // Used in error/warning messages. Exact format match not critical.
@@ -46,11 +47,36 @@ inline std::string num2lstr(double val) {
 }
 
 // Error message helper — space-pads errMsg buffer, copies msg into it.
-// Used by all AeroDyn translations for NWTC-compatible error reporting.
 inline void setErrMsg(char* errMsg, const std::string& msg) {
     std::memset(errMsg, ' ', ErrMsgLen);
     size_t n = std::min(msg.size(), (size_t)ErrMsgLen);
     std::memcpy(errMsg, msg.c_str(), n);
+}
+
+// SetErrStat — accumulate errors from callee calls (matches Fortran NWTC_Base::SetErrStat).
+// Keeps highest severity, concatenates messages with RoutineName prefix.
+inline void SetErrStat(int errStatLcl, const char* errMsgLcl, int* errStat, char* errMsg, const char* routineName) {
+    if (errStatLcl != ErrID_None) {
+        if (*errStat != ErrID_None) {
+            int len = ErrMsgLen;
+            while (len > 0 && errMsg[len-1] == ' ') len--;
+            errMsg[len] = '\0';
+            char tmp[ErrMsgLen + 1];
+            std::snprintf(tmp, sizeof(tmp), "%s\n%s:%.*s", errMsg, routineName, ErrMsgLen, errMsgLcl);
+            std::memset(errMsg, ' ', ErrMsgLen);
+            std::memcpy(errMsg, tmp, std::min(std::strlen(tmp), (size_t)ErrMsgLen));
+        } else {
+            char tmp[ErrMsgLen + 1];
+            int n = std::snprintf(tmp, sizeof(tmp), "%s:%.*s", routineName, ErrMsgLen, errMsgLcl);
+            std::memset(errMsg, ' ', ErrMsgLen);
+            std::memcpy(errMsg, tmp, std::min((size_t)n, (size_t)ErrMsgLen));
+        }
+        if (errStatLcl > *errStat) *errStat = errStatLcl;
+    }
+}
+
+inline void SetErrStat(int errStatLcl, const std::string& errMsgLcl, int* errStat, char* errMsg, const char* routineName) {
+    SetErrStat(errStatLcl, errMsgLcl.c_str(), errStat, errMsg, routineName);
 }
 
 // ---- EqualRealNos (NWTC_Num.f90:1647, EqualRealNos8) ----

@@ -9,7 +9,6 @@
 #include "vit_aerodyn_constants.h"
 #include <algorithm>
 #include <cstring>
-#include <string>
 
 void ComputeTau1(const dbemt_inputtype_view_t* u,
                  const dbemt_parametertype_view_t* p,
@@ -17,30 +16,11 @@ void ComputeTau1(const dbemt_inputtype_view_t* u,
                  double* tau1,
                  int* errStat, char* errMsg)
 {
-    const char* RoutineName = "ComputeTau";
     constexpr double max_AxInd = 0.5;
     constexpr double min_Un = 0.1;
 
     *errStat = ErrID_None;
     std::memset(errMsg, ' ', ErrMsgLen);
-
-    auto SetErrStat = [&](int level, const std::string& msg) {
-        if (level != ErrID_None) {
-            if (*errStat != ErrID_None) {
-                char tmp[ErrMsgLen + 1];
-                int len = ErrMsgLen;
-                while (len > 0 && errMsg[len-1] == ' ') len--;
-                errMsg[len] = '\0';
-                std::snprintf(tmp, sizeof(tmp), "%s\n%s:%s", errMsg, RoutineName, msg.c_str());
-                std::memset(errMsg, ' ', ErrMsgLen);
-                std::memcpy(errMsg, tmp, std::min(std::strlen(tmp), (size_t)ErrMsgLen));
-            } else {
-                std::string full = std::string(RoutineName) + ":" + msg;
-                setErrMsg(errMsg, full);
-            }
-            if (level > *errStat) *errStat = level;
-        }
-    };
 
     if (p->DBEMT_Mod == DBEMT_tauConst || p->DBEMT_Mod == DBEMT_cont_tauConst) {
         *tau1 = p->tau1_const;
@@ -50,9 +30,10 @@ void ComputeTau1(const dbemt_inputtype_view_t* u,
             AxInd_disk = max_AxInd;
             if (m->FirstWarn_tau1) {
                 SetErrStat(ErrID_Severe,
-                    "Rotor-averaged axial induction factor is greater than "
+                    ("Rotor-averaged axial induction factor is greater than "
                     + num2lstr(max_AxInd)
-                    + "; limiting time-varying tau1. This message will not be repeated though the condition may persist.");
+                    + "; limiting time-varying tau1. This message will not be repeated though the condition may persist."),
+                    errStat, errMsg, "ComputeTau");
                 m->FirstWarn_tau1 = 0;
             }
         } else {
@@ -64,9 +45,10 @@ void ComputeTau1(const dbemt_inputtype_view_t* u,
             Un_disk = min_Un;
             if (m->FirstWarn_tau1) {
                 SetErrStat(ErrID_Severe,
-                    "Uninduced axial relative air speed, Un, is less than "
+                    ("Uninduced axial relative air speed, Un, is less than "
                     + num2lstr(min_Un)
-                    + " m/s; limiting time-varying tau1. This message will not be repeated though the condition may persist.");
+                    + " m/s; limiting time-varying tau1. This message will not be repeated though the condition may persist."),
+                    errStat, errMsg, "ComputeTau");
                 m->FirstWarn_tau1 = 0;
             }
         } else {

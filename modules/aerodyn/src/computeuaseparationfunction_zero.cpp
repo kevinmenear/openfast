@@ -17,6 +17,7 @@
 
 #include "vit_types.h"
 #include "vit_nwtc.h"
+#include "vit_fortran_intrinsics.h"
 
 // 2D column-major access: Coefs(Row, Col) in Fortran = Coefs[(Col-1)*nrows + (Row-1)] in C
 #define COEFS(row1, col1) p->Coefs[((col1)-1) * p->n_Coefs_rows + ((row1)-1)]
@@ -27,45 +28,21 @@ void ComputeUASeparationFunction_zero(afi_table_type_view_t* p, int ColUAf, doub
     int col_fs = ColUAf + 1;
     int col_fa = col_fs + 1;
 
-    // Find iLow: last row where alpha < alphaLower AND Coefs(:,ColUAf) is at its minimum
-    // Fortran: iTemp = minloc(Coefs(:,ColUAf), DIM=1, MASK=alpha < alphaLower)
-    //          iLow  = maxloc(alpha, DIM=1, MASK=alpha < alphaLower AND Coefs(:,ColUAf) == Coefs(iTemp,ColUAf))
-    int iTemp = -1;
-    double minVal = std::numeric_limits<double>::max();
-    for (int i = 0; i < p->NumAlf; i++) {
-        if (p->Alpha[i] < p->UA_BL.alphaLower) {
-            if (COEFS(i + 1, ColUAf) < minVal) {
-                minVal = COEFS(i + 1, ColUAf);
-                iTemp = i + 1;  // 1-based
-            }
-        }
-    }
+    int iTemp = fortran_minloc(p->NumAlf,
+        [&](int i) { return COEFS(i + 1, ColUAf); },
+        [&](int i) { return p->Alpha[i] < p->UA_BL.alphaLower; });
 
     int iLow = 1;
-    if (iTemp > 0) {
-        double maxAlpha = -std::numeric_limits<double>::max();
-        for (int i = 0; i < p->NumAlf; i++) {
-            if (p->Alpha[i] < p->UA_BL.alphaLower && COEFS(i + 1, ColUAf) == COEFS(iTemp, ColUAf)) {
-                if (p->Alpha[i] > maxAlpha) {
-                    maxAlpha = p->Alpha[i];
-                    iLow = i + 1;  // 1-based
-                }
-            }
-        }
+    if (p->Alpha[iTemp - 1] < p->UA_BL.alphaLower) {
+        double iTempVal = COEFS(iTemp, ColUAf);
+        iLow = fortran_maxloc(p->NumAlf,
+            [&](int i) { return p->Alpha[i]; },
+            [&](int i) { return p->Alpha[i] < p->UA_BL.alphaLower && COEFS(i + 1, ColUAf) == iTempVal; });
     }
 
-    // Find iHigh: first row where alpha > alphaUpper AND Coefs(:,ColUAf) is at its minimum
-    // Fortran: iHigh = minloc(Coefs(:,ColUAf), DIM=1, MASK=alpha > alphaUpper)
-    int iHigh = p->NumAlf;
-    minVal = std::numeric_limits<double>::max();
-    for (int i = 0; i < p->NumAlf; i++) {
-        if (p->Alpha[i] > p->UA_BL.alphaUpper) {
-            if (COEFS(i + 1, ColUAf) < minVal) {
-                minVal = COEFS(i + 1, ColUAf);
-                iHigh = i + 1;  // 1-based
-            }
-        }
-    }
+    int iHigh = fortran_minloc(p->NumAlf,
+        [&](int i) { return COEFS(i + 1, ColUAf); },
+        [&](int i) { return p->Alpha[i] > p->UA_BL.alphaUpper; });
 
     // Compute break-point variables for wrap-around
     p->UA_BL.alphaBreakUpper = p->Alpha[iHigh - 1];

@@ -16,7 +16,7 @@ All indices are 1-based in Fortran. The macro preserves 1-based indexing to matc
 
 All translations should `#include "vit_nwtc.h"` for NWTC Library functions and constants. Do NOT inline these — the implementations are compiled once in `vit_nwtc.cpp` and linked into all translations. VIT automatically copies both files to kernel directories during verification.
 
-**Constants:** `Pi`, `TwoPi`, `PiBy2`, `D2R`, `R2D`, `ErrMsgLen`
+**Constants:** `Pi`, `TwoPi`, `PiBy2`, `D2R`, `R2D`, `ErrMsgLen`, `ErrID_None`, `ErrID_Warn`, `ErrID_Severe`, `ErrID_Fatal`, `AbortErrLev`
 
 **Functions (12 total):**
 - `EqualRealNos(a, b)` — epsilon-based floating-point comparison
@@ -34,35 +34,26 @@ All translations should `#include "vit_nwtc.h"` for NWTC Library functions and c
 
 All arrays are 0-based in C++. Index-tracking parameters (Ind in InterpStp/InterpExtrapStp, return from LocateBin) are 1-based to match Fortran convention. See `vit_nwtc.h` for full signatures and documentation.
 
-## MINLOC / MAXLOC with Masks
+## Fortran Array Intrinsics (MINLOC, MAXLOC, CSHIFT)
 
-Fortran `MINLOC(array, DIM=1, MASK=condition)` returns the index of the minimum value where the mask is true. Translate as a manual loop:
-
-```cpp
-int idx = 1;  // 1-based default
-double minVal = std::numeric_limits<double>::max();
-for (int i = 0; i < N; i++) {
-    if (mask_condition(i) && array[i] < minVal) {
-        minVal = array[i];
-        idx = i + 1;  // 1-based
-    }
-}
-```
-
-## CSHIFT (Circular Array Shift)
-
-Fortran `CSHIFT(array, shift)` performs a circular shift. Positive shift moves elements left:
+Use the shared implementations in `vit_fortran_intrinsics.h` — do not write inline loops:
 
 ```cpp
-static void cshift(const double* src, double* dst, int n, int shift) {
-    shift = ((shift % n) + n) % n;
-    for (int i = 0; i < n; i++) {
-        dst[i] = src[(i + shift) % n];
-    }
-}
+#include "vit_fortran_intrinsics.h"
+
+// MINLOC(array, DIM=1, MASK=condition) — returns 1-based index
+int idx = fortran_minloc(N,
+    [&](int i) { return array[i]; },        // value at 0-based index
+    [&](int i) { return array[i] >= threshold; }); // mask predicate
+
+// MAXLOC — same pattern
+int idx = fortran_maxloc(N, value_fn, mask_fn);
+
+// CSHIFT(array, shift) — circular shift, positive = left
+fortran_cshift(src, dst, n, shift);
 ```
 
-Use `std::vector<double>` for the temporary arrays (Fortran's stack-allocated variable-length arrays).
+Use `std::vector<double>` for temporary arrays (Fortran's stack-allocated variable-length arrays).
 
 ## Callee Declarations
 
@@ -97,6 +88,22 @@ std::memset(errMsg, ' ', ErrMsgLen);
 ```
 
 Do NOT use `errMsg[0] = '\0'` — it will pass baselines (Fortran callers only read up to the first space-trim) but fail KGen kernel verification.
+
+## SetErrStat Error Accumulation
+
+Fortran functions that call multiple subroutines use `SetErrStat` to accumulate errors. `vit_nwtc.h` provides a C++ `SetErrStat()` that matches the Fortran semantics (keeps highest severity, concatenates messages with routine name prefix):
+
+```cpp
+int ErrStat2 = 0;
+char ErrMsg2[ErrMsgLen];
+std::memset(ErrMsg2, ' ', ErrMsgLen);
+
+some_callee_c(..., &ErrStat2, ErrMsg2);
+SetErrStat(ErrStat2, ErrMsg2, ErrStat, ErrMsg, "DBEMT_RK4");
+if (*ErrStat >= AbortErrLev) return;
+```
+
+Match the Fortran source exactly for which calls get error checks — some functions skip checks on later calls (e.g., RK4 only checks the first CalcContStateDeriv call).
 
 ## View-Type INOUT Arguments
 

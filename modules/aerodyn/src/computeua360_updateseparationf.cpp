@@ -19,19 +19,10 @@
 #include <cmath>
 #include <vector>
 #include "vit_nwtc.h"
+#include "vit_fortran_intrinsics.h"
 
 // 2D column-major access: Coefs(Row, Col) in Fortran = Coefs[(Col-1)*nrows + (Row-1)] in C
 #define COEFS(row1, col1) p->Coefs[((col1)-1) * p->n_Coefs_rows + ((row1)-1)]
-
-// Fortran CSHIFT: circular shift of array by 'shift' positions
-// Positive shift moves elements left (element shift+1 becomes element 1)
-static void cshift(const double* src, double* dst, int n, int shift) {
-    // Normalize shift to [0, n)
-    shift = ((shift % n) + n) % n;
-    for (int i = 0; i < n; i++) {
-        dst[i] = src[(i + shift) % n];
-    }
-}
 
 void ComputeUA360_updateSeparationF(afi_table_type_view_t* p, int ColUAf, double* cn_cl, int n_cn_cl, int iLower, int iUpper) {
     int N = p->NumAlf;
@@ -60,20 +51,9 @@ void ComputeUA360_updateSeparationF(afi_table_type_view_t* p, int ColUAf, double
         COEFS(Row, ColUAf) = 1.0;
     }
 
-    // Fix issues if there is a second peak near 180 degrees
-    // iLowerBreak = maxloc(alpha, DIM=1, MASK=alpha <= alphaBreakLower)
-    int iLowerBreak = 1;
-    {
-        double maxAlpha = -std::numeric_limits<double>::max();
-        for (int i = 0; i < N; i++) {
-            if (p->Alpha[i] <= p->UA_BL.alphaBreakLower) {
-                if (p->Alpha[i] > maxAlpha) {
-                    maxAlpha = p->Alpha[i];
-                    iLowerBreak = i + 1;  // 1-based
-                }
-            }
-        }
-    }
+    int iLowerBreak = fortran_maxloc(N,
+        [&](int i) { return p->Alpha[i]; },
+        [&](int i) { return p->Alpha[i] <= p->UA_BL.alphaBreakLower; });
 
     // CSHIFT: circular shift alpha and f_st by iLowerBreak positions
     std::vector<double> alpha_(N);
@@ -85,8 +65,8 @@ void ComputeUA360_updateSeparationF(afi_table_type_view_t* p, int ColUAf, double
         coefs_col[i] = COEFS(i + 1, ColUAf);
     }
 
-    cshift(p->Alpha, alpha_.data(), N, iLowerBreak);
-    cshift(coefs_col.data(), f_st.data(), N, iLowerBreak);
+    fortran_cshift(p->Alpha, alpha_.data(), N, iLowerBreak);
+    fortran_cshift(coefs_col.data(), f_st.data(), N, iLowerBreak);
 
     // Fix wrapped angles
     for (int Row = 1; Row < N; Row++) {  // Row 2..N (0-based: 1..N-1)
@@ -95,33 +75,13 @@ void ComputeUA360_updateSeparationF(afi_table_type_view_t* p, int ColUAf, double
         }
     }
 
-    // iReverseFlow = maxloc(f_st, DIM=1, MASK=alpha_ > alphaBreakUpper)
-    int iReverseFlow = 1;
-    {
-        double maxF = -std::numeric_limits<double>::max();
-        for (int i = 0; i < N; i++) {
-            if (alpha_[i] > p->UA_BL.alphaBreakUpper) {
-                if (f_st[i] > maxF) {
-                    maxF = f_st[i];
-                    iReverseFlow = i + 1;  // 1-based
-                }
-            }
-        }
-    }
+    int iReverseFlow = fortran_maxloc(N,
+        [&](int i) { return f_st[i]; },
+        [&](int i) { return alpha_[i] > p->UA_BL.alphaBreakUpper; });
 
-    // iUpperBreak = minloc(alpha_, DIM=1, MASK=alpha_ >= alphaBreakUpper)
-    int iUpperBreak = 1;
-    {
-        double minAlpha = std::numeric_limits<double>::max();
-        for (int i = 0; i < N; i++) {
-            if (alpha_[i] >= p->UA_BL.alphaBreakUpper) {
-                if (alpha_[i] < minAlpha) {
-                    minAlpha = alpha_[i];
-                    iUpperBreak = i + 1;  // 1-based
-                }
-            }
-        }
-    }
+    int iUpperBreak = fortran_minloc(N,
+        [&](int i) { return alpha_[i]; },
+        [&](int i) { return alpha_[i] >= p->UA_BL.alphaBreakUpper; });
 
     // Make monotonically decreasing from single peak (backward sweep)
     // Fortran: do Row=iReverseFlow-1,iUpperBreak+1,-1
@@ -141,7 +101,7 @@ void ComputeUA360_updateSeparationF(afi_table_type_view_t* p, int ColUAf, double
 
     // Reverse CSHIFT: p%Coefs(:,ColUAf) = cshift(f_st, -iLowerBreak)
     std::vector<double> result(N);
-    cshift(f_st.data(), result.data(), N, -iLowerBreak);
+    fortran_cshift(f_st.data(), result.data(), N, -iLowerBreak);
     for (int i = 0; i < N; i++) {
         COEFS(i + 1, ColUAf) = result[i];
     }

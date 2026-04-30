@@ -3,6 +3,7 @@
 // After verification: CalculateUACoeffs kernel PASSED
 
 #include "vit_translated.h"
+#include "vit_fortran_intrinsics.h"
 
 // --- User-provided C++ implementation ---
 // VIT Translation Scaffold
@@ -79,20 +80,9 @@ void CalculateUACoeffs(afi_ua_bl_default_type_t* CalcDefaults, afi_table_type_vi
 
     p->UA_BL.UACutout_blend = std::max(0.0, std::abs(p->UA_BL.UACutout) - std::abs(p->UA_BL.UACutout_delta));
 
-    // --- Calculate based on airfoil polar ---
-    // iCdMin = minloc(Coefs(:,ColCd), DIM=1, MASK=abs(alpha) <= LimitAlphaRange)
-    int iCdMin = 1;
-    {
-        double minCd = 1e30;
-        for (int i = 0; i < N; i++) {
-            if (std::abs(p->Alpha[i]) <= LimitAlphaRange) {
-                if (COEFS(i+1, ColCd) < minCd) {
-                    minCd = COEFS(i+1, ColCd);
-                    iCdMin = i + 1; // 1-based
-                }
-            }
-        }
-    }
+    int iCdMin = fortran_minloc(N,
+        [&](int i) { return COEFS(i+1, ColCd); },
+        [&](int i) { return std::abs(p->Alpha[i]) <= LimitAlphaRange; });
 
     // Check for circular/constant polar
     double maxCd = -1e30, minCd2 = 1e30, maxCl = -1e30;
@@ -167,19 +157,13 @@ void CalculateUACoeffs(afi_ua_bl_default_type_t* CalcDefaults, afi_table_type_vi
 
 
         // Find bounding indices for LimitAlphaRange
-        // iHighLimit = min(maxloc(alpha_, DIM=1, MASK=alpha_ < LimitAlphaRange) + 1, size(alpha_))
-        iHighLimit = 1;
-        for (int i = 0; i < Nm1; i++) {
-            if (alpha_[i] < LimitAlphaRange) iHighLimit = i + 1;
-        }
-        iHighLimit = std::min(iHighLimit + 1, Nm1);
+        iHighLimit = std::min(fortran_maxloc(Nm1,
+            [&](int i) { return alpha_[i]; },
+            [&](int i) { return alpha_[i] < LimitAlphaRange; }) + 1, Nm1);
 
-        // iLowLimit = max(minloc(alpha_, DIM=1, MASK=alpha_ > -LimitAlphaRange) - 1, 1)
-        iLowLimit = Nm1;
-        for (int i = 0; i < Nm1; i++) {
-            if (alpha_[i] > -LimitAlphaRange) { iLowLimit = i + 1; break; }
-        }
-        iLowLimit = std::max(iLowLimit - 1, 1);
+        iLowLimit = std::max(fortran_minloc(Nm1,
+            [&](int i) { return alpha_[i]; },
+            [&](int i) { return alpha_[i] > -LimitAlphaRange; }) - 1, 1);
 
         if (iHighLimit - iLowLimit < 3) iHighLimit = std::min(iLowLimit + 2, Nm1);
         if (iHighLimit - iLowLimit < 3) iLowLimit = std::max(iHighLimit - 2, 1);
@@ -285,20 +269,9 @@ void CalculateUACoeffs(afi_ua_bl_default_type_t* CalcDefaults, afi_table_type_vi
 
         // --- alpha1 ---
         if (CalcDefaults->alpha1) {
-            // iGuess = max(1, minloc(alpha, DIM=1, MASK=alpha >= alphaUpper AND Coefs(:,ColUAf) <= fAtCriticalCn))
-            iGuess = 1;
-            {
-                double minAlpha = 1e30;
-                for (int i = 0; i < N; i++) {
-                    if (p->Alpha[i] >= p->UA_BL.alphaUpper && COEFS(i+1, ColUAf) <= fAtCriticalCn) {
-                        if (p->Alpha[i] < minAlpha) {
-                            minAlpha = p->Alpha[i];
-                            iGuess = i + 1;
-                        }
-                    }
-                }
-            }
-            iGuess = std::max(1, iGuess);
+            iGuess = std::max(1, fortran_minloc(N,
+                [&](int i) { return p->Alpha[i]; },
+                [&](int i) { return p->Alpha[i] >= p->UA_BL.alphaUpper && COEFS(i+1, ColUAf) <= fAtCriticalCn; }));
 
             // fZeros(p%alpha(iUpper:), fAtCriticalCn - p%Coefs(iUpper:,ColUAf), roots, nRoots)
             int slice_n = N - iUpper + 1;
@@ -325,19 +298,9 @@ void CalculateUACoeffs(afi_ua_bl_default_type_t* CalcDefaults, afi_table_type_vi
 
         // --- alpha2 ---
         if (CalcDefaults->alpha2) {
-            // iGuess = maxloc(alpha, DIM=1, MASK=alpha <= alphaLower AND Coefs(:,ColUAf) <= fAtCriticalCn)
-            iGuess = 1;
-            {
-                double maxAlpha = -1e30;
-                for (int i = 0; i < N; i++) {
-                    if (p->Alpha[i] <= p->UA_BL.alphaLower && COEFS(i+1, ColUAf) <= fAtCriticalCn) {
-                        if (p->Alpha[i] > maxAlpha) {
-                            maxAlpha = p->Alpha[i];
-                            iGuess = i + 1;
-                        }
-                    }
-                }
-            }
+            iGuess = fortran_maxloc(N,
+                [&](int i) { return p->Alpha[i]; },
+                [&](int i) { return p->Alpha[i] <= p->UA_BL.alphaLower && COEFS(i+1, ColUAf) <= fAtCriticalCn; });
 
             // fZeros(p%alpha(:iLower), fAtCriticalCn - p%Coefs(:iLower,ColUAf), roots, nRoots)
             int slice_n = iLower;
