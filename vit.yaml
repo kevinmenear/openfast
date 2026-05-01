@@ -144,7 +144,10 @@ translations:
   DBEMT_ReInit:
     status: integrated
     cpp_file: translations/DBEMT/dbemt_reinit.cpp
-    verification: custom-test
+    cases_passed: 4
+    cases_total: 4
+    cases_skipped: 0
+    kernel_dir: kernel/DBEMT_ReInit
 types:
   AFI_ParameterType:
     strategy: view

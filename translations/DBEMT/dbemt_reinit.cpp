@@ -58,9 +58,3 @@ void DBEMT_ReInit(dbemt_parametertype_view_t* p, dbemt_continuousstatetype_view_
 
     m->FirstWarn_tau1 = 1;
 }
-
-extern "C" {
-    void dbemt_reinit_c(dbemt_parametertype_view_t* p, dbemt_continuousstatetype_view_t* x, dbemt_otherstatetype_view_t* OtherState, dbemt_miscvartype_t* m) {
-        DBEMT_ReInit(p, x, OtherState, m);
-    }
-}
