@@ -109,9 +109,7 @@ integrate DBEMT_UpdateStates        $T/dbemt_updatestates.cpp        $F90 --reve
 integrate DBEMT_InitStates_AllNodes $T/dbemt_initstates_allnodes.cpp $F90 --reverse-copy
 integrate DBEMT_ValidateInitInp    $T/dbemt_validateinitinp.cpp    $F90
 integrate DBEMT_ReInit             $T/dbemt_reinit.cpp             $F90 --reverse-copy
-# DBEMT_Init has a hand-written wrapper (handles INTENT(OUT) allocation).
-# Its wrapper is committed in DBEMT.f90 and restored by git checkout in Step 1.
-# Do NOT add vit integrate for DBEMT_Init — the standard wrapper would break.
+integrate DBEMT_Init               $T/dbemt_init.cpp               $F90 --reverse-copy --auto-allocate
 
 # -----------------------------------------------------------------------
 # Step 3: Restore committed .cpp files

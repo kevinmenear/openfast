@@ -303,8 +303,11 @@ private
 !! The initial states and initial guess for the input are defined.
     SUBROUTINE DBEMT_Init(InitInp, u, p, x, OtherState, m, Interval, InitOut, ErrStat, ErrMsg)
         USE ISO_C_BINDING
-        USE vit_dbemt_initinputtype_view, ONLY: dbemt_initinputtype_view_t, vit_populate_dbemt_initinputtype
+        USE vit_dbemt_initinputtype_view, ONLY: dbemt_initinputtype_view_t, vit_populate_dbemt_initinputtype, vit_copy_scalars_to_dbemt_initinputtype
+        USE vit_dbemt_inputtype_view, ONLY: dbemt_inputtype_view_t, vit_populate_dbemt_inputtype, vit_copy_scalars_to_dbemt_inputtype
         USE vit_dbemt_parametertype_view, ONLY: dbemt_parametertype_view_t, vit_populate_dbemt_parametertype, vit_copy_scalars_to_dbemt_parametertype
+        USE vit_dbemt_continuousstatetype_view, ONLY: dbemt_continuousstatetype_view_t, vit_populate_dbemt_continuousstatetype, vit_copy_scalars_to_dbemt_continuousstatetype
+        USE vit_dbemt_otherstatetype_view, ONLY: dbemt_otherstatetype_view_t, vit_populate_dbemt_otherstatetype, vit_copy_scalars_to_dbemt_otherstatetype
         IMPLICIT NONE
         TYPE(DBEMT_INITINPUTTYPE), INTENT(IN), TARGET :: InitInp
         TYPE(DBEMT_INPUTTYPE), INTENT(OUT), TARGET :: u
@@ -317,73 +320,75 @@ private
         INTEGER(4), INTENT(OUT) :: ErrStat
         CHARACTER(*), INTENT(OUT) :: ErrMsg
         CHARACTER(KIND=C_CHAR) :: ErrMsg_c(LEN(ErrMsg))
-        INTEGER :: vit_i_ErrMsg, i
+        INTEGER :: vit_i_ErrMsg
+        TYPE(dbemt_initinputtype_view_t), TARGET :: InitInp_view
+        TYPE(dbemt_inputtype_view_t), TARGET :: u_view
+        TYPE(dbemt_parametertype_view_t), TARGET :: p_view
+        TYPE(dbemt_continuousstatetype_view_t), TARGET :: x_view
+        TYPE(dbemt_otherstatetype_view_t), TARGET :: OtherState_view
         INTEGER(4) :: ErrStat2
         CHARACTER(ErrMsgLen) :: ErrMsg2
-        TYPE(dbemt_initinputtype_view_t), TARGET :: InitInp_view
-        TYPE(dbemt_parametertype_view_t), TARGET :: p_view
-
-        ErrStat = ErrID_None
-        ErrMsg = ""
-        InitOut%Ver = ProgDesc('DBEMT', '', '')
-
-        CALL DBEMT_ValidateInitInp(Interval, InitInp, ErrStat2, ErrMsg2)
-        CALL SetErrStat(ErrStat2, ErrMsg2, ErrStat, ErrMsg, 'DBEMT_Init')
-        IF (ErrStat >= AbortErrLev) RETURN
-
+        CHARACTER(*), PARAMETER :: RoutineName = 'DBEMT_Init'
+        INTEGER :: vit_alloc_i
+        ! --- Pre-allocate arrays (auto-extracted from Fortran source) ---
         ALLOCATE(u%element(InitInp%numNodes, InitInp%numBlades), STAT=ErrStat2)
         IF (ErrStat2 /= 0) THEN
-            CALL SetErrStat(ErrID_Fatal, " Error allocating u%element.", ErrStat, ErrMsg, 'DBEMT_Init')
+            CALL SetErrStat(ErrID_Fatal, " Error allocating u%element.", ErrStat, ErrMsg, RoutineName)
             RETURN
         END IF
-
         IF (InitInp%DBEMT_Mod == DBEMT_tauConst .OR. InitInp%DBEMT_Mod == DBEMT_cont_tauConst) THEN
-            ALLOCATE(p%spanRatio(InitInp%numNodes, InitInp%numBlades), STAT=ErrStat2)
-            IF (ErrStat2 /= 0) THEN
-                CALL SetErrStat(ErrID_Fatal, " Error allocating p%spanRatio.  ", ErrStat, ErrMsg, 'DBEMT_Init')
-                RETURN
-            END IF
+        ALLOCATE(p%spanRatio(InitInp%numNodes, InitInp%numBlades), STAT=ErrStat2)
+        IF (ErrStat2 /= 0) THEN
+            CALL SetErrStat(ErrID_Fatal, " Error allocating p%spanRatio.  ", ErrStat, ErrMsg, RoutineName)
+            RETURN
         END IF
-
+        END IF
         ALLOCATE(x%element(InitInp%numNodes, InitInp%numBlades), STAT=ErrStat2)
         IF (ErrStat2 /= 0) THEN
-            CALL SetErrStat(ErrID_Fatal, " Error allocating x%element.  ", ErrStat, ErrMsg, 'DBEMT_Init')
+            CALL SetErrStat(ErrID_Fatal, " Error allocating x%element.  ", ErrStat, ErrMsg, RoutineName)
             RETURN
         END IF
-
         IF (InitInp%DBEMT_Mod == DBEMT_cont_tauConst) THEN
-            ALLOCATE(OtherState%n(InitInp%numNodes, InitInp%numBlades), STAT=ErrStat2)
-            IF (ErrStat2 /= 0) THEN
-                CALL SetErrStat(ErrID_Fatal, " Error allocating OtherState%n.", ErrStat, ErrMsg, 'DBEMT_Init')
-                RETURN
-            END IF
-            DO i = 1, SIZE(OtherState%xdot)
-                CALL DBEMT_CopyContState(x, OtherState%xdot(i), MESH_NEWCOPY, ErrStat2, ErrMsg2)
-                IF (ErrStat2 /= 0) THEN
-                    CALL SetErrStat(ErrID_Fatal, " Error allocating OtherState%xdot.", ErrStat, ErrMsg, 'DBEMT_Init')
-                    RETURN
-                END IF
-            END DO
+        ALLOCATE(OtherState%n(InitInp%numNodes, InitInp%numBlades), STAT=ErrStat2)
+        IF (ErrStat2 /= 0) THEN
+            CALL SetErrStat(ErrID_Fatal, " Error allocating OtherState%n.", ErrStat, ErrMsg, RoutineName)
+            RETURN
         END IF
-
+        END IF
         ALLOCATE(OtherState%areStatesInitialized(InitInp%numNodes, InitInp%numBlades), STAT=ErrStat2)
         IF (ErrStat2 /= 0) THEN
-            CALL SetErrStat(ErrID_Fatal, " Error allocating OtherState%areStatesInitialized.  ", ErrStat, ErrMsg, 'DBEMT_Init')
+            CALL SetErrStat(ErrID_Fatal, " Error allocating OtherState%areStatesInitialized.  ", ErrStat, ErrMsg, RoutineName)
             RETURN
         END IF
-
+        IF (InitInp%DBEMT_Mod == DBEMT_cont_tauConst) THEN
+        DO vit_alloc_i = 1, SIZE(OtherState%xdot)
+        CALL DBEMT_CopyContState(x, OtherState%xdot(vit_alloc_i), MESH_NEWCOPY, ErrStat2, ErrMsg2)
+        END DO
+            IF (ErrStat2 /= 0) THEN
+                CALL SetErrStat(ErrID_Fatal, "Error in DBEMT_CopyContState.", ErrStat, ErrMsg, RoutineName)
+                RETURN
+            END IF
+        END IF
+        ! Populate view structs from Fortran types
         CALL vit_populate_dbemt_initinputtype(InitInp, InitInp_view)
+        CALL vit_populate_dbemt_inputtype(u, u_view)
         CALL vit_populate_dbemt_parametertype(p, p_view)
+        CALL vit_populate_dbemt_continuousstatetype(x, x_view)
+        CALL vit_populate_dbemt_otherstatetype(OtherState, OtherState_view)
+        ! Convert CHARACTER args to C_CHAR arrays
         DO vit_i_ErrMsg = 1, LEN(ErrMsg)
             ErrMsg_c(vit_i_ErrMsg) = ErrMsg(vit_i_ErrMsg:vit_i_ErrMsg)
         END DO
-        CALL dbemt_init_c(C_LOC(InitInp_view), C_LOC(u), C_LOC(p_view), C_LOC(x), C_LOC(OtherState), C_LOC(m), Interval, ErrStat, ErrMsg_c)
+        CALL dbemt_init_c(C_LOC(InitInp_view), C_LOC(u_view), C_LOC(p_view), C_LOC(x_view), C_LOC(OtherState_view), C_LOC(m), Interval, ErrStat, ErrMsg_c)
+        ! Copy C_CHAR arrays back to CHARACTER args (INTENT OUT/INOUT)
         DO vit_i_ErrMsg = 1, LEN(ErrMsg)
             ErrMsg(vit_i_ErrMsg:vit_i_ErrMsg) = ErrMsg_c(vit_i_ErrMsg)
         END DO
+        ! Copy modified scalars back from view to Fortran type
+        CALL vit_copy_scalars_to_dbemt_inputtype(u_view, u)
         CALL vit_copy_scalars_to_dbemt_parametertype(p_view, p)
-
-        CALL DBEMT_ReInit(p, x, OtherState, m)
+        CALL vit_copy_scalars_to_dbemt_continuousstatetype(x_view, x)
+        CALL vit_copy_scalars_to_dbemt_otherstatetype(OtherState_view, OtherState)
     END SUBROUTINE DBEMT_Init
 
 !..................................................................................................................................
