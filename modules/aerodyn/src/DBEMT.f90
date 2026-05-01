@@ -252,6 +252,23 @@ private
         END SUBROUTINE dbemt_reinit_c
     END INTERFACE
 
+
+    ! Auto-generated interface for C++ implementation of DBEMT_Init
+    INTERFACE
+        SUBROUTINE dbemt_init_c(InitInp, u, p, x, OtherState, m, Interval, ErrStat, ErrMsg) BIND(C, NAME='dbemt_init_c')
+            USE ISO_C_BINDING
+            TYPE(C_PTR), VALUE :: InitInp
+            TYPE(C_PTR), VALUE :: u
+            TYPE(C_PTR), VALUE :: p
+            TYPE(C_PTR), VALUE :: x
+            TYPE(C_PTR), VALUE :: OtherState
+            TYPE(C_PTR), VALUE :: m
+            REAL(C_DOUBLE), VALUE :: Interval
+            INTEGER(C_INT), INTENT(OUT) :: ErrStat
+            CHARACTER(KIND=C_CHAR), INTENT(OUT) :: ErrMsg(*)
+        END SUBROUTINE dbemt_init_c
+    END INTERFACE
+
    contains
    
    
@@ -284,133 +301,90 @@ private
 !> This routine is called at the start of the simulation to perform initialization steps.
 !! The parameters are set here and not changed during the simulation.
 !! The initial states and initial guess for the input are defined.
-subroutine DBEMT_Init( InitInp, u, p, x, OtherState, m, Interval, InitOut, ErrStat, ErrMsg )
-!..................................................................................................................................
+    SUBROUTINE DBEMT_Init(InitInp, u, p, x, OtherState, m, Interval, InitOut, ErrStat, ErrMsg)
+        USE ISO_C_BINDING
+        USE vit_dbemt_initinputtype_view, ONLY: dbemt_initinputtype_view_t, vit_populate_dbemt_initinputtype
+        USE vit_dbemt_parametertype_view, ONLY: dbemt_parametertype_view_t, vit_populate_dbemt_parametertype, vit_copy_scalars_to_dbemt_parametertype
+        IMPLICIT NONE
+        TYPE(DBEMT_INITINPUTTYPE), INTENT(IN), TARGET :: InitInp
+        TYPE(DBEMT_INPUTTYPE), INTENT(OUT), TARGET :: u
+        TYPE(DBEMT_PARAMETERTYPE), INTENT(OUT), TARGET :: p
+        TYPE(DBEMT_CONTINUOUSSTATETYPE), INTENT(OUT), TARGET :: x
+        TYPE(DBEMT_OTHERSTATETYPE), INTENT(OUT), TARGET :: OtherState
+        TYPE(DBEMT_MISCVARTYPE), INTENT(OUT), TARGET :: m
+        REAL(8), INTENT(IN) :: Interval
+        TYPE(DBEMT_INITOUTPUTTYPE), INTENT(OUT) :: InitOut
+        INTEGER(4), INTENT(OUT) :: ErrStat
+        CHARACTER(*), INTENT(OUT) :: ErrMsg
+        CHARACTER(KIND=C_CHAR) :: ErrMsg_c(LEN(ErrMsg))
+        INTEGER :: vit_i_ErrMsg, i
+        INTEGER(4) :: ErrStat2
+        CHARACTER(ErrMsgLen) :: ErrMsg2
+        TYPE(dbemt_initinputtype_view_t), TARGET :: InitInp_view
+        TYPE(dbemt_parametertype_view_t), TARGET :: p_view
 
-   type(DBEMT_InitInputType),       intent(in   ) :: InitInp       !< Input data for initialization routine
-   type(DBEMT_InputType),           intent(  out) :: u             !< An initial guess for the input; input mesh must be defined
-   type(DBEMT_ParameterType),       intent(  out) :: p             !< Parameters
-   type(DBEMT_ContinuousStateType), intent(  out) :: x             !< Initial continuous states
-   type(DBEMT_OtherStateType),      intent(  out) :: OtherState    !< Initial other/logical states
-   type(DBEMT_MiscVarType),         intent(  out) :: m             !< Initial misc/optimization variables
-   real(DbKi),                      intent(in   ) :: interval      !< Coupling interval in seconds: the rate that
-                                                                   !!   (1) DBEMT_UpdateStates() is called in loose coupling &
-                                                                   !!   (2) DBEMT_UpdateDiscState() is called in tight coupling.
-                                                                   !!   Input is the suggested time from the glue code;
-                                                                   !!   Output is the actual coupling interval that will be used
-                                                                   !!   by the glue code.
-   type(DBEMT_InitOutputType),      intent(  out) :: InitOut       !< Output for initialization routine
-   integer(IntKi),                  intent(  out) :: errStat       !< Error status of the operation
-   character(*),                    intent(  out) :: errMsg        !< Error message if ErrStat /= ErrID_None
-   
-   
-     ! Local variables
-   integer(IntKi)                              :: i,j             ! loop counter
-   real(ReKi)                                  :: rTip          ! Maximum tip radius for all blades 
-   integer(IntKi)                              :: errStat2      ! temporary error status of the operation
-   character(ErrMsgLen)                        :: errMsg2       ! temporary error message 
-   character(*), parameter                     :: RoutineName = 'DBEMT_Init'
-   
-   
-   
-      ! Initialize variables for this routine
+        ErrStat = ErrID_None
+        ErrMsg = ""
+        InitOut%Ver = ProgDesc('DBEMT', '', '')
 
-   errStat = ErrID_None
-   errMsg  = ""
-   
-      ! initialize InitOut to avoid compiler warnings
-   InitOut%Ver = ProgDesc( 'DBEMT', '', '' ) 
-   
-   
-  !if (p%DBEMT_Mod == DBEMT_none) return  ! DBEMT is turned off.
-   
-      ! Validate the Initialization inputs
-   call DBEMT_ValidateInitInp(interval, InitInp, errStat2, errMsg2)
-      call SetErrStat( errStat2, errMsg2, ErrStat, ErrMsg, RoutineName)
-      if (errStat >= AbortErrLev) return
-      
-      ! Set parameter data using the initialization inputs
-   
-   p%DBEMT_Mod  = InitInp%DBEMT_Mod
-   
-   
-   p%dt = interval
-   p%numBlades  = InitInp%numBlades
-   p%numNodes   = InitInp%numNodes
-   p%k_0ye      = 0.6_ReKi
-   !>>>>> bjj: these are unused:
-   !p%c5         = 1.1_ReKi
-   !p%c6         = 1.0_ReKi
-   !p%c7         = 1.3_ReKi
-   !p%c8         = 0.39_ReKi
-   !p%c9         = 0.26_ReKi
-   !<<<<<<
-   p%tau1_const = InitInp%tau1_const  ! Default = 0.33_ReKi
-   
-   allocate(u%element(p%numNodes, p%numBlades), stat=ErrStat2)
-      if (ErrStat2 /= 0 ) then
-         call SetErrStat( ErrID_Fatal, " Error allocating u%element.", ErrStat, ErrMsg, RoutineName)
-         return
-      end if
+        CALL DBEMT_ValidateInitInp(Interval, InitInp, ErrStat2, ErrMsg2)
+        CALL SetErrStat(ErrStat2, ErrMsg2, ErrStat, ErrMsg, 'DBEMT_Init')
+        IF (ErrStat >= AbortErrLev) RETURN
 
-   if (p%DBEMT_Mod == DBEMT_tauConst .or. p%DBEMT_Mod == DBEMT_cont_tauConst) then
-      ! DBEMT_Mod = 1 and 3 use constant tau1 and tau2
-      allocate( p%spanRatio(p%numNodes, p%numBlades), STAT=ErrStat2)
-      if (ErrStat2 /= 0 ) then
-         call SetErrStat( ErrID_Fatal, " Error allocating p%spanRatio.  ", ErrStat, ErrMsg, RoutineName)
-         return
-      end if
-         ! compute the largest tip radius of all blades
-      rTip = 0.0_ReKi
-      do j = 1,p%numBlades
-         do i= 1,p%numNodes
-            rTip = max(rTip, InitInp%rlocal(i,j))
-         end do
-      end do
-      
-      do j = 1,p%numBlades
-         do i= 1,p%numNodes
-            p%spanRatio(i,j) = InitInp%rlocal(i,j)/rTip  ! normalized radial distance from center of rotation to node
-         end do
-      end do
-   end if
-   
-      ! Initialize the continuous states
-   allocate( x%element(p%numNodes, p%numBlades), STAT=ErrStat2) ! This is the axial and tangential induced velocity at node i on blade j
-      if (ErrStat2 /= 0 ) then
-         call SetErrStat( ErrID_Fatal, " Error allocating x%element.  ", ErrStat, ErrMsg, RoutineName)
-         return
-      end if
+        ALLOCATE(u%element(InitInp%numNodes, InitInp%numBlades), STAT=ErrStat2)
+        IF (ErrStat2 /= 0) THEN
+            CALL SetErrStat(ErrID_Fatal, " Error allocating u%element.", ErrStat, ErrMsg, 'DBEMT_Init')
+            RETURN
+        END IF
 
-   if (p%DBEMT_Mod == DBEMT_cont_tauConst) then
-      allocate( OtherState%n(p%numNodes, p%numBlades), STAT=ErrStat2)
-         if (ErrStat2 /= 0 ) then
-            call SetErrStat( ErrID_Fatal, " Error allocating OtherState%n.", ErrStat, ErrMsg, RoutineName)
-            return
-         end if
-         
-      do i=1,size(OtherState%xdot)
-         call DBEMT_CopyContState( x, OtherState%xdot(i), MESH_NEWCOPY, ErrStat2, ErrMsg2 )
-            if (ErrStat2 /= 0 ) then
-               call SetErrStat( ErrID_Fatal, " Error allocating OtherState%xdot.", ErrStat, ErrMsg, RoutineName)
-               return
-            end if
-      end do
+        IF (InitInp%DBEMT_Mod == DBEMT_tauConst .OR. InitInp%DBEMT_Mod == DBEMT_cont_tauConst) THEN
+            ALLOCATE(p%spanRatio(InitInp%numNodes, InitInp%numBlades), STAT=ErrStat2)
+            IF (ErrStat2 /= 0) THEN
+                CALL SetErrStat(ErrID_Fatal, " Error allocating p%spanRatio.  ", ErrStat, ErrMsg, 'DBEMT_Init')
+                RETURN
+            END IF
+        END IF
 
-      p%lin_nx = p%numNodes*p%numBlades*4 ! vind and vind_1
-   else
-      p%lin_nx = 0
-   end if
+        ALLOCATE(x%element(InitInp%numNodes, InitInp%numBlades), STAT=ErrStat2)
+        IF (ErrStat2 /= 0) THEN
+            CALL SetErrStat(ErrID_Fatal, " Error allocating x%element.  ", ErrStat, ErrMsg, 'DBEMT_Init')
+            RETURN
+        END IF
 
-   allocate( OtherState%areStatesInitialized(p%numNodes, p%numBlades), STAT=ErrStat2)
-      if (ErrStat2 /= 0 ) then
-         call SetErrStat( ErrID_Fatal, " Error allocating OtherState%areStatesInitialized.  ", ErrStat, ErrMsg, RoutineName)
-         return
-      end if
-   
-   call DBEMT_ReInit(p, x,OtherState,m)
-      
-end subroutine DBEMT_Init
+        IF (InitInp%DBEMT_Mod == DBEMT_cont_tauConst) THEN
+            ALLOCATE(OtherState%n(InitInp%numNodes, InitInp%numBlades), STAT=ErrStat2)
+            IF (ErrStat2 /= 0) THEN
+                CALL SetErrStat(ErrID_Fatal, " Error allocating OtherState%n.", ErrStat, ErrMsg, 'DBEMT_Init')
+                RETURN
+            END IF
+            DO i = 1, SIZE(OtherState%xdot)
+                CALL DBEMT_CopyContState(x, OtherState%xdot(i), MESH_NEWCOPY, ErrStat2, ErrMsg2)
+                IF (ErrStat2 /= 0) THEN
+                    CALL SetErrStat(ErrID_Fatal, " Error allocating OtherState%xdot.", ErrStat, ErrMsg, 'DBEMT_Init')
+                    RETURN
+                END IF
+            END DO
+        END IF
+
+        ALLOCATE(OtherState%areStatesInitialized(InitInp%numNodes, InitInp%numBlades), STAT=ErrStat2)
+        IF (ErrStat2 /= 0) THEN
+            CALL SetErrStat(ErrID_Fatal, " Error allocating OtherState%areStatesInitialized.  ", ErrStat, ErrMsg, 'DBEMT_Init')
+            RETURN
+        END IF
+
+        CALL vit_populate_dbemt_initinputtype(InitInp, InitInp_view)
+        CALL vit_populate_dbemt_parametertype(p, p_view)
+        DO vit_i_ErrMsg = 1, LEN(ErrMsg)
+            ErrMsg_c(vit_i_ErrMsg) = ErrMsg(vit_i_ErrMsg:vit_i_ErrMsg)
+        END DO
+        CALL dbemt_init_c(C_LOC(InitInp_view), C_LOC(u), C_LOC(p_view), C_LOC(x), C_LOC(OtherState), C_LOC(m), Interval, ErrStat, ErrMsg_c)
+        DO vit_i_ErrMsg = 1, LEN(ErrMsg)
+            ErrMsg(vit_i_ErrMsg:vit_i_ErrMsg) = ErrMsg_c(vit_i_ErrMsg)
+        END DO
+        CALL vit_copy_scalars_to_dbemt_parametertype(p_view, p)
+
+        CALL DBEMT_ReInit(p, x, OtherState, m)
+    END SUBROUTINE DBEMT_Init
 
 !..................................................................................................................................
     SUBROUTINE DBEMT_ReInit(p, x, OtherState, m)

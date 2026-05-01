@@ -112,6 +112,7 @@ add_library(aerodynlib STATIC
   src/vit_dbemt_initinputtype_view.f90
   src/dbemt_validateinitinp.cpp
   src/dbemt_reinit.cpp
+  src/dbemt_init.cpp
 )
 # Prevent vectorization changes when function bodies are replaced by C++ wrappers.
 # Replacing a module-internal function with a wrapper call changes the loop body size,

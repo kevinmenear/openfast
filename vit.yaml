@@ -144,10 +144,14 @@ translations:
   DBEMT_ReInit:
     status: integrated
     cpp_file: translations/DBEMT/dbemt_reinit.cpp
-    cases_passed: 4
-    cases_total: 4
+    verification: simulation
+  DBEMT_Init:
+    status: integrated
+    cpp_file: translations/DBEMT/dbemt_init.cpp
+    cases_passed: 3
+    cases_total: 3
     cases_skipped: 0
-    kernel_dir: kernel/DBEMT_ReInit
+    kernel_dir: kernel/DBEMT_Init
 types:
   AFI_ParameterType:
     strategy: view

@@ -50,6 +50,7 @@ git checkout HEAD -- modules/aerodyn/src/dbemt_updatestates.cpp
 git checkout HEAD -- modules/aerodyn/src/dbemt_initstates_allnodes.cpp
 git checkout HEAD -- modules/aerodyn/src/dbemt_validateinitinp.cpp
 git checkout HEAD -- modules/aerodyn/src/dbemt_reinit.cpp
+git checkout HEAD -- modules/aerodyn/src/dbemt_init.cpp
 git checkout HEAD -- modules/aerodyn/src/vit_bridge_extrapinterp.f90
 git checkout HEAD -- modules/aerodyn/src/vit_afi_parametertype_view.f90
 git checkout HEAD -- modules/aerodyn/src/vit_afi_table_type_view.f90
@@ -108,6 +109,9 @@ integrate DBEMT_UpdateStates        $T/dbemt_updatestates.cpp        $F90 --reve
 integrate DBEMT_InitStates_AllNodes $T/dbemt_initstates_allnodes.cpp $F90 --reverse-copy
 integrate DBEMT_ValidateInitInp    $T/dbemt_validateinitinp.cpp    $F90
 integrate DBEMT_ReInit             $T/dbemt_reinit.cpp             $F90 --reverse-copy
+# DBEMT_Init has a hand-written wrapper (handles INTENT(OUT) allocation).
+# Its wrapper is committed in DBEMT.f90 and restored by git checkout in Step 1.
+# Do NOT add vit integrate for DBEMT_Init — the standard wrapper would break.
 
 # -----------------------------------------------------------------------
 # Step 3: Restore committed .cpp files
@@ -147,7 +151,8 @@ git checkout HEAD -- \
     modules/aerodyn/src/dbemt_updatestates.cpp \
     modules/aerodyn/src/dbemt_initstates_allnodes.cpp \
     modules/aerodyn/src/dbemt_validateinitinp.cpp \
-    modules/aerodyn/src/dbemt_reinit.cpp
+    modules/aerodyn/src/dbemt_reinit.cpp \
+    modules/aerodyn/src/dbemt_init.cpp
 echo "  Done"
 
 # -----------------------------------------------------------------------
