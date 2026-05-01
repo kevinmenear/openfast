@@ -18,7 +18,8 @@ All translations should `#include "vit_nwtc.h"` for NWTC Library functions and c
 
 **Constants:** `Pi`, `TwoPi`, `PiBy2`, `D2R`, `R2D`, `ErrMsgLen`, `ErrID_None`, `ErrID_Warn`, `ErrID_Severe`, `ErrID_Fatal`, `AbortErrLev`
 
-**Functions (12 total):**
+**Functions (13 total):**
+- `SetErrStat(errStatLcl, errMsgLcl, errStat*, errMsg*, routineName)` — accumulate errors from callee calls (keeps highest severity, concatenates messages)
 - `EqualRealNos(a, b)` — epsilon-based floating-point comparison
 - `fZeros(x, f, n, roots, roots_size, nZeros, ...)` — zero-crossing finder
 - `InterpExtrapStp(XVal, XAry, YAry, Ind, AryLen)` — linear interpolation with stepping (Ind is 1-based)
