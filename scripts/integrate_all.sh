@@ -50,7 +50,6 @@ git checkout HEAD -- modules/aerodyn/src/dbemt_updatestates.cpp
 git checkout HEAD -- modules/aerodyn/src/dbemt_initstates_allnodes.cpp
 git checkout HEAD -- modules/aerodyn/src/dbemt_validateinitinp.cpp
 git checkout HEAD -- modules/aerodyn/src/dbemt_reinit.cpp
-git checkout HEAD -- modules/aerodyn/src/dbemt_init.cpp
 git checkout HEAD -- modules/aerodyn/src/vit_bridge_extrapinterp.f90
 git checkout HEAD -- modules/aerodyn/src/vit_afi_parametertype_view.f90
 git checkout HEAD -- modules/aerodyn/src/vit_afi_table_type_view.f90
@@ -88,9 +87,9 @@ integrate AFI_ValidateInitInput             $T/afi_validateinitinput.cpp        
 integrate AFI_ComputeAirfoilCoefs           $T/afi_computeairfoilcoefs.cpp            $F90
 integrate AFI_ComputeUACoefs                $T/afi_computeuacoefs.cpp                 $F90
 
-# Hand-integrated functions (AFI_Init, ReadAFfile, AFI_WrHeader,
-# AFI_WrData, AFI_WrTables) are already in the committed
-# AirfoilInfo.f90 restored in Step 1.
+# Hand-integrated functions (ReadAFfile, AFI_WrHeader, AFI_WrData,
+# AFI_WrTables) are already in the committed AirfoilInfo.f90
+# restored in Step 1. AFI_Init stays in Fortran (not translated).
 
 # -----------------------------------------------------------------------
 # Step 2b: Integrate DBEMT leaf functions
@@ -109,7 +108,6 @@ integrate DBEMT_UpdateStates        $T/dbemt_updatestates.cpp        $F90 --reve
 integrate DBEMT_InitStates_AllNodes $T/dbemt_initstates_allnodes.cpp $F90 --reverse-copy
 integrate DBEMT_ValidateInitInp    $T/dbemt_validateinitinp.cpp    $F90
 integrate DBEMT_ReInit             $T/dbemt_reinit.cpp             $F90 --reverse-copy
-integrate DBEMT_Init               $T/dbemt_init.cpp               $F90 --reverse-copy --auto-allocate
 
 # -----------------------------------------------------------------------
 # Step 3: Restore committed .cpp files
@@ -134,7 +132,6 @@ git checkout HEAD -- \
     modules/aerodyn/src/afi_computeairfoilcoefs.cpp \
     modules/aerodyn/src/afi_computeuacoefs.cpp \
     modules/aerodyn/src/readaffile.cpp \
-    modules/aerodyn/src/afi_init.cpp \
     modules/aerodyn/src/afi_wrheader.cpp \
     modules/aerodyn/src/afi_wrdata.cpp \
     modules/aerodyn/src/afi_wrtables.cpp \
@@ -149,8 +146,7 @@ git checkout HEAD -- \
     modules/aerodyn/src/dbemt_updatestates.cpp \
     modules/aerodyn/src/dbemt_initstates_allnodes.cpp \
     modules/aerodyn/src/dbemt_validateinitinp.cpp \
-    modules/aerodyn/src/dbemt_reinit.cpp \
-    modules/aerodyn/src/dbemt_init.cpp
+    modules/aerodyn/src/dbemt_reinit.cpp
 echo "  Done"
 
 # -----------------------------------------------------------------------

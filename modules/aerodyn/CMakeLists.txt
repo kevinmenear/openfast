@@ -55,7 +55,6 @@ add_library(basicaerolib STATIC
   src/afi_computeairfoilcoefs.cpp
   src/afi_computeuacoefs.cpp
   src/readaffile.cpp
-  src/afi_init.cpp
   src/afi_wrheader.cpp
   src/afi_wrdata.cpp
   src/afi_wrtables.cpp
@@ -112,7 +111,6 @@ add_library(aerodynlib STATIC
   src/vit_dbemt_initinputtype_view.f90
   src/dbemt_validateinitinp.cpp
   src/dbemt_reinit.cpp
-  src/dbemt_init.cpp
 )
 # Prevent vectorization changes when function bodies are replaced by C++ wrappers.
 # Replacing a module-internal function with a wrapper call changes the loop body size,

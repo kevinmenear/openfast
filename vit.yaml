@@ -86,10 +86,6 @@ translations:
     status: integrated
     cpp_file: translations/AirfoilInfo/readaffile.cpp
     verification: simulation
-  AFI_Init:
-    status: integrated
-    cpp_file: translations/AirfoilInfo/afi_init.cpp
-    verification: simulation
   AFI_WrHeader:
     status: integrated
     cpp_file: translations/AirfoilInfo/afi_wrheader.cpp
@@ -145,13 +141,6 @@ translations:
     status: integrated
     cpp_file: translations/DBEMT/dbemt_reinit.cpp
     verification: simulation
-  DBEMT_Init:
-    status: integrated
-    cpp_file: translations/DBEMT/dbemt_init.cpp
-    cases_passed: 3
-    cases_total: 3
-    cases_skipped: 0
-    kernel_dir: kernel/DBEMT_Init
 types:
   AFI_ParameterType:
     strategy: view
