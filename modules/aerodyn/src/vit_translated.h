@@ -46,6 +46,7 @@ void dbemt_ab4_c(int i, int j, double t, int n, dbemt_elementinputtype_t* u, int
 void dbemt_abm4_c(int i, int j, double t, int n, dbemt_elementinputtype_t* u, int n_u, double* utimes, int n_utimes, dbemt_parametertype_view_t* p, dbemt_continuousstatetype_view_t* x, dbemt_otherstatetype_view_t* OtherState, dbemt_miscvartype_t* m, int* ErrStat, char* ErrMsg);
 void dbemt_updatestates_c(int i, int j, double t, int n, dbemt_inputtype_view_t* u, int n_u, double* uTimes, dbemt_parametertype_view_t* p, dbemt_continuousstatetype_view_t* x, dbemt_otherstatetype_view_t* OtherState, dbemt_miscvartype_t* m, int* errStat, char* errMsg);
 void dbemt_initstates_allnodes_c(dbemt_inputtype_view_t* u, dbemt_parametertype_view_t* p, dbemt_continuousstatetype_view_t* x, dbemt_otherstatetype_view_t* OtherState);
+void dbemt_validateinitinp_c(double interval, dbemt_initinputtype_view_t* InitInp, int* errStat, char* errMsg);
 
 #ifdef __cplusplus
 }

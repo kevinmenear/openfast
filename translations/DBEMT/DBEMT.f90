@@ -46,6 +46,7 @@ private
 
    public :: DBEMT_ReInit
    public :: DBEMT_InitStates_AllNodes
+   PUBLIC :: DBEMT_ValidateInitInp
 
 
     ! Auto-generated interface for C++ implementation of ComputeTau2

@@ -138,6 +138,10 @@ translations:
     status: integrated
     cpp_file: translations/DBEMT/dbemt_initstates_allnodes.cpp
     verification: test-validate
+  DBEMT_ValidateInitInp:
+    status: integrated
+    cpp_file: translations/DBEMT/dbemt_validateinitinp.cpp
+    verification: test-validate
 types:
   AFI_ParameterType:
     strategy: view
@@ -150,6 +154,8 @@ types:
   DBEMT_ContinuousStateType:
     strategy: view
   DBEMT_OtherStateType:
+    strategy: view
+  DBEMT_InitInputType:
     strategy: view
 shared_files:
 - modules/aerodyn/src/vit_nwtc.h
