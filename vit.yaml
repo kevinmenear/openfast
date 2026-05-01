@@ -137,11 +137,14 @@ translations:
   DBEMT_InitStates_AllNodes:
     status: integrated
     cpp_file: translations/DBEMT/dbemt_initstates_allnodes.cpp
-    verification: test-validate
+    verification: simulation
   DBEMT_ValidateInitInp:
     status: integrated
     cpp_file: translations/DBEMT/dbemt_validateinitinp.cpp
-    verification: test-validate
+  DBEMT_ReInit:
+    status: integrated
+    cpp_file: translations/DBEMT/dbemt_reinit.cpp
+    verification: custom-test
 types:
   AFI_ParameterType:
     strategy: view

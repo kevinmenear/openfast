@@ -240,6 +240,18 @@ private
         END SUBROUTINE dbemt_validateinitinp_c
     END INTERFACE
 
+
+    ! Auto-generated interface for C++ implementation of DBEMT_ReInit
+    INTERFACE
+        SUBROUTINE dbemt_reinit_c(p, x, OtherState, m) BIND(C, NAME='dbemt_reinit_c')
+            USE ISO_C_BINDING
+            TYPE(C_PTR), VALUE :: p
+            TYPE(C_PTR), VALUE :: x
+            TYPE(C_PTR), VALUE :: OtherState
+            TYPE(C_PTR), VALUE :: m
+        END SUBROUTINE dbemt_reinit_c
+    END INTERFACE
+
    contains
    
    
@@ -401,51 +413,28 @@ subroutine DBEMT_Init( InitInp, u, p, x, OtherState, m, Interval, InitOut, ErrSt
 end subroutine DBEMT_Init
 
 !..................................................................................................................................
-subroutine DBEMT_ReInit( p, x, OtherState, m )
-
-   type(DBEMT_ParameterType),       intent(in   ) :: p             !< parameters
-   type(DBEMT_ContinuousStateType), intent(inout) :: x             !< Initial continuous states
-   type(DBEMT_OtherStateType),      intent(inout) :: OtherState    !< Initial other/logical states
-   type(DBEMT_MiscVarType),         intent(inout) :: m             !< Initial misc/optimization variables
-
-   integer                                        :: i
-   integer                                        :: j
-   integer                                        :: n
-   integer(IntKi)                                 :: ErrStat2
-   character(ErrMsgLen)                           :: ErrMsg2
-   
-      ! Initialize variables for this routine
-
-   do j=1,size(x%element,2)
-      do i=1,size(x%element,1)
-         x%element(i,j)%vind     = 0.0_ReKi  ! Dynamic induced velocities
-         x%element(i,j)%vind_1   = 0.0_ReKi  ! Reduced induced velocities
-      end do
-   end do
-
-   OtherState%areStatesInitialized = .false.
-   
-   if (p%DBEMT_Mod == DBEMT_tauConst .or. p%DBEMT_Mod == DBEMT_cont_tauConst) then
-      OtherState%tau1  = p%tau1_const
-   else
-      OtherState%tau1  = 0.0_ReKi
-   end if
-   
-   if (allocated(OtherState%n)) then
-      OtherState%n = -1
-   
-      do n=1,size(OtherState%xdot)
-         do j=1,size(x%element,2)
-            do i=1,size(x%element,1)
-               call DBEMT_CopyElementContinuousStateType( x%element(i,j), OtherState%xdot(n)%element(i,j), MESH_UPDATECOPY, ErrStat2, ErrMsg2)
-            end do
-         end do
-      end do
-   end if
-   
-   m%FirstWarn_tau1 = .true.
-
-end subroutine DBEMT_ReInit
+    SUBROUTINE DBEMT_ReInit(p, x, OtherState, m)
+        USE ISO_C_BINDING
+        USE vit_dbemt_parametertype_view, ONLY: dbemt_parametertype_view_t, vit_populate_dbemt_parametertype, vit_copy_scalars_to_dbemt_parametertype
+        USE vit_dbemt_continuousstatetype_view, ONLY: dbemt_continuousstatetype_view_t, vit_populate_dbemt_continuousstatetype, vit_copy_scalars_to_dbemt_continuousstatetype
+        USE vit_dbemt_otherstatetype_view, ONLY: dbemt_otherstatetype_view_t, vit_populate_dbemt_otherstatetype, vit_copy_scalars_to_dbemt_otherstatetype
+        IMPLICIT NONE
+        TYPE(DBEMT_PARAMETERTYPE), INTENT(IN), TARGET :: p
+        TYPE(DBEMT_CONTINUOUSSTATETYPE), INTENT(INOUT), TARGET :: x
+        TYPE(DBEMT_OTHERSTATETYPE), INTENT(INOUT), TARGET :: OtherState
+        TYPE(DBEMT_MISCVARTYPE), INTENT(INOUT), TARGET :: m
+        TYPE(dbemt_parametertype_view_t), TARGET :: p_view
+        TYPE(dbemt_continuousstatetype_view_t), TARGET :: x_view
+        TYPE(dbemt_otherstatetype_view_t), TARGET :: OtherState_view
+        ! Populate view structs from Fortran types
+        CALL vit_populate_dbemt_parametertype(p, p_view)
+        CALL vit_populate_dbemt_continuousstatetype(x, x_view)
+        CALL vit_populate_dbemt_otherstatetype(OtherState, OtherState_view)
+        CALL dbemt_reinit_c(C_LOC(p_view), C_LOC(x_view), C_LOC(OtherState_view), C_LOC(m))
+        ! Copy modified scalars back from view to Fortran type
+        CALL vit_copy_scalars_to_dbemt_continuousstatetype(x_view, x)
+        CALL vit_copy_scalars_to_dbemt_otherstatetype(OtherState_view, OtherState)
+    END SUBROUTINE DBEMT_ReInit
 !!----------------------------------------------------------------------------------------------------------------------------------
 !> routine to initialize the states based on inputs
     SUBROUTINE DBEMT_InitStates_AllNodes(u, p, x, OtherState)
