@@ -52,6 +52,8 @@ add_library(basicaerolib STATIC
   src/computeua360_attachedflow.cpp
   src/calculateuacoeffs.cpp
   src/afi_validateinitinput.cpp
+  src/afi_init.cpp
+  src/checkvaluesareuniquemonotonicincreasing.cpp
   src/afi_computeairfoilcoefs.cpp
   src/afi_computeuacoefs.cpp
   src/readaffile.cpp

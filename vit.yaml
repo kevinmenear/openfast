@@ -73,6 +73,10 @@ translations:
   AFI_ComputeAirfoilCoefs:
     status: integrated
     cpp_file: translations/AirfoilInfo/afi_computeairfoilcoefs.cpp
+  AFI_Init:
+    status: integrated
+    cpp_file: translations/AirfoilInfo/afi_init.cpp
+    verification: simulation
   AFI_ComputeUACoefs:
     status: integrated
     cpp_file: translations/AirfoilInfo/afi_computeuacoefs.cpp

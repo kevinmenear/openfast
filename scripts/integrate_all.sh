@@ -88,8 +88,10 @@ integrate AFI_ComputeAirfoilCoefs           $T/afi_computeairfoilcoefs.cpp      
 integrate AFI_ComputeUACoefs                $T/afi_computeuacoefs.cpp                 $F90
 
 # Hand-integrated functions (ReadAFfile, AFI_WrHeader, AFI_WrData,
-# AFI_WrTables) are already in the committed AirfoilInfo.f90
-# restored in Step 1. AFI_Init stays in Fortran (not translated).
+# AFI_WrTables, AFI_Init) live in the committed AirfoilInfo.f90 restored in
+# Step 1; their .cpp (incl. afi_init.cpp and the standalone CheckValues unit)
+# are restored in Step 3. AFI_Init is a hand-written two-pass special case
+# (dev note 202607240452); DBEMT_Init remains Fortran.
 
 # -----------------------------------------------------------------------
 # Step 2b: Integrate DBEMT leaf functions
@@ -135,6 +137,8 @@ git checkout HEAD -- \
     modules/aerodyn/src/afi_wrheader.cpp \
     modules/aerodyn/src/afi_wrdata.cpp \
     modules/aerodyn/src/afi_wrtables.cpp \
+    modules/aerodyn/src/afi_init.cpp \
+    modules/aerodyn/src/checkvaluesareuniquemonotonicincreasing.cpp \
     modules/aerodyn/src/computetau2.cpp \
     modules/aerodyn/src/computetau1.cpp \
     modules/aerodyn/src/dbemt_initstates.cpp \
