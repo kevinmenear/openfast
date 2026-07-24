@@ -81,11 +81,11 @@ translations:
     status: integrated
     cpp_file: translations/AirfoilInfo/afi_computeuacoefs.cpp
   CheckValuesAreUniqueMonotonicIncreasing:
-    status: verified
+    status: integrated
     cpp_file: translations/AirfoilInfo/checkvaluesareuniquemonotonicincreasing.cpp
     verification: test-validate
-    note: inlined as static helper in afi_init.cpp; original Fortran remains in AirfoilInfo.f90
-      for external callers
+    note: standalone compiled build unit (in CMakeLists); called from afi_init.cpp pass1.
+      Re-verified 11/11 test-validate 2026-07-24. Fortran body kept in AirfoilInfo.f90.
   ReadAFfile:
     status: integrated
     cpp_file: translations/AirfoilInfo/readaffile.cpp
