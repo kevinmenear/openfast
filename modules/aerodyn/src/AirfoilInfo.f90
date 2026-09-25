@@ -240,6 +240,36 @@ MODULE AirfoilInfo
         END SUBROUTINE afi_computeairfoilcoefs_c
     END INTERFACE
 
+
+    ! Auto-generated interface for C++ implementation of ReadAFfile
+    INTERFACE
+        SUBROUTINE readaffile_c(InitInp, NumCoefsIn, p, ErrStat, ErrMsg, len_ErrMsg, UnEc) BIND(C, NAME='readaffile_c')
+            USE ISO_C_BINDING
+            TYPE(C_PTR), VALUE :: InitInp
+            INTEGER(C_INT), VALUE :: NumCoefsIn
+            TYPE(C_PTR), VALUE :: p
+            INTEGER(C_INT), INTENT(OUT) :: ErrStat
+            CHARACTER(KIND=C_CHAR), INTENT(OUT) :: ErrMsg(*)
+            INTEGER(C_INT), VALUE :: len_ErrMsg
+            INTEGER(C_INT), VALUE :: UnEc
+        END SUBROUTINE readaffile_c
+    END INTERFACE
+
+
+    ! Auto-generated interface for C++ implementation of AFI_Init
+    INTERFACE
+        SUBROUTINE afi_init_c(InitInput, p, ErrStat, ErrMsg, len_ErrMsg, has_UnEcho, UnEcho) BIND(C, NAME='afi_init_c')
+            USE ISO_C_BINDING
+            TYPE(C_PTR), VALUE :: InitInput
+            TYPE(C_PTR), VALUE :: p
+            INTEGER(C_INT), INTENT(OUT) :: ErrStat
+            CHARACTER(KIND=C_CHAR), INTENT(OUT) :: ErrMsg(*)
+            INTEGER(C_INT), VALUE :: len_ErrMsg
+            INTEGER(C_INT), VALUE :: has_UnEcho
+            INTEGER(C_INT), VALUE :: UnEcho
+        END SUBROUTINE afi_init_c
+    END INTERFACE
+
 CONTAINS
 
 
@@ -264,192 +294,50 @@ CONTAINS
    end function CheckValuesAreUniqueMonotonicIncreasing
    
    !=============================================================================
-   SUBROUTINE AFI_Init ( InitInput, p, ErrStat, ErrMsg, UnEcho )
-      ! C++ wrapper: two-pass multi-table validation + spline initialization
-      USE ISO_C_BINDING
-      USE vit_afi_parametertype_view, ONLY: afi_parametertype_view_t, &
-          vit_populate_afi_parametertype, vit_copy_scalars_to_afi_parametertype
-      USE vit_afi_table_type_view, ONLY: afi_table_type_view_t, vit_copy_scalars_to_afi_table_type
-      IMPLICIT NONE
+    SUBROUTINE AFI_Init(InitInput, p, ErrStat, ErrMsg, UnEcho)
+        USE ISO_C_BINDING
+        USE vit_afi_parametertype_view, ONLY: afi_parametertype_view_t, &
+            vit_populate_afi_parametertype, &
+            vit_snapshot_afi_parametertype, &
+            vit_adopt_afi_parametertype, &
+            vit_copy_scalars_to_afi_parametertype
+        IMPLICIT NONE
+        TYPE(AFI_INITINPUTTYPE), INTENT(IN), TARGET :: InitInput
+        TYPE(AFI_PARAMETERTYPE), INTENT(OUT), TARGET :: p
+        INTEGER(4), INTENT(OUT) :: ErrStat
+        INTEGER, INTENT(IN), OPTIONAL :: UnEcho
+        CHARACTER(*), INTENT(OUT) :: ErrMsg
+        CHARACTER(KIND=C_CHAR) :: ErrMsg_c(LEN(ErrMsg))
+        INTEGER :: vit_i_ErrMsg
+        TYPE(afi_parametertype_view_t), TARGET :: p_view
+        TYPE(afi_parametertype_view_t) :: p_snap   ! pre-call copy, for vit_adopt
 
-      ! --- Arguments (unchanged from original) ---
-      INTEGER(IntKi), INTENT(OUT)               :: ErrStat
-      INTEGER, INTENT(IN), OPTIONAL             :: UnEcho
-      CHARACTER(*), INTENT(OUT)                 :: ErrMsg
-      TYPE (AFI_InitInputType), INTENT(IN   )   :: InitInput
-      TYPE (AFI_ParameterType), INTENT(  OUT)   :: p
+        ! Local variables for OPTIONAL args
+        INTEGER(C_INT) :: has_UnEcho_flag
+        INTEGER(C_INT) :: UnEcho_val
 
-      ! --- BIND(C) mirror of AFI_InitInputType ---
-      TYPE, BIND(C) :: afi_initinput_c_t
-          CHARACTER(KIND=C_CHAR) :: FileName(1024)
-          INTEGER(C_INT) :: AFTabMod
-          INTEGER(C_INT) :: InCol_Alfa
-          INTEGER(C_INT) :: InCol_Cl
-          INTEGER(C_INT) :: InCol_Cd
-          INTEGER(C_INT) :: InCol_Cm
-          INTEGER(C_INT) :: InCol_Cpmin
-          INTEGER(C_INT) :: UAMod
-      END TYPE afi_initinput_c_t
-
-      ! --- C function interfaces ---
-      INTERFACE
-          SUBROUTINE afi_init_pass1_c(InitInp, p, n_secondVals_out, secondVals_buf, &
-                                       spline_dim1_out, spline_dim2_out, errStat, errMsg) BIND(C)
-              USE ISO_C_BINDING
-              TYPE(C_PTR), VALUE :: InitInp
-              TYPE(C_PTR), VALUE :: p
-              TYPE(C_PTR), VALUE :: n_secondVals_out
-              TYPE(C_PTR), VALUE :: secondVals_buf
-              TYPE(C_PTR), VALUE :: spline_dim1_out
-              TYPE(C_PTR), VALUE :: spline_dim2_out
-              TYPE(C_PTR), VALUE :: errStat
-              TYPE(C_PTR), VALUE :: errMsg
-          END SUBROUTINE afi_init_pass1_c
-          SUBROUTINE afi_init_pass2_c(p, secondVals_buf, n_secondVals, errStat, errMsg) BIND(C)
-              USE ISO_C_BINDING
-              TYPE(C_PTR), VALUE :: p
-              TYPE(C_PTR), VALUE :: secondVals_buf
-              INTEGER(C_INT), VALUE :: n_secondVals
-              TYPE(C_PTR), VALUE :: errStat
-              TYPE(C_PTR), VALUE :: errMsg
-          END SUBROUTINE afi_init_pass2_c
-      END INTERFACE
-
-      ! --- Local variables ---
-      TYPE(afi_parametertype_view_t), TARGET :: p_view
-      TYPE(afi_initinput_c_t), TARGET :: initinp_c
-      INTEGER(C_INT), TARGET :: c_errStat
-      CHARACTER(KIND=C_CHAR), TARGET :: c_errMsg(ErrMsgLen)
-      INTEGER(C_INT), TARGET :: n_secondVals
-      REAL(C_DOUBLE), TARGET :: secondVals_buf(100)
-      INTEGER(C_INT), TARGET :: spline_dim1(100)
-      INTEGER(C_INT), TARGET :: spline_dim2(100)
-      INTEGER :: iTable, i, UnEc, NumCoefs
-      INTEGER :: ErrStat2
-      CHARACTER(ErrMsgLen) :: ErrMsg2
-      CHARACTER(*), PARAMETER :: RoutineName = 'AFI_Init'
-      TYPE(afi_table_type_view_t), POINTER :: table_views(:)
-
-      ErrStat = ErrID_None
-      ErrMsg  = ""
-
-      p%FileName = InitInput%FileName
-
-      ! --- Validate inputs ---
-      CALL AFI_ValidateInitInput(InitInput, ErrStat2, ErrMsg2)
-         CALL SetErrStat(ErrStat2, ErrMsg2, ErrStat, ErrMsg, RoutineName)
-         IF (ErrStat >= AbortErrLev) RETURN
-
-      ! --- Handle OPTIONAL UnEcho ---
-      IF (PRESENT(UnEcho)) THEN
-         UnEc = UnEcho
-      ELSE
-         UnEc = -1
-      END IF
-
-      ! --- Set AFTabMod before ReadAFfile ---
-      p%AFTabMod = InitInput%AFTabMod
-
-      ! --- Compute NumCoefs for ReadAFfile ---
-      ! (Column index logic replicated here since ReadAFfile needs NumCoefs)
-      p%ColCl    = 1
-      p%ColCd    = 2
-      p%ColCm    = 0
-      p%ColCpmin = 0
-      p%ColUAf   = 0
-      IF (InitInput%InCol_Cm > 0) THEN
-         p%ColCm = 3
-         IF (InitInput%InCol_Cpmin > 0) THEN
-            p%ColCpmin = 4
-         END IF
-      ELSE IF (InitInput%InCol_Cpmin > 0) THEN
-         p%ColCpmin = 3
-      END IF
-      NumCoefs = MAX(p%ColCd, p%ColCm, p%ColCpmin)
-
-      ! --- Echo header ---
-      IF (UnEc > 0) THEN
-         WRITE (UnEc,'("--",/,A)') 'Contents of "'//TRIM(InitInput%FileName)//'":'
-      END IF
-
-      ! --- Read airfoil file (existing two-pass wrapper) ---
-      CALL ReadAFfile(InitInput, NumCoefs, p, ErrStat2, ErrMsg2, UnEc)
-         CALL SetErrStat(ErrStat2, ErrMsg2, ErrStat, ErrMsg, RoutineName)
-         IF (ErrStat >= AbortErrLev) RETURN
-
-      ! --- Pack InitInput for C++ ---
-      DO i = 1, 1024
-          initinp_c%FileName(i) = InitInput%FileName(i:i)
-      END DO
-      initinp_c%AFTabMod   = INT(InitInput%AFTabMod, C_INT)
-      initinp_c%InCol_Alfa = INT(InitInput%InCol_Alfa, C_INT)
-      initinp_c%InCol_Cl   = INT(InitInput%InCol_Cl, C_INT)
-      initinp_c%InCol_Cd   = INT(InitInput%InCol_Cd, C_INT)
-      initinp_c%InCol_Cm   = INT(InitInput%InCol_Cm, C_INT)
-      initinp_c%InCol_Cpmin = INT(InitInput%InCol_Cpmin, C_INT)
-      initinp_c%UAMod      = 0
-
-      ! --- Populate view with ReadAFfile results ---
-      CALL vit_populate_afi_parametertype(p, p_view)
-
-      ! --- Pass 1: Column setup + multi-table validation ---
-      CALL afi_init_pass1_c(C_LOC(initinp_c), C_LOC(p_view), &
-                            C_LOC(n_secondVals), C_LOC(secondVals_buf), &
-                            C_LOC(spline_dim1), C_LOC(spline_dim2), &
-                            C_LOC(c_errStat), C_LOC(c_errMsg))
-
-      ErrStat2 = INT(c_errStat, IntKi)
-      DO i = 1, MIN(LEN(ErrMsg2), ErrMsgLen)
-          ErrMsg2(i:i) = c_errMsg(i)
-      END DO
-      CALL SetErrStat(ErrStat2, ErrMsg2, ErrStat, ErrMsg, RoutineName)
-      IF (ErrStat >= AbortErrLev) RETURN
-
-      ! --- Copy modified scalars back from view ---
-      CALL vit_copy_scalars_to_afi_parametertype(p_view, p)
-      CALL C_F_POINTER(p_view%Table, table_views, [p%NumTabs])
-      DO iTable = 1, p%NumTabs
-          CALL vit_copy_scalars_to_afi_table_type(table_views(iTable), p%Table(iTable))
-      END DO
-
-      ! --- Allocate secondVals if needed ---
-      IF (n_secondVals > 0) THEN
-          ALLOCATE(p%secondVals(n_secondVals), STAT=ErrStat2)
-          IF (ErrStat2 /= 0) THEN
-              CALL SetErrStat(ErrID_Fatal, 'Error allocating memory for the secondVals array.', &
-                              ErrStat, ErrMsg, RoutineName)
-              RETURN
-          END IF
-      END IF
-
-      ! --- Allocate SplineCoefs per table ---
-      DO iTable = 1, p%NumTabs
-          IF (spline_dim1(iTable) > 0) THEN
-              ALLOCATE(p%Table(iTable)%SplineCoefs(spline_dim1(iTable), &
-                       spline_dim2(iTable), 0:3), STAT=ErrStat2)
-              IF (ErrStat2 /= 0) THEN
-                  CALL SetErrStat(ErrStat2, 'Error allocating memory for the SplineCoefs array.', &
-                                  ErrStat, ErrMsg, RoutineName)
-                  RETURN
-              END IF
-          END IF
-      END DO
-
-      ! --- Re-populate view with newly allocated arrays ---
-      CALL vit_populate_afi_parametertype(p, p_view)
-
-      ! --- Pass 2: Fill secondVals + compute spline coefficients ---
-      CALL afi_init_pass2_c(C_LOC(p_view), C_LOC(secondVals_buf), &
-                            INT(n_secondVals, C_INT), &
-                            C_LOC(c_errStat), C_LOC(c_errMsg))
-
-      ErrStat2 = INT(c_errStat, IntKi)
-      DO i = 1, MIN(LEN(ErrMsg2), ErrMsgLen)
-          ErrMsg2(i:i) = c_errMsg(i)
-      END DO
-      CALL SetErrStat(ErrStat2, ErrMsg2, ErrStat, ErrMsg, RoutineName)
-
-   END SUBROUTINE AFI_Init
+        has_UnEcho_flag = 0
+        UnEcho_val = 0
+        IF (PRESENT(UnEcho)) THEN
+            has_UnEcho_flag = 1
+            UnEcho_val = UnEcho
+        END IF
+        ! Populate view structs from Fortran types
+        CALL vit_populate_afi_parametertype(p, p_view)
+        CALL vit_snapshot_afi_parametertype(p_view, p_snap)
+        ! Convert CHARACTER args to C_CHAR arrays
+        DO vit_i_ErrMsg = 1, LEN(ErrMsg)
+            ErrMsg_c(vit_i_ErrMsg) = ErrMsg(vit_i_ErrMsg:vit_i_ErrMsg)
+        END DO
+        CALL afi_init_c(C_LOC(InitInput), C_LOC(p_view), ErrStat, ErrMsg_c, LEN(ErrMsg), has_UnEcho_flag, UnEcho_val)
+        ! Copy C_CHAR arrays back to CHARACTER args (INTENT OUT/INOUT)
+        DO vit_i_ErrMsg = 1, LEN(ErrMsg)
+            ErrMsg(vit_i_ErrMsg:vit_i_ErrMsg) = ErrMsg_c(vit_i_ErrMsg)
+        END DO
+        ! Adopt ALLOCATABLE components the C++ allocated (vit_adopt_<type>)
+        CALL vit_copy_scalars_to_afi_parametertype(p_view, p)
+        CALL vit_adopt_afi_parametertype(p_view, p_snap, p)
+    END SUBROUTINE AFI_Init
 
    !=============================================================================
    !> This routine checks the init input values for AFI and makes sure they are valid
@@ -474,144 +362,41 @@ CONTAINS
     END SUBROUTINE AFI_ValidateInitInput
   
    !=============================================================================
-   SUBROUTINE ReadAFfile ( InitInp, NumCoefsIn, p, ErrStat, ErrMsg, UnEc )
-      ! C++ wrapper: two-pass idiomatic file parser
-      USE ISO_C_BINDING
-      USE vit_afi_parametertype_view, ONLY: afi_parametertype_view_t, &
-          vit_populate_afi_parametertype, vit_copy_scalars_to_afi_parametertype
-      USE vit_afi_table_type_view, ONLY: afi_table_type_view_t, vit_copy_scalars_to_afi_table_type
-      IMPLICIT NONE
-
-      ! --- Arguments (unchanged from original) ---
-      TYPE (AFI_InitInputType), INTENT(IN)    :: InitInp
-      INTEGER(IntKi),    INTENT(  OUT)        :: ErrStat
-      INTEGER(IntKi),    INTENT(IN   )        :: NumCoefsIn
-      INTEGER,           INTENT(IN)           :: UnEc
-      CHARACTER(*),      INTENT(  OUT)        :: ErrMsg
-      TYPE (AFI_ParameterType), INTENT(INOUT) :: p
-      
-      ! --- BIND(C) mirror of AFI_InitInputType ---
-      TYPE, BIND(C) :: afi_initinput_c_t
-          CHARACTER(KIND=C_CHAR) :: FileName(1024)
-          INTEGER(C_INT) :: AFTabMod
-          INTEGER(C_INT) :: InCol_Alfa
-          INTEGER(C_INT) :: InCol_Cl
-          INTEGER(C_INT) :: InCol_Cd
-          INTEGER(C_INT) :: InCol_Cm
-          INTEGER(C_INT) :: InCol_Cpmin
-          INTEGER(C_INT) :: UAMod
-      END TYPE afi_initinput_c_t
-
-      ! --- C function interfaces ---
-      INTERFACE
-          SUBROUTINE readaffile_pass1_c(InitInp, NumCoefsIn, p, numalf_out, &
-                                         ncoefstab_out, errStat, errMsg) BIND(C)
-              USE ISO_C_BINDING
-              TYPE(C_PTR), VALUE :: InitInp
-              INTEGER(C_INT), VALUE :: NumCoefsIn
-              TYPE(C_PTR), VALUE :: p
-              TYPE(C_PTR), VALUE :: numalf_out
-              TYPE(C_PTR), VALUE :: ncoefstab_out
-              TYPE(C_PTR), VALUE :: errStat
-              TYPE(C_PTR), VALUE :: errMsg
-          END SUBROUTINE readaffile_pass1_c
-          SUBROUTINE readaffile_fill_c(p, InitInp, NumCoefsIn, errStat, errMsg) BIND(C)
-              USE ISO_C_BINDING
-              TYPE(C_PTR), VALUE :: p
-              TYPE(C_PTR), VALUE :: InitInp
-              INTEGER(C_INT), VALUE :: NumCoefsIn
-              TYPE(C_PTR), VALUE :: errStat
-              TYPE(C_PTR), VALUE :: errMsg
-          END SUBROUTINE readaffile_fill_c
-      END INTERFACE
-
-      ! --- Local variables ---
-      TYPE(afi_parametertype_view_t), TARGET :: p_view
-      TYPE(afi_initinput_c_t), TARGET :: initinp_c
-      INTEGER(C_INT), TARGET :: numalf_out(100)
-      INTEGER(C_INT), TARGET :: ncoefstab_out(100)
-      INTEGER(C_INT), TARGET :: c_errStat
-      CHARACTER(KIND=C_CHAR), TARGET :: c_errMsg(ErrMsgLen)
-      INTEGER :: iTable, i
-      TYPE(afi_table_type_view_t), POINTER :: table_views(:)
-
-      ErrStat = ErrID_None
-      ErrMsg  = ""
-
-      ! --- Populate InitInp C struct ---
-      DO i = 1, 1024
-          initinp_c%FileName(i) = InitInp%FileName(i:i)
-      END DO
-      initinp_c%AFTabMod   = INT(InitInp%AFTabMod, C_INT)
-      initinp_c%InCol_Alfa = INT(InitInp%InCol_Alfa, C_INT)
-      initinp_c%InCol_Cl   = INT(InitInp%InCol_Cl, C_INT)
-      initinp_c%InCol_Cd   = INT(InitInp%InCol_Cd, C_INT)
-      initinp_c%InCol_Cm   = INT(InitInp%InCol_Cm, C_INT)
-      initinp_c%InCol_Cpmin = INT(InitInp%InCol_Cpmin, C_INT)
-      initinp_c%UAMod      = INT(InitInp%UAMod, C_INT)
-
-      ! --- Pass 1: Parse file, determine sizes ---
-      CALL readaffile_pass1_c(C_LOC(initinp_c), INT(NumCoefsIn, C_INT), &
-                              C_LOC(p_view), C_LOC(numalf_out), C_LOC(ncoefstab_out), &
-                              C_LOC(c_errStat), C_LOC(c_errMsg))
-
-      ErrStat = INT(c_errStat, IntKi)
-      ! Copy C error message back to Fortran
-      DO i = 1, MIN(LEN(ErrMsg), ErrMsgLen)
-          ErrMsg(i:i) = c_errMsg(i)
-      END DO
-      IF (ErrStat >= AbortErrLev) RETURN
-
-      ! --- Copy parsed scalars from view to Fortran p ---
-      p%InterpOrd    = INT(p_view%InterpOrd, IntKi)
-      p%RelThickness = REAL(p_view%RelThickness, ReKi)
-      p%NonDimArea   = REAL(p_view%NonDimArea, ReKi)
-      p%NumCoords    = INT(p_view%NumCoords, IntKi)
-      p%NumTabs      = INT(p_view%NumTabs, IntKi)
-      p%ColUAf       = INT(p_view%ColUAf, IntKi)
-      DO i = 1, 1024
-          p%BL_file(i:i) = p_view%BL_file(i)
-      END DO
-
-      ! --- Allocate Fortran arrays based on parsed sizes ---
-      ALLOCATE(p%Table(p%NumTabs))
-
-      IF (p%NumCoords > 0) THEN
-          ALLOCATE(p%X_Coord(p%NumCoords))
-          ALLOCATE(p%Y_Coord(p%NumCoords))
-      END IF
-
-      DO iTable = 1, p%NumTabs
-          ALLOCATE(p%Table(iTable)%Alpha(numalf_out(iTable)))
-          ALLOCATE(p%Table(iTable)%Coefs(numalf_out(iTable), ncoefstab_out(iTable)))
-          p%Table(iTable)%Coefs = 0.0_ReKi
-      END DO
-
-      ! --- Re-populate view with pointers to allocated arrays ---
-      CALL vit_populate_afi_parametertype(p, p_view)
-
-      ! --- Pass 2: Fill arrays from cache ---
-      CALL readaffile_fill_c(C_LOC(p_view), C_LOC(initinp_c), &
-                             INT(NumCoefsIn, C_INT), C_LOC(c_errStat), C_LOC(c_errMsg))
-
-      IF (INT(c_errStat, IntKi) > ErrStat) THEN
-          ErrStat = INT(c_errStat, IntKi)
-          DO i = 1, MIN(LEN(ErrMsg), ErrMsgLen)
-              ErrMsg(i:i) = c_errMsg(i)
-          END DO
-      END IF
-
-      ! --- Copy scalars back from views to Fortran types ---
-      ! Top-level scalar (ColUAf may have been modified by pass 2)
-      p%ColUAf = INT(p_view%ColUAf, IntKi)
-
-      ! Per-table scalars (Re, UserProp, NumAlf, ConstData, InclUAdata, UA_BL)
-      CALL C_F_POINTER(p_view%Table, table_views, [p%NumTabs])
-      DO iTable = 1, p%NumTabs
-          CALL vit_copy_scalars_to_afi_table_type(table_views(iTable), p%Table(iTable))
-      END DO
-
-   END SUBROUTINE ReadAFfile
+    SUBROUTINE ReadAFfile(InitInp, NumCoefsIn, p, ErrStat, ErrMsg, UnEc)
+        USE ISO_C_BINDING
+        USE vit_afi_parametertype_view, ONLY: afi_parametertype_view_t, &
+            vit_populate_afi_parametertype, &
+            vit_copy_scalars_to_afi_parametertype, &
+            vit_snapshot_afi_parametertype, &
+            vit_adopt_afi_parametertype
+        IMPLICIT NONE
+        TYPE(AFI_INITINPUTTYPE), INTENT(IN), TARGET :: InitInp
+        INTEGER(4), INTENT(IN) :: NumCoefsIn
+        TYPE(AFI_PARAMETERTYPE), INTENT(INOUT), TARGET :: p
+        INTEGER(4), INTENT(OUT) :: ErrStat
+        INTEGER, INTENT(IN) :: UnEc
+        CHARACTER(*), INTENT(OUT) :: ErrMsg
+        CHARACTER(KIND=C_CHAR) :: ErrMsg_c(LEN(ErrMsg))
+        INTEGER :: vit_i_ErrMsg
+        TYPE(afi_parametertype_view_t), TARGET :: p_view
+        TYPE(afi_parametertype_view_t) :: p_snap   ! pre-call copy, for vit_adopt
+        ! Populate view structs from Fortran types
+        CALL vit_populate_afi_parametertype(p, p_view)
+        CALL vit_snapshot_afi_parametertype(p_view, p_snap)
+        ! Convert CHARACTER args to C_CHAR arrays
+        DO vit_i_ErrMsg = 1, LEN(ErrMsg)
+            ErrMsg_c(vit_i_ErrMsg) = ErrMsg(vit_i_ErrMsg:vit_i_ErrMsg)
+        END DO
+        CALL readaffile_c(C_LOC(InitInp), NumCoefsIn, C_LOC(p_view), ErrStat, ErrMsg_c, LEN(ErrMsg), UnEc)
+        ! Copy C_CHAR arrays back to CHARACTER args (INTENT OUT/INOUT)
+        DO vit_i_ErrMsg = 1, LEN(ErrMsg)
+            ErrMsg(vit_i_ErrMsg:vit_i_ErrMsg) = ErrMsg_c(vit_i_ErrMsg)
+        END DO
+        ! Copy modified scalars back from view to Fortran type
+        CALL vit_copy_scalars_to_afi_parametertype(p_view, p)
+        ! Adopt ALLOCATABLE components the C++ allocated (vit_adopt_<type>)
+        CALL vit_adopt_afi_parametertype(p_view, p_snap, p)
+    END SUBROUTINE ReadAFfile
 !----------------------------------------------------------------------------------------------------------------------------------  
     SUBROUTINE CalculateUACoeffs(CalcDefaults, p, ColCl, ColCd, ColCm, ColUAf, UAMod)
         USE ISO_C_BINDING

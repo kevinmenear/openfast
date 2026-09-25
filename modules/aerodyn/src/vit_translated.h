@@ -49,6 +49,8 @@ void dbemt_initstates_allnodes_c(dbemt_inputtype_view_t* u, dbemt_parametertype_
 void dbemt_validateinitinp_c(double interval, dbemt_initinputtype_view_t* InitInp, int* errStat, char* errMsg);
 void dbemt_reinit_c(dbemt_parametertype_view_t* p, dbemt_continuousstatetype_view_t* x, dbemt_otherstatetype_view_t* OtherState, dbemt_miscvartype_t* m);
 void dbemt_init_c(dbemt_initinputtype_view_t* InitInp, dbemt_inputtype_view_t* u, dbemt_parametertype_view_t* p, dbemt_continuousstatetype_view_t* x, dbemt_otherstatetype_view_t* OtherState, dbemt_miscvartype_t* m, double Interval, int* ErrStat, char* ErrMsg);
+void readaffile_c(afi_initinputtype_t* InitInp, int NumCoefsIn, afi_parametertype_view_t* p, int* ErrStat, char* ErrMsg, int len_ErrMsg, int UnEc);
+void afi_init_c(afi_initinputtype_t* InitInput, afi_parametertype_view_t* p, int* ErrStat, char* ErrMsg, int len_ErrMsg, int has_UnEcho, int UnEcho);
 
 #ifdef __cplusplus
 }

@@ -4,16 +4,41 @@
 
 MODULE vit_afi_table_type_view
     USE ISO_C_BINDING
-    USE AirfoilInfo_Types, ONLY: AFI_Table_Type
+    USE ISO_FORTRAN_ENV, ONLY: ERROR_UNIT
+    USE AirfoilInfo_Types, ONLY: AFI_Table_Type, ReKi
     IMPLICIT NONE
     PRIVATE
     PUBLIC :: afi_table_type_view_t, vit_populate_afi_table_type, vit_copy_scalars_to_afi_table_type, vit_original_afi_table_type
+    PUBLIC :: vit_direct_afi_table_type, vit_view_in_afi_table_type, vit_view_out_afi_table_type
+    PUBLIC :: vit_snapshot_afi_table_type, vit_adopt_afi_table_type
+
+    INTERFACE
+        SUBROUTINE vit_c_free(p) BIND(C, NAME='free')
+            IMPORT :: C_PTR
+            TYPE(C_PTR), VALUE :: p
+        END SUBROUTINE vit_c_free
+    END INTERFACE
+
+    TYPE, BIND(C) :: vit_adopt_header_t
+        INTEGER(C_INT64_T) :: magic
+        TYPE(C_PTR) :: base
+        INTEGER(C_INT32_T) :: rank
+        INTEGER(C_INT32_T) :: lb(3)
+    END TYPE vit_adopt_header_t
+    INTEGER(C_INT64_T), PARAMETER :: VIT_ADOPT_MAGIC = INT(Z'5649544144505431', C_INT64_T)
 
     ! Kernel stash: pointer to original Fortran type, set by wrapper before calling C++.
     ! Callee bridges USE this to pass the original type to Fortran callees.
     TYPE(AFI_Table_Type), POINTER, SAVE :: vit_original_afi_table_type => NULL()
 
-    ! Nested BIND(C) mirror for TYPE(AFI_UA_BL_TYPE)
+    ! DIRECT-CALLER ORIGINAL. The stash above is set by an integration or
+    ! kernel WRAPPER before it calls the C++. A C++ caller with NO wrapper --
+    ! the differential harness calls the translation directly -- leaves it
+    ! NULL, and a callee bridge that passes it dereferences a null pointer.
+    ! This is the object the bridge points it at in that case.
+    TYPE(AFI_Table_Type), TARGET, SAVE :: vit_direct_afi_table_type
+
+    ! Nested BIND(C) mirror for TYPE(AFI_UA_BL_Type)
     TYPE, BIND(C) :: afi_ua_bl_type_view_t
         REAL(C_DOUBLE) :: alpha0 = 0
         REAL(C_DOUBLE) :: alpha1 = 0
@@ -93,7 +118,7 @@ CONTAINS
         view%NumAlf = INT(src%NumAlf, C_INT)
         view%ConstData = LOGICAL(src%ConstData, C_BOOL)
         view%InclUAdata = LOGICAL(src%InclUAdata, C_BOOL)
-        ! --- Nested TYPE(AFI_UA_BL_TYPE) UA_BL ---
+        ! --- Nested TYPE(AFI_UA_BL_Type) UA_BL ---
         view%UA_BL%alpha0 = REAL(src%UA_BL%alpha0, C_DOUBLE)
         view%UA_BL%alpha1 = REAL(src%UA_BL%alpha1, C_DOUBLE)
         view%UA_BL%alpha2 = REAL(src%UA_BL%alpha2, C_DOUBLE)
@@ -180,7 +205,7 @@ CONTAINS
         dest%NumAlf = INT(view%NumAlf, C_INT)
         dest%ConstData = view%ConstData
         dest%InclUAdata = view%InclUAdata
-        ! --- Nested TYPE(AFI_UA_BL_TYPE) UA_BL ---
+        ! --- Nested TYPE(AFI_UA_BL_Type) UA_BL ---
         dest%UA_BL%alpha0 = REAL(view%UA_BL%alpha0, C_DOUBLE)
         dest%UA_BL%alpha1 = REAL(view%UA_BL%alpha1, C_DOUBLE)
         dest%UA_BL%alpha2 = REAL(view%UA_BL%alpha2, C_DOUBLE)
@@ -227,5 +252,320 @@ CONTAINS
         dest%UA_BL%CnBreakLower = REAL(view%UA_BL%CnBreakLower, C_DOUBLE)
 
     END SUBROUTINE vit_copy_scalars_to_afi_table_type
+
+    SUBROUTINE vit_view_in_afi_table_type(view, dest)
+        ! view -> Fortran TYPE, reading the CALLER'S buffers.
+        TYPE(afi_table_type_view_t), INTENT(IN) :: view
+        TYPE(AFI_Table_Type), INTENT(INOUT) :: dest
+        REAL(ReKi), POINTER :: vit_ap_alpha(:)
+        REAL(ReKi), POINTER :: vit_ap_coefs(:,:)
+
+        ! The direct-caller conversion is not measured on these field(s):
+        !  SplineCoefs
+        ERROR STOP 'VIT: vit_view_in_afi_table_type: an unmeasured field kind; see the comment above'
+        dest%UserProp = REAL(view%UserProp, C_DOUBLE)
+        dest%Re = REAL(view%Re, C_DOUBLE)
+        dest%NumAlf = INT(view%NumAlf, C_INT)
+        dest%ConstData = view%ConstData
+        dest%InclUAdata = view%InclUAdata
+        ! --- Nested TYPE(AFI_UA_BL_Type) UA_BL ---
+        dest%UA_BL%alpha0 = REAL(view%UA_BL%alpha0, C_DOUBLE)
+        dest%UA_BL%alpha1 = REAL(view%UA_BL%alpha1, C_DOUBLE)
+        dest%UA_BL%alpha2 = REAL(view%UA_BL%alpha2, C_DOUBLE)
+        dest%UA_BL%eta_e = REAL(view%UA_BL%eta_e, C_DOUBLE)
+        dest%UA_BL%C_nalpha = REAL(view%UA_BL%C_nalpha, C_DOUBLE)
+        dest%UA_BL%C_lalpha = REAL(view%UA_BL%C_lalpha, C_DOUBLE)
+        dest%UA_BL%T_f0 = REAL(view%UA_BL%T_f0, C_DOUBLE)
+        dest%UA_BL%T_V0 = REAL(view%UA_BL%T_V0, C_DOUBLE)
+        dest%UA_BL%T_p = REAL(view%UA_BL%T_p, C_DOUBLE)
+        dest%UA_BL%T_VL = REAL(view%UA_BL%T_VL, C_DOUBLE)
+        dest%UA_BL%b1 = REAL(view%UA_BL%b1, C_DOUBLE)
+        dest%UA_BL%b2 = REAL(view%UA_BL%b2, C_DOUBLE)
+        dest%UA_BL%b5 = REAL(view%UA_BL%b5, C_DOUBLE)
+        dest%UA_BL%A1 = REAL(view%UA_BL%A1, C_DOUBLE)
+        dest%UA_BL%A2 = REAL(view%UA_BL%A2, C_DOUBLE)
+        dest%UA_BL%A5 = REAL(view%UA_BL%A5, C_DOUBLE)
+        dest%UA_BL%S1 = REAL(view%UA_BL%S1, C_DOUBLE)
+        dest%UA_BL%S2 = REAL(view%UA_BL%S2, C_DOUBLE)
+        dest%UA_BL%S3 = REAL(view%UA_BL%S3, C_DOUBLE)
+        dest%UA_BL%S4 = REAL(view%UA_BL%S4, C_DOUBLE)
+        dest%UA_BL%Cn1 = REAL(view%UA_BL%Cn1, C_DOUBLE)
+        dest%UA_BL%Cn2 = REAL(view%UA_BL%Cn2, C_DOUBLE)
+        dest%UA_BL%St_sh = REAL(view%UA_BL%St_sh, C_DOUBLE)
+        dest%UA_BL%Cd0 = REAL(view%UA_BL%Cd0, C_DOUBLE)
+        dest%UA_BL%Cm0 = REAL(view%UA_BL%Cm0, C_DOUBLE)
+        dest%UA_BL%k0 = REAL(view%UA_BL%k0, C_DOUBLE)
+        dest%UA_BL%k1 = REAL(view%UA_BL%k1, C_DOUBLE)
+        dest%UA_BL%k2 = REAL(view%UA_BL%k2, C_DOUBLE)
+        dest%UA_BL%k3 = REAL(view%UA_BL%k3, C_DOUBLE)
+        dest%UA_BL%k1_hat = REAL(view%UA_BL%k1_hat, C_DOUBLE)
+        dest%UA_BL%x_cp_bar = REAL(view%UA_BL%x_cp_bar, C_DOUBLE)
+        dest%UA_BL%UACutout = REAL(view%UA_BL%UACutout, C_DOUBLE)
+        dest%UA_BL%UACutout_delta = REAL(view%UA_BL%UACutout_delta, C_DOUBLE)
+        dest%UA_BL%UACutout_blend = REAL(view%UA_BL%UACutout_blend, C_DOUBLE)
+        dest%UA_BL%filtCutOff = REAL(view%UA_BL%filtCutOff, C_DOUBLE)
+        dest%UA_BL%alphaUpper = REAL(view%UA_BL%alphaUpper, C_DOUBLE)
+        dest%UA_BL%alphaLower = REAL(view%UA_BL%alphaLower, C_DOUBLE)
+        dest%UA_BL%c_alphaLower = REAL(view%UA_BL%c_alphaLower, C_DOUBLE)
+        dest%UA_BL%c_alphaUpper = REAL(view%UA_BL%c_alphaUpper, C_DOUBLE)
+        dest%UA_BL%alpha0ReverseFlow = REAL(view%UA_BL%alpha0ReverseFlow, C_DOUBLE)
+        dest%UA_BL%alphaBreakUpper = REAL(view%UA_BL%alphaBreakUpper, C_DOUBLE)
+        dest%UA_BL%CnBreakUpper = REAL(view%UA_BL%CnBreakUpper, C_DOUBLE)
+        dest%UA_BL%alphaBreakLower = REAL(view%UA_BL%alphaBreakLower, C_DOUBLE)
+        dest%UA_BL%CnBreakLower = REAL(view%UA_BL%CnBreakLower, C_DOUBLE)
+        IF (ALLOCATED(dest%Alpha)) DEALLOCATE(dest%Alpha)
+        IF (C_ASSOCIATED(view%Alpha) .AND. view%n_Alpha > 0) THEN
+            CALL C_F_POINTER(view%Alpha, vit_ap_alpha, [INT(view%n_Alpha)])
+            ALLOCATE(dest%Alpha(view%n_Alpha))
+            dest%Alpha = vit_ap_alpha
+        ELSE IF (view%n_Alpha == 0) THEN
+            ALLOCATE(dest%Alpha(0))   ! allocated-empty, distinct from unallocated
+        END IF
+        IF (ALLOCATED(dest%Coefs)) DEALLOCATE(dest%Coefs)
+        IF (C_ASSOCIATED(view%Coefs) .AND. view%n_Coefs_rows > 0 &
+                .AND. view%n_Coefs_cols > 0) THEN
+            CALL C_F_POINTER(view%Coefs, vit_ap_coefs, &
+                [INT(view%n_Coefs_rows), INT(view%n_Coefs_cols)])
+            ALLOCATE(dest%Coefs(view%n_Coefs_rows, view%n_Coefs_cols))
+            dest%Coefs = vit_ap_coefs
+        ELSE IF (view%n_Coefs_rows == 0 .AND. view%n_Coefs_cols == 0) THEN
+            ALLOCATE(dest%Coefs(0, 0))   ! allocated-empty, distinct from unallocated
+        END IF
+
+    END SUBROUTINE vit_view_in_afi_table_type
+
+    SUBROUTINE vit_view_out_afi_table_type(src, view)
+        ! Fortran TYPE -> view, writing INTO the caller's buffer and
+        ! leaving its pointer and capacity exactly as it supplied them.
+        TYPE(AFI_Table_Type), INTENT(IN) :: src
+        TYPE(afi_table_type_view_t), INTENT(INOUT) :: view
+        REAL(ReKi), POINTER :: vit_ap_alpha(:)
+        REAL(ReKi), POINTER :: vit_ap_coefs(:,:)
+
+        ! The direct-caller conversion is not measured on these field(s):
+        !  SplineCoefs
+        ERROR STOP 'VIT: vit_view_out_afi_table_type: an unmeasured field kind; see the comment above'
+        view%UserProp = REAL(src%UserProp, C_DOUBLE)
+        view%Re = REAL(src%Re, C_DOUBLE)
+        view%NumAlf = INT(src%NumAlf, C_INT)
+        view%ConstData = LOGICAL(src%ConstData, C_BOOL)
+        view%InclUAdata = LOGICAL(src%InclUAdata, C_BOOL)
+        ! --- Nested TYPE(AFI_UA_BL_Type) UA_BL ---
+        view%UA_BL%alpha0 = REAL(src%UA_BL%alpha0, C_DOUBLE)
+        view%UA_BL%alpha1 = REAL(src%UA_BL%alpha1, C_DOUBLE)
+        view%UA_BL%alpha2 = REAL(src%UA_BL%alpha2, C_DOUBLE)
+        view%UA_BL%eta_e = REAL(src%UA_BL%eta_e, C_DOUBLE)
+        view%UA_BL%C_nalpha = REAL(src%UA_BL%C_nalpha, C_DOUBLE)
+        view%UA_BL%C_lalpha = REAL(src%UA_BL%C_lalpha, C_DOUBLE)
+        view%UA_BL%T_f0 = REAL(src%UA_BL%T_f0, C_DOUBLE)
+        view%UA_BL%T_V0 = REAL(src%UA_BL%T_V0, C_DOUBLE)
+        view%UA_BL%T_p = REAL(src%UA_BL%T_p, C_DOUBLE)
+        view%UA_BL%T_VL = REAL(src%UA_BL%T_VL, C_DOUBLE)
+        view%UA_BL%b1 = REAL(src%UA_BL%b1, C_DOUBLE)
+        view%UA_BL%b2 = REAL(src%UA_BL%b2, C_DOUBLE)
+        view%UA_BL%b5 = REAL(src%UA_BL%b5, C_DOUBLE)
+        view%UA_BL%A1 = REAL(src%UA_BL%A1, C_DOUBLE)
+        view%UA_BL%A2 = REAL(src%UA_BL%A2, C_DOUBLE)
+        view%UA_BL%A5 = REAL(src%UA_BL%A5, C_DOUBLE)
+        view%UA_BL%S1 = REAL(src%UA_BL%S1, C_DOUBLE)
+        view%UA_BL%S2 = REAL(src%UA_BL%S2, C_DOUBLE)
+        view%UA_BL%S3 = REAL(src%UA_BL%S3, C_DOUBLE)
+        view%UA_BL%S4 = REAL(src%UA_BL%S4, C_DOUBLE)
+        view%UA_BL%Cn1 = REAL(src%UA_BL%Cn1, C_DOUBLE)
+        view%UA_BL%Cn2 = REAL(src%UA_BL%Cn2, C_DOUBLE)
+        view%UA_BL%St_sh = REAL(src%UA_BL%St_sh, C_DOUBLE)
+        view%UA_BL%Cd0 = REAL(src%UA_BL%Cd0, C_DOUBLE)
+        view%UA_BL%Cm0 = REAL(src%UA_BL%Cm0, C_DOUBLE)
+        view%UA_BL%k0 = REAL(src%UA_BL%k0, C_DOUBLE)
+        view%UA_BL%k1 = REAL(src%UA_BL%k1, C_DOUBLE)
+        view%UA_BL%k2 = REAL(src%UA_BL%k2, C_DOUBLE)
+        view%UA_BL%k3 = REAL(src%UA_BL%k3, C_DOUBLE)
+        view%UA_BL%k1_hat = REAL(src%UA_BL%k1_hat, C_DOUBLE)
+        view%UA_BL%x_cp_bar = REAL(src%UA_BL%x_cp_bar, C_DOUBLE)
+        view%UA_BL%UACutout = REAL(src%UA_BL%UACutout, C_DOUBLE)
+        view%UA_BL%UACutout_delta = REAL(src%UA_BL%UACutout_delta, C_DOUBLE)
+        view%UA_BL%UACutout_blend = REAL(src%UA_BL%UACutout_blend, C_DOUBLE)
+        view%UA_BL%filtCutOff = REAL(src%UA_BL%filtCutOff, C_DOUBLE)
+        view%UA_BL%alphaUpper = REAL(src%UA_BL%alphaUpper, C_DOUBLE)
+        view%UA_BL%alphaLower = REAL(src%UA_BL%alphaLower, C_DOUBLE)
+        view%UA_BL%c_alphaLower = REAL(src%UA_BL%c_alphaLower, C_DOUBLE)
+        view%UA_BL%c_alphaUpper = REAL(src%UA_BL%c_alphaUpper, C_DOUBLE)
+        view%UA_BL%alpha0ReverseFlow = REAL(src%UA_BL%alpha0ReverseFlow, C_DOUBLE)
+        view%UA_BL%alphaBreakUpper = REAL(src%UA_BL%alphaBreakUpper, C_DOUBLE)
+        view%UA_BL%CnBreakUpper = REAL(src%UA_BL%CnBreakUpper, C_DOUBLE)
+        view%UA_BL%alphaBreakLower = REAL(src%UA_BL%alphaBreakLower, C_DOUBLE)
+        view%UA_BL%CnBreakLower = REAL(src%UA_BL%CnBreakLower, C_DOUBLE)
+        IF (C_ASSOCIATED(view%Alpha) .AND. view%n_Alpha > 0) THEN
+            IF (ALLOCATED(src%Alpha)) THEN
+                IF (SIZE(src%Alpha) == view%n_Alpha) THEN
+                    CALL C_F_POINTER(view%Alpha, vit_ap_alpha, [INT(view%n_Alpha)])
+                    vit_ap_alpha = src%Alpha
+                ELSE
+                    WRITE(ERROR_UNIT,'(A,I0,A,I0,A)') &
+                        'VIT: AFI_Table_Type%Alpha came back at ', SIZE(src%Alpha), &
+                        ' element(s) against the ', view%n_Alpha, &
+                        ' the caller supplied; left unchanged'
+                END IF
+            END IF
+        END IF
+        IF (C_ASSOCIATED(view%Coefs) .AND. view%n_Coefs_rows > 0 &
+                .AND. view%n_Coefs_cols > 0) THEN
+            IF (ALLOCATED(src%Coefs)) THEN
+                IF (SIZE(src%Coefs, 1) == view%n_Coefs_rows .AND. &
+                    SIZE(src%Coefs, 2) == view%n_Coefs_cols) THEN
+                    CALL C_F_POINTER(view%Coefs, vit_ap_coefs, &
+                        [INT(view%n_Coefs_rows), INT(view%n_Coefs_cols)])
+                    vit_ap_coefs = src%Coefs
+                ELSE
+                    WRITE(ERROR_UNIT,'(A,I0,A,I0,A,I0,A,I0,A)') &
+                        'VIT: AFI_Table_Type%Coefs came back at ', SIZE(src%Coefs, 1), &
+                        ' x ', SIZE(src%Coefs, 2), &
+                        ' against the ', view%n_Coefs_rows, &
+                        ' x ', view%n_Coefs_cols, &
+                        ' the caller supplied; left unchanged'
+                END IF
+            END IF
+        END IF
+
+    END SUBROUTINE vit_view_out_afi_table_type
+
+    SUBROUTINE vit_snapshot_afi_table_type(view, snap)
+        ! Pre-call copy of a view, for vit_adopt_afi_table_type.
+        TYPE(afi_table_type_view_t), INTENT(IN) :: view
+        TYPE(afi_table_type_view_t), INTENT(OUT) :: snap
+
+        snap = view
+    END SUBROUTINE vit_snapshot_afi_table_type
+
+    SUBROUTINE vit_adopt_afi_table_type(view, snap, dest)
+        ! Adopt the ALLOCATABLE components a C++ translation allocated.
+        ! See view_populator._adopt_routines for the convention.
+        TYPE(afi_table_type_view_t), INTENT(IN) :: view
+        TYPE(afi_table_type_view_t), INTENT(IN) :: snap
+        TYPE(AFI_Table_Type), INTENT(INOUT) :: dest
+        LOGICAL :: vit_same
+        TYPE(vit_adopt_header_t), POINTER :: vit_h
+        REAL(ReKi), POINTER :: vit_ad_alpha(:)
+        REAL(ReKi), POINTER :: vit_ad_coefs(:,:)
+        REAL(ReKi), POINTER :: vit_ad_splinecoefs(:,:,:)
+
+        ! --- Alpha ---
+        vit_same = C_ASSOCIATED(view%Alpha, snap%Alpha)
+        IF (.NOT. C_ASSOCIATED(view%Alpha) .AND. &
+            .NOT. C_ASSOCIATED(snap%Alpha)) vit_same = .TRUE.
+        IF (.NOT. vit_same) THEN
+            IF (ALLOCATED(dest%Alpha)) DEALLOCATE(dest%Alpha)
+            IF (C_ASSOCIATED(view%Alpha)) THEN
+                IF (C_ASSOCIATED(view%Alpha, snap%Coefs)) THEN
+                    ERROR STOP 'VIT adopt: AFI_Table_Type%Alpha was set to the pre-call storage of AFI_Table_Typ' // &
+                        'e%Coefs; only a malloc buffer can be adopted'
+                END IF
+                IF (C_ASSOCIATED(view%Alpha, snap%SplineCoefs)) THEN
+                    ERROR STOP 'VIT adopt: AFI_Table_Type%Alpha was set to the pre-call storage of AFI_Table_Typ' // &
+                        'e%SplineCoefs; only a malloc buffer can be adopted'
+                END IF
+                vit_h => vit_adopt_header(view%Alpha, 1, 'AFI_Table_Type%Alpha')
+                CALL C_F_POINTER(view%Alpha, vit_ad_alpha, &
+                    [INT(view%n_Alpha)])
+                ALLOCATE(dest%Alpha( &
+                    vit_h%lb(1):vit_h%lb(1)+view%n_Alpha-1))
+                dest%Alpha = vit_ad_alpha
+                CALL vit_c_free(vit_h%base)
+            END IF
+        ELSE IF (C_ASSOCIATED(view%Alpha)) THEN
+            IF (view%n_Alpha /= snap%n_Alpha) THEN
+                ERROR STOP 'VIT adopt: AFI_Table_Type%Alpha changed extent without a new buffer; C++ cannot ' // &
+                    'resize Fortran storage in place'
+            END IF
+        END IF
+        ! --- Coefs ---
+        vit_same = C_ASSOCIATED(view%Coefs, snap%Coefs)
+        IF (.NOT. C_ASSOCIATED(view%Coefs) .AND. &
+            .NOT. C_ASSOCIATED(snap%Coefs)) vit_same = .TRUE.
+        IF (.NOT. vit_same) THEN
+            IF (ALLOCATED(dest%Coefs)) DEALLOCATE(dest%Coefs)
+            IF (C_ASSOCIATED(view%Coefs)) THEN
+                IF (C_ASSOCIATED(view%Coefs, snap%Alpha)) THEN
+                    ERROR STOP 'VIT adopt: AFI_Table_Type%Coefs was set to the pre-call storage of AFI_Table_Typ' // &
+                        'e%Alpha; only a malloc buffer can be adopted'
+                END IF
+                IF (C_ASSOCIATED(view%Coefs, snap%SplineCoefs)) THEN
+                    ERROR STOP 'VIT adopt: AFI_Table_Type%Coefs was set to the pre-call storage of AFI_Table_Typ' // &
+                        'e%SplineCoefs; only a malloc buffer can be adopted'
+                END IF
+                vit_h => vit_adopt_header(view%Coefs, 2, 'AFI_Table_Type%Coefs')
+                CALL C_F_POINTER(view%Coefs, vit_ad_coefs, &
+                    [INT(view%n_Coefs_rows), INT(view%n_Coefs_cols)])
+                ALLOCATE(dest%Coefs( &
+                    vit_h%lb(1):vit_h%lb(1)+view%n_Coefs_rows-1, &
+                    vit_h%lb(2):vit_h%lb(2)+view%n_Coefs_cols-1))
+                dest%Coefs = vit_ad_coefs
+                CALL vit_c_free(vit_h%base)
+            END IF
+        ELSE IF (C_ASSOCIATED(view%Coefs)) THEN
+            IF (view%n_Coefs_rows /= snap%n_Coefs_rows) THEN
+                ERROR STOP 'VIT adopt: AFI_Table_Type%Coefs changed extent without a new buffer; C++ cannot ' // &
+                    'resize Fortran storage in place'
+            END IF
+            IF (view%n_Coefs_cols /= snap%n_Coefs_cols) THEN
+                ERROR STOP 'VIT adopt: AFI_Table_Type%Coefs changed extent without a new buffer; C++ cannot ' // &
+                    'resize Fortran storage in place'
+            END IF
+        END IF
+        ! --- SplineCoefs ---
+        vit_same = C_ASSOCIATED(view%SplineCoefs, snap%SplineCoefs)
+        IF (.NOT. C_ASSOCIATED(view%SplineCoefs) .AND. &
+            .NOT. C_ASSOCIATED(snap%SplineCoefs)) vit_same = .TRUE.
+        IF (.NOT. vit_same) THEN
+            IF (ALLOCATED(dest%SplineCoefs)) DEALLOCATE(dest%SplineCoefs)
+            IF (C_ASSOCIATED(view%SplineCoefs)) THEN
+                IF (C_ASSOCIATED(view%SplineCoefs, snap%Alpha)) THEN
+                    ERROR STOP 'VIT adopt: AFI_Table_Type%SplineCoefs was set to the pre-call storage of AFI_Tab' // &
+                        'le_Type%Alpha; only a malloc buffer can be adopted'
+                END IF
+                IF (C_ASSOCIATED(view%SplineCoefs, snap%Coefs)) THEN
+                    ERROR STOP 'VIT adopt: AFI_Table_Type%SplineCoefs was set to the pre-call storage of AFI_Tab' // &
+                        'le_Type%Coefs; only a malloc buffer can be adopted'
+                END IF
+                vit_h => vit_adopt_header(view%SplineCoefs, 3, 'AFI_Table_Type%SplineCoefs')
+                CALL C_F_POINTER(view%SplineCoefs, vit_ad_splinecoefs, &
+                    [INT(view%n_SplineCoefs_dim1), INT(view%n_SplineCoefs_dim2), INT(view%n_SplineCoefs_dim3)])
+                ALLOCATE(dest%SplineCoefs( &
+                    vit_h%lb(1):vit_h%lb(1)+view%n_SplineCoefs_dim1-1, &
+                    vit_h%lb(2):vit_h%lb(2)+view%n_SplineCoefs_dim2-1, &
+                    vit_h%lb(3):vit_h%lb(3)+view%n_SplineCoefs_dim3-1))
+                dest%SplineCoefs = vit_ad_splinecoefs
+                CALL vit_c_free(vit_h%base)
+            END IF
+        ELSE IF (C_ASSOCIATED(view%SplineCoefs)) THEN
+            IF (view%n_SplineCoefs_dim1 /= snap%n_SplineCoefs_dim1) THEN
+                ERROR STOP 'VIT adopt: AFI_Table_Type%SplineCoefs changed extent without a new buffer; C++ c' // &
+                    'annot resize Fortran storage in place'
+            END IF
+            IF (view%n_SplineCoefs_dim2 /= snap%n_SplineCoefs_dim2) THEN
+                ERROR STOP 'VIT adopt: AFI_Table_Type%SplineCoefs changed extent without a new buffer; C++ c' // &
+                    'annot resize Fortran storage in place'
+            END IF
+            IF (view%n_SplineCoefs_dim3 /= snap%n_SplineCoefs_dim3) THEN
+                ERROR STOP 'VIT adopt: AFI_Table_Type%SplineCoefs changed extent without a new buffer; C++ c' // &
+                    'annot resize Fortran storage in place'
+            END IF
+        END IF
+    END SUBROUTINE vit_adopt_afi_table_type
+
+    FUNCTION vit_adopt_header(p, rank, what) RESULT(h)
+        ! The header vit_adopt_alloc_lb put 32 bytes in front of buffer p.
+        TYPE(C_PTR), INTENT(IN) :: p
+        INTEGER, INTENT(IN) :: rank
+        CHARACTER(*), INTENT(IN) :: what
+        TYPE(vit_adopt_header_t), POINTER :: h
+        INTEGER(C_INTPTR_T) :: a
+        a = TRANSFER(p, a) - 32_C_INTPTR_T
+        CALL C_F_POINTER(TRANSFER(a, p), h)
+        IF (h%magic /= VIT_ADOPT_MAGIC) ERROR STOP 'VIT adopt: ' // what // &
+            ' was not allocated with vit_adopt_alloc; only such a buffer can be adopted'
+        IF (h%rank /= 0 .AND. h%rank /= rank) ERROR STOP 'VIT adopt: ' // what // &
+            ' was allocated with vit_adopt_alloc_lb for a different rank'
+    END FUNCTION vit_adopt_header
 
 END MODULE vit_afi_table_type_view
