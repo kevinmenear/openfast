@@ -4,7 +4,7 @@
 # Build aerodyn_driver with gcov coverage instrumentation, run all 17 AeroDyn
 # regression test cases, and collect per-line execution counts for every source
 # file. Produces gcov JSON output that parse_gcov.py consolidates into
-# vit/analysis/aerodyn/line_coverage.json.
+# vit/docs/case-studies/aerodyn/data/line_coverage.json.
 #
 # This gives definitive "which test case exercises which call site" data —
 # eliminating guesswork when choosing test cases for KGen extraction.
@@ -23,8 +23,8 @@ BUILD_DIR="${OPENFAST_ROOT}/build-coverage"
 GCOV_OUTPUT_DIR="${BUILD_DIR}/gcov_json"
 RTEST_CASES_ROOT="${OPENFAST_ROOT}/reg_tests/r-test/modules/aerodyn"
 DRIVER="${BUILD_DIR}/modules/aerodyn/aerodyn_driver"
-PARSER="/workspace/vit/scripts/parse_gcov.py"
-OUTPUT="/workspace/vit/analysis/aerodyn/line_coverage.json"
+PARSER="/workspace/vit/docs/case-studies/aerodyn/scripts/parse_gcov.py"
+OUTPUT="/workspace/vit/docs/case-studies/aerodyn/data/line_coverage.json"
 
 REBUILD="${1:-}"
 
