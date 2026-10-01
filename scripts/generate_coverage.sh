@@ -3,7 +3,7 @@
 #
 # Build aerodyn_driver with gcov coverage instrumentation, run all 17 AeroDyn
 # regression test cases, and collect per-line execution counts for every source
-# file. Produces gcov JSON output that parse_gcov.py consolidates into
+# file. Produces gcov JSON output that `vit coverage import` consolidates into
 # vit/docs/case-studies/aerodyn/data/line_coverage.json.
 #
 # This gives definitive "which test case exercises which call site" data —
@@ -23,7 +23,6 @@ BUILD_DIR="${OPENFAST_ROOT}/build-coverage"
 GCOV_OUTPUT_DIR="${BUILD_DIR}/gcov_json"
 RTEST_CASES_ROOT="${OPENFAST_ROOT}/reg_tests/r-test/modules/aerodyn"
 DRIVER="${BUILD_DIR}/modules/aerodyn/aerodyn_driver"
-PARSER="/workspace/vit/docs/case-studies/aerodyn/scripts/parse_gcov.py"
 OUTPUT="/workspace/vit/docs/case-studies/aerodyn/data/line_coverage.json"
 
 REBUILD="${1:-}"
@@ -140,7 +139,7 @@ echo "=== Coverage collection: ${PASSED} passed, ${FAILED} failed out of ${TOTAL
 # ── Step 5: Parse into consolidated JSON ────────────────────────────────
 
 echo "=== Parsing gcov output ==="
-python3 "$PARSER" \
+vit coverage import \
     --gcov-dir "$GCOV_OUTPUT_DIR" \
     --output "$OUTPUT" \
     --source-root "$OPENFAST_ROOT"
